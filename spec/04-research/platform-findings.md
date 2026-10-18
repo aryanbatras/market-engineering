@@ -2,9 +2,60 @@
 
 Verified 2026-10-18 from vendor documentation. These replaced our assumptions. **Re-verify before building against any of them** — pricing pages move.
 
+> **Superseded 2026-10-18:** Clerk and Turso were evaluated in full below and then **rejected in favour of Supabase**. Sections 2 and 3 are retained as the record of what we verified and why we moved, not as the chosen stack. The reasoning is in section 1a and `spec/02-architecture/auth.md`.
+
 ---
 
-## Razorpay — UPI subscriptions are viable, with one open item
+## 1a. Supabase — the chosen stack
+
+Free plan, verified against vendor pricing:
+
+| Metric | Free | Pro |
+|---|---|---|
+| Projects | 2 active | Unlimited |
+| Database size | 500 MB | 8 GB (then $0.125/GB) |
+| Egress | 5 GB + 5 GB cached | 250 GB + 250 GB cached (then $0.09/GB) |
+| File storage | 1 GB | 100 GB |
+| Auth MAU | 50,000 | 100,000 (then $0.00325) |
+| Edge Function invocations | 500,000 | 2M |
+| Backups | **None** | Daily, 7-day retention |
+| Pausing | **After 7 days inactivity** | Never |
+| Price | $0 | $25/mo |
+
+Compute add-ons on top of Pro: Micro $10/mo (covered by $10 included credit), Small $15, Medium $60, Large $110. A database-only project on Micro is $25/mo total.
+
+### Why it won
+
+| Against Clerk | |
+|---|---|
+| Auth + database in one service | One dependency, one pool, one dashboard |
+| Cheaper at the paid tier | Pro $25 covers both; Clerk Pro $25 + Turso Developer $5.99 = $30.99 |
+| Better backups on Pro | Daily backups with 7-day retention, vs Clerk's 1-day application logs |
+| **RLS is a real security boundary** | The browser holds an anon key and the database enforces access even if we ship a bug |
+
+| Against Turso | |
+|---|---|
+| Postgres, not SQLite | jsonb is genuinely better for our document shape; mature ecosystem |
+| No hard block on breach | Overage is billed on Pro instead of the database being disabled |
+| Far more recognisable | Founder decision: the stack has to read as credible to a reviewer |
+
+### ⚠️ What is worse, and what we do about it
+
+**Free projects pause after 7 days of inactivity.** The first request after waking has significant latency.
+
+This is the worst failure mode in the product: a recruiter opens a student's link after six months and the site hangs. Our users are students, so engagement is seasonal by nature.
+
+**Structural mitigation:** public portfolio reads come from CDN cache and never touch the database. The most important route is insulated. What remains exposed is the builder and dashboard, where a pause costs an editing session rather than a first impression — and it costs one paying customer to fix by moving to Pro.
+
+**We are not implementing a heartbeat** to prevent pausing. It burns compute indefinitely and works against the platform's intent. The fix is Pro, and R1 already tells us when that happens.
+
+**5 GB egress is the tightest budget in the system.** At ~40 KB per render that is ~125,000 uncached portfolio views per month against a 500,000 target. The public route must read from cache on hit. Non-negotiable.
+
+**500 MB database with no backups.** ~25,000 portfolios. Export-on-demand caps the damage; Pro closes it.
+
+---
+
+## 1b. Razorpay — UPI subscriptions are viable, with one open item
 
 **Supported on Razorpay Subscriptions:** Cards (Visa, Mastercard, RuPay), UPI Autopay, eMandate (eNACH).
 
@@ -29,7 +80,7 @@ Razorpay's Subscriptions FAQ labels UPI as **"early access"** and states *"we wi
 
 ---
 
-## Clerk — free tier is 50,000 retained users, and billing is unusable for us
+### Clerk detail — why we moved away
 
 **Hobby (free):**
 - **50,000 monthly retained users per app**, unlimited applications
@@ -58,7 +109,7 @@ We are using Razorpay. Therefore **Clerk Billing cannot be used.** Entitlements 
 
 ---
 
-## Turso — hard blocks on breach, and the row math is tight
+### Turso detail — why we moved away
 
 **Free plan:**
 
@@ -115,13 +166,14 @@ Relevant to R12 and the public route. `unstable_cache` / `use cache` with tagged
 
 ---
 
-## Cost summary at hobby tier
+## Stack, decided
 
-| Service | Free tier | Our headroom |
+| Concern | Choice | Evaluated and rejected |
 |---|---|---|
-| Vercel | Hobby | Generous; function size is the constraint, not compute |
-| Clerk | 50,000 MRU | Above our 10k–50k target |
-| Turso | 500M reads / 10M writes | **Tightest constraint in the system** |
-| Razorpay | Transaction fees only | ~2% + GST on collected payments |
+| Database | Supabase Postgres | Turso — hard block on breach, SQLite dialect |
+| Auth | Supabase Auth | Clerk — Stripe-only billing, 1-day log retention |
+| ORM | Drizzle | Prisma — heavier, engine binary |
+| Payments | Razorpay | Stripe (India-restricted), Clerk Billing (Stripe-only) |
+| Hosting | Vercel Hobby | — |
 
-Turso is the one that will fail first, and it fails hard rather than degrading. Monitoring on write volume is a launch requirement, not a nice-to-have.
+**Egress is now the tightest budget in the system**, replacing Turso's write ceiling. The architectural consequence is the same rule for a different reason: `/p/[handle]` reads from CDN cache and never queries the database on a hit.

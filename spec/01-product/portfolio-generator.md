@@ -31,7 +31,7 @@ That is the whole feature. Everything else is detail.
 
 The marketing page's single job: make it obvious that text becomes a website.
 
-The hero is the **Compile** element (`design.md` §3) — YAML appearing line by line on the left, the rendered portfolio rebuilding on the right. No explanation needed; the demo is the explanation.
+The hero is the **Compile** element (`DESIGN.md` §3) — a *working* editor, YAML appearing line by line on the left while the rendered portfolio rebuilds on the right. Not a video, not a mockup. The visitor can type into it. No explanation needed; the demo is the explanation.
 
 Above the fold: the demo, one sentence, one button. Not a feature grid.
 
@@ -41,9 +41,9 @@ Above the fold: the demo, one sentence, one button. Not a feature grid.
 
 The builder opens immediately. No account, no gate.
 
-**Why:** this is the strongest demonstration we have, and Clerk's free tier meters *retained* users — someone who renders a portfolio and bounces costs us nothing. Removing the signup step removes the largest source of drop-off from the value path.
+**Why:** this is the strongest demonstration we have, and it is nearly free — an anonymous preview creates no auth user and no database row, so someone who renders a portfolio and bounces consumes none of our quotas. Removing the signup step removes the largest source of drop-off from the value path.
 
-**Preview renders from in-memory data.** It never touches Turso, because the user is not authenticated and their data belongs to their browser.
+**Preview renders from in-memory data.** It never touches the database, because the user is not authenticated and their data belongs to their browser.
 
 **Publishing is the only thing that requires an account.** The gate sits at the last possible moment, right when the user already has something they want.
 
@@ -69,7 +69,7 @@ GitHub merges in as an additional namespace and never overwrites what they typed
 
 ## Step 4 — Pick a template
 
-Five templates, live preview, instant switch. See `../../design.md` §14.
+Five templates, live preview, instant switch. Composition rules per template live in `../05-ui/template-system.md`.
 
 | Template | For |
 |---|---|
@@ -121,7 +121,7 @@ Share prompts appear **after** the first publish and **only** when a portfolio i
 | Handle claim, publish, unpublish | Multiple portfolios per account |
 | Data export, always | Custom domains |
 | JSON-LD, OG image, PDF download | Resume tailoring, LinkedIn tools |
-| Razorpay subscription | Annual plans, team plans |
+| Razorpay subscription, three tiers | Annual plans, team plans |
 
 ---
 

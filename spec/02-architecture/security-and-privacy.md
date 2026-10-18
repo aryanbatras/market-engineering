@@ -10,12 +10,12 @@ We treat it as though it matters regardless.
 
 | Data | Where | Retention |
 |---|---|---|
-| Identity (name, email, avatar) | Clerk, mirrored to Turso | Until account deletion |
-| Portfolio content | Turso | Until account deletion |
-| GitHub public data | Turso | Until disconnect, then retained as content |
-| Handle | Turso | Until account deletion |
-| Entitlements | Turso | Until account deletion |
-| Revision snapshots | Turso | 30 days, capped at 5 per portfolio |
+| Identity (name, email, avatar) | Supabase Auth | Until account deletion |
+| Portfolio content | Supabase Postgres | Until account deletion |
+| GitHub public data | Supabase Postgres | Until disconnect, then retained as content |
+| Handle | Supabase Postgres | Until account deletion |
+| Entitlements | Supabase Postgres | Until account deletion |
+| Revision snapshots | Supabase Postgres | 30 days, capped at 3 per portfolio |
 | Resume files | **Never stored** | — |
 
 **We do not store uploaded resumes.** If PDF import ships, parsing is client-side and the file never reaches our servers. If we ever cannot parse client-side, we do not ship the feature rather than store the file.
@@ -61,9 +61,10 @@ Not legal advice. Before launch at scale, this needs review by an actual lawyer.
 
 Two-step, with a typed confirmation, because it is irreversible.
 
-1. **Immediate** — portfolio unpublished, public URL returns 404, Clerk user deleted, Razorpay subscription cancelled.
-2. **30 days** — Turso row retained for recovery, then purged.
-3. **Then gone.** No backups we control retain it beyond the Turso restore window.
+1. **Immediate** — portfolio unpublished, public URL returns 404, Razorpay subscription cancelled, `auth.users` deleted. Cascades remove every application row in the same transaction.
+2. **Then gone.** No backup we control retains it — Free has no backups at all, and Pro's 7-day window applies to us, not to a deleted user.
+
+The 30-day recovery window on *revisions* is not a promise of account recovery. Revisions live on the portfolio, so deleting the account deletes them too.
 
 The copy lists exactly what will be deleted before the action becomes available. "This cannot be undone" is not sufficient; the user should know *what* they are losing.
 
@@ -134,10 +135,10 @@ Handle claims are rate-limited to prevent someone enumerating availability at sp
 
 | Service | What we send | Why it is acceptable |
 |---|---|---|
-| Clerk | Email, name, GitHub OAuth | Identity. Required by R9. |
+| **Supabase** | **Everything** | **Auth, database, and storage in one service. Our primary processor.** |
 | Vercel | Request metadata | Hosting. Required by R2. |
-| Turso | Everything | Our database. Required by R10. |
-| Razorpay | Name, email, payment | Payment. Required by founder decision. |
+
+| Razorpay | Name, email, payment | Payment. Separate processor, India. |
 | GitHub | OAuth token | Only when the user connects. |
 | Google Fonts | **Nothing** | Fonts are self-hosted via `next/font`. No user IP leak to a third party. |
 

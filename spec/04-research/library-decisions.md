@@ -12,9 +12,9 @@ Every dependency, why it was chosen, and what was rejected. A library enters thi
 | Language | **TypeScript**, strict | — | Non-negotiable with a schema-driven contract. |
 | Styling | **Tailwind CSS v4** | CSS Modules, vanilla-extract, styled-components | v4 is CSS-first (`@theme`, `@utility`, `@source`) and shadcn/ui is native to it. Zero-runtime is critical for the template bundle budget. |
 | Components | **shadcn/ui** | HeroUI components, Mantine, Chakra | R8 mandates a popular library. shadcn gives us ownership of the source, which matters because our templates must stay closed-source. See the note below. |
-| Auth | **Clerk** | Auth.js, Supabase Auth, Better Auth | R9. 50k free MRU, GitHub social login out of the box, testable with dummy credentials. |
-| Database | **Turso / libSQL** | Neon, Supabase, PlanetScale | R10. SQLite fits our access pattern (few large documents, not heavy relational joins). Hard limits are the risk — see `platform-findings.md`. |
-| ORM | **Drizzle ORM** | Prisma, Kysely | First-class SQLite dialect, typed schema, migrations without a Rust binary or a Prisma engine. `drizzle-kit` pushes migrations over HTTP, which works from Vercel serverless. |
+| Auth | **Supabase Auth** | Clerk, Auth.js, Better Auth, Firebase | R9. Google and GitHub social login, email for automated testing, 50k free MAU, and it ships in the same product as the database. One dependency instead of two. |
+| Database | **Supabase Postgres** | Turso, Neon, PlanetScale | R10. `jsonb` fits our access pattern (few large documents, not heavy relational joins). Row Level Security means the database enforces access even if we ship a bug, which is stronger than a purely server-mediated design. |
+| ORM | **Drizzle ORM** | Prisma, Kysely, Supabase client directly | First-class Postgres dialect, typed schema, migrations with no engine binary. Closer to the SQL than Prisma, which matters because Postgres-specific features like `jsonb` operators and partial indexes are how we hit our constraints. |
 | Validation | **Zod** | Valibot, Yup, Joi | Single source of truth for the portfolio contract. It generates both the JSON Schema and the prompt we hand users' LLMs. One definition, three consumers. |
 | YAML parsing | **`yaml`** | `js-yaml`, `gray-matter` | Maintained, spec-compliant, zero deps, good error positions (we show line numbers in the paste box). |
 | Payments | **Razorpay** + `razorpay` + `razorpay-subscriptions` | Stripe, Lemon Squeezy, Polar, Clerk Billing | Founder decision. India-first, UPI-first. Clerk Billing is Stripe-only and therefore unavailable. |
@@ -33,9 +33,8 @@ We also *need* to own the component source. Our portfolio templates are the prod
 
 | Concern | Choice | Rejected | Why |
 |---|---|---|---|
-| Display type | **Instrument Sans** | Inter (display role), Space Grotesk, General Sans | Distinctive without being loud. Not the Inter-everywhere default. |
-| Body type | **Inter** | Geist, Public Sans | Legibility at 16px for non-design-literate readers, which is our actual audience. |
-| Utility type | **Geist Mono** | JetBrains Mono, IBM Plex Mono | Pairs cleanly with Instrument Sans. |
+| Display **and** text | **Geist** | Inter, General Sans, Space Grotesk, Instrument Sans | Founder-pinned: Vercel's typeface. One family for display and body, which halves the font payload and removes the pairing question entirely. Weight 800 carries the display work. |
+| Utility | **Geist Mono** | JetBrains Mono, IBM Plex Mono | Code and technical values only, never as decoration. |
 | Icons | **Phosphor** | Lucide, Heroicons | 1.5px stroke at 20px gives the iOS-adjacent weight the brief asks for. Lucide is the other valid choice. |
 | Class composition | **`cn` (clsx + tailwind-merge)**, `cva`, `tailwind-variants` | — | Required by R7. `tailwind-variants` when a component has many slots and variant cross-products. |
 | Animation | **GSAP** | — | Founder decision. Scroll choreography. All plugins now free. |
@@ -97,7 +96,7 @@ If the corpus fails these, the feature stays out and we say so plainly rather th
 
 - **No AI SDK.** No `ai` package, no OpenAI/Anthropic client, no spend. We ship the prompt and the schema; the user brings their own model. This is R1 and D8 both.
 - **No PDF/DOCX generation library** for v1. `next/og` covers OG images; the PDF surface follows the Forme precedent once we have real data shapes.
-- **No analytics SDK that writes to our database.** Turso's 10M write ceiling cannot absorb page views.
+- **No analytics SDK that writes to our database.** Supabase Free meters egress at 5 GB/month, and page views are the highest-volume event we have.
 - **No component library alongside shadcn/ui.**
 
 ---

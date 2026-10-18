@@ -1,192 +1,207 @@
 # Data layer
 
-Turso / libSQL with Drizzle ORM. R10.
+Supabase Postgres with Drizzle ORM. R10.
 
 ---
 
-## The constraint that shapes everything
+## The constraints that shape everything
 
 From `../04-research/platform-findings.md`:
 
-- Free plan **blocks the database outright** on exceeding any single metric.
-- **10M writes/month ≈ 3.8 writes/second** sustained.
-- **500M row reads/month**, and a "row read" is a row *scan* — an unindexed query burns quota proportional to what it examined, not what it returned.
+| Limit | Value | Consequence |
+|---|---|---|
+| **Database size** | **500 MB** on Free | Caps us around 25,000 portfolios. Revisions must be rationed. |
+| **Egress** | **5 GB / month** | Portfolio views must be CDN-cached or we run out in a week |
+| **Project pausing** | 7 days inactivity | See `auth.md`. Mitigated by caching public reads. |
+| Auth MAU | 50,000 | Matches Clerk. Not our binding constraint. |
+| Backups | **None on Free** | No automatic restore point |
 
-This is the tightest limit in the whole system. Clerk and Vercel both have far more headroom than Turso.
+Egress is the number to watch. It replaced Turso's write ceiling as the tightest constraint, and it moves the caching requirement from "strongly recommended" to "mandatory."
 
-**Design consequence:** the product is read-heavy and write-light by construction. Portfolio pages are read constantly and written rarely. Every design decision below follows from keeping writes rare.
+**500 MB / ~20 KB per portfolio ≈ 25,000 portfolios.** That is inside our target range, so it is a ceiling to plan for rather than a wall we hit next week. But revisions are pure overhead against it, so the caps below are firm.
 
 ---
 
 ## Tables
 
-```
+```sql
 users
-  clerkId         text    primary key
-  email           text    unique
+  id              uuid        primary key, references auth.users (cascade delete)
+  email           text        not null
   name            text
-  avatarUrl       text
-  createdAt       integer
-  updatedAt       integer
+  avatar_url      text
+  created_at      timestamptz not null default now()
+  updated_at      timestamptz not null default now()
 
 handles
-  handle          text    primary key, lowercase, unique
-  ownerClerkId    text    unique — single portfolio per account
-  status          text    active | reserved | blocked
-  createdAt       integer
+  handle          text        primary key, lowercased
+  user_id         uuid        unique references users, cascade delete
+  status          text        not null default 'active'   -- active | reserved | blocked
+  redirect_to     text                                     -- set while a rename propagates
+  created_at      timestamptz not null default now()
 
 portfolios
-  handle          text    primary key
-  clerkId         text
-  schemaVersion   integer
-  templateId      text
-  config          text    JSON
-  data            text    JSON — the validated portfolio document
-  visibility      text    public | private | unlisted
-  publishedAt     integer
-  createdAt       integer
-  updatedAt       integer
+  handle          text        primary key references handles
+  user_id         uuid        not null references users, cascade delete
+  schema_version  integer     not null
+  template_id     text        not null
+  config          jsonb       not null default '{}'
+  data            jsonb       not null
+  visibility      text        not null default 'private'  -- public | private | unlisted
+  published_at    timestamptz
+  created_at      timestamptz not null default now()
+  updated_at      timestamptz not null default now()
 
 portfolio_revisions
-  id              text    primary key
-  handle          text
-  schemaVersion   integer
-  data            text
-  createdAt       integer
+  id              uuid        primary key
+  handle          text        not null
+  schema_version  integer     not null
+  data            jsonb       not null
+  created_at      timestamptz not null default now()
 
 entitlements
-  clerkId         text    primary key
-  plan            text    free | paid
-  razorpaySubscriptionId  text
-  status          text    none | pending | active | past_due | cancelled
-  currentPeriodEnd integer
-  updatedAt       integer
+  user_id         uuid        primary key references users, cascade delete
+  plan            text        not null default 'free'     -- free | paid | sponsor
+  razorpay_subscription_id  text  unique
+  status          text        not null default 'none'     -- none | pending | active | past_due | cancelled
+  current_period_end       timestamptz
+  updated_at      timestamptz not null default now()
 
 imports
-  id              text    primary key
-  clerkId         text
-  source          text    github | linkedin | manual | yaml
-  status          text    pending | complete | failed
-  createdAt       integer
-  completedAt     integer
+  id              uuid        primary key
+  user_id         uuid        not null references users, cascade delete
+  source          text        not null                       -- github | linkedin | manual | yaml
+  status          text        not null                       -- pending | complete | failed
+  created_at      timestamptz not null default now()
+  completed_at    timestamptz
 ```
 
 ---
 
 ## Design notes
 
-**`portfolios.data` is a JSON document, not normalised tables.**
+**`portfolios.data` is `jsonb`, not normalised tables.**
 
-Our access pattern is "load one entire portfolio, render it". Normalising `projects`, `education`, and `skills` into relational tables would multiply reads on the hottest path to solve a problem we do not have — we never query across users' projects.
+Our access pattern is "load one entire portfolio and render it." Normalising projects, education, and skills would multiply reads on the hottest path to solve a problem we do not have — we never query across users' projects.
 
-Turso is SQLite, and SQLite handles a JSON text column well. This is the shape the database is good at.
+Postgres `jsonb` is genuinely better than Turso's TEXT here: it is indexed, binary, and queryable when we do need to reach into it later, without a migration.
 
-**Revisions are capped.** Keep the last 5 per handle. Old revisions are the easiest way to blow the write budget for a feature nobody uses. Retention is 30 days, then pruned.
+**Revisions are capped at 3, retained 30 days.** Turso allowed 5. The storage budget is an order of magnitude tighter, and a revision we have not used to recover anything is a revision we are paying for twice.
 
-**One row per user for entitlements.** Entitlements are read on nearly every authenticated request. Keeping them as a single-row lookup rather than a join is worth the denormalisation.
+**`handles.user_id` is unique.** This is how "single portfolio per account" is enforced — by the database, not by application logic that can be bypassed.
 
-**`handles.ownerClerkId` is unique.** This is how "single portfolio per account" is enforced — by the database, not by application logic that can be bypassed.
+**`jsonb` carries the schema version.** `schema_version` is a column rather than a key inside the JSON so it can be indexed and filtered without touching the document.
+
+**Cascade delete everywhere.** Deleting `auth.users` removes every trace. That is the correct behaviour for a DPDP-compliant deletion and it removes an entire class of orphaned-row bugs.
 
 ---
 
 ## Indexes
 
-Mandatory, because row reads are metered by scan:
-
+```sql
+create unique index on handles (user_id);
+create unique index on handles (handle) where status = 'active';
+create index on portfolios (user_id);
+create index on portfolios (visibility) where visibility = 'public';
+create index on portfolios (published_at desc) where visibility = 'public';
+create unique index on entitlements (razorpay_subscription_id);
+create index on portfolio_revisions (handle, created_at desc);
+create index on imports (user_id, created_at desc);
 ```
-users                email (unique)
-handles              ownerClerkId (unique)
-portfolios           clerkId
-entitlements         razorpaySubscriptionId (unique)
-portfolio_revisions  handle, createdAt
-imports              clerkId, createdAt
-```
 
-Every query that filters or sorts on a portfolio column must be covered. A full table scan across 50,000 portfolios is 50,000 reads per request and will block the database on a busy afternoon.
+Partial indexes matter more here than they did on SQLite. Public portfolio reads are the overwhelming majority of traffic and they only touch rows where `visibility = 'public'`, so a partial index keeps the hot path off the private rows entirely.
 
 ---
 
-## Write budget
+## Egress budget
 
-Allocated against the 3.8 writes/second ceiling:
+**5 GB per month on Free.** This is the constraint that decides the architecture.
 
-| Operation | Frequency |
+Every portfolio view that queries Postgres directly spends egress. At roughly 40 KB per render:
+
+```
+5 GB / 40 KB  ≈  125,000 uncached renders per month
+```
+
+Our target is 500,000 portfolio views per month. **Uncached, we exhaust the budget in a week.**
+
+### The rule
+
+**`/p/[handle]` reads from CDN cache and never queries Supabase on a hit.** Revalidate on publish via cache tags.
+
+This was already the plan under Turso, where caching was justified by the write ceiling. Here it is justified by egress, which is a stronger argument, and it has the side benefit of insulating the most important route from the project-pausing problem.
+
+### What this means in practice
+
+| Route | Supabase access |
 |---|---|
-| Portfolio save | A few per user per session |
-| Revision write | Same |
-| Publish / unpublish | Rare |
-| Handle claim | Once |
-| Clerk user mirror | Once per signup |
-| Razorpay entitlement sync | Rare, webhook-driven |
-| GitHub import | Once per connect |
-
-**What we deliberately do not write:**
-
-- ❌ Portfolio views. No `updatedAt` touch, no last-viewed timestamp, no view counter.
-- ❌ Analytics events.
-- ❌ Session records.
-- ❌ Per-render or per-request anything.
-
-Page views are the highest-volume event in the product and they are precisely the thing we refuse to write. Analytics goes to a free-tier external service, and the public route reads from cache instead of touching Turso at all.
+| `/p/[handle]` public | **Cache hit only.** On miss, one query then cache. |
+| `/builder`, `/dashboard` | Direct, user-initiated, low volume |
+| Template catalogue | Cached, static catalogue |
+| OG image generation | Cached, long TTL, regenerated on publish only |
+| Any analytics or view counter | **Never.** Externally, or not at all. |
 
 ---
 
 ## Connection and runtime
 
-`@libsql/client` over HTTP, from Vercel serverless. Not the native/libsql socket client — that requires a persistent process we do not have on serverless.
-
 ```ts
-const client = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-})
+const client = drizzle(postgres(process.env.DATABASE_URL), { schema })
 ```
 
-One module-level client per serverless instance. Reused across warm invocations. Turso's HTTP driver handles connection pooling internally.
+- **Browser:** Supabase JS client with the anon key. RLS is the boundary.
+- **Server:** Drizzle over the pooled connection string. Never the direct one — Postgres has a connection limit and serverless instances open connections independently.
+
+**Pooler, always.** Supabase's connection pooler is required on serverless. The direct connection URL will exhaust Postgres's connection limit under concurrent serverless invocations, which is a hard failure and an easy one to hit by accident.
+
+The previous architecture also raises a question the old one did not: **should the browser query Supabase directly at all?** For a static portfolio catalogue, yes — RLS makes it safe and it removes a round trip. For anything involving entitlements, no — entitlements must never be client-readable.
 
 ---
 
 ## Migrations
 
-`drizzle-kit` generates SQL migrations, applied over HTTP. Committed to the repo, applied in deploy order.
+`drizzle-kit` generates SQL migrations against the Postgres dialect.
 
 **Rules:**
 
-- Migrations are additive where possible. Dropping a column is two migrations: stop writing it, then drop it.
-- No migration runs against production without being reviewed.
-- We do not rely on automatic migration on deploy. Schema changes are deliberate steps.
+- Migrations are additive. Dropping a column is two steps: stop writing it, then drop it.
+- Every migration that touches a table with data must be reviewed for table locks on large tables.
+- **RLS policies ship in the same migration as the table.** A table that exists without RLS is fully readable by anyone with the anon key, and that window should never exist even briefly.
+- Reviewed and applied deliberately. Never automatically on deploy.
 
 ---
 
-## Backups and recovery
+## Backups
 
-Free tier gives **1 day** of point-in-time restore. Developer tier ($5.99/mo) gives 10 days plus 3-day audit logs.
+**Free has none.** This is a genuine durability gap for user portfolios — the one thing users would be most upset to lose.
 
-That is the first spend we make once R1 lifts, and it is cheap enough that it should not be the thing that forces the decision.
+Mitigations, in order:
 
-Until then: the user's data is theirs and always exportable, which reduces the cost of a bad state considerably.
+1. **Data is always exportable.** A user can retrieve everything in YAML or JSON at any time. That caps the damage from data loss even though it does not prevent it.
+2. **Pro ($25/month) includes daily backups with 7-day retention.** We upgrade on first revenue, which is customer number one.
+3. Revisions give a 30-day in-product undo, which covers the common case — a user overwriting something — but not a database-level incident.
+
+**Monitoring for storage growth is a launch requirement.** At 500 MB with no backups and no automatic warning, running out of space quietly would be bad. Supabase does surface database size, but we should alert on it ourselves.
 
 ---
 
 ## Monitoring
 
-Launch requirement, not a later improvement:
+Launch requirement:
 
-- Rows read per hour
-- Rows written per hour
-- Storage growth
-- Query latency outliers
-
-**Turso does not degrade gracefully — it blocks.** We need warning before we hit the wall, not an incident page after. Free-tier external monitoring is sufficient; the metric is simple.
+- **Egress per day** — the tightest budget in the system
+- **Database size** — approaching 500 MB with no backups on Free
+- **Project pause state** — alert if the project pauses, because that means public routes are degraded
+- Query latency on the builder path
+- Razorpay webhook failure rate
 
 ---
 
 ## Scaling path
 
-Out of order, decided in advance so the migration is mechanical rather than an emergency:
+1. **Free → Pro ($25/month).** Removes pausing, adds 8 GB, 250 GB egress, daily backups. First spend after R1 lifts.
+2. **CDN caching layer, properly configured.** Do this before Pro if egress gets tight — it is the cheaper fix and it is what the architecture already assumes.
+3. **Revisions to object storage.** If revision history grows past what is worth storing inline, move cold revisions to Supabase Storage and keep only the latest in `jsonb`.
+4. **Normalise only if query patterns demand it.** They currently do not.
 
-1. **Free → Developer ($5.99/mo).** Real overage billing. First spend after R1 lifts. Worth doing before Clerk Pro.
-2. **Read replicas / caching layer.** Only if row reads approach the limit.
-3. **Schema normalisation.** Only if we grow query patterns we do not currently have.
-
-Each step touches one folder because the dependency inversion in `layering.md` keeps persistence behind a port.
+Each step touches one folder, because the dependency inversion in `layering.md` keeps persistence behind a port.

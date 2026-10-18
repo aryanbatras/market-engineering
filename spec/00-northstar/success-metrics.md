@@ -20,9 +20,9 @@ Deliberately small. A hobby-tier product with one founder needs five numbers it 
 
 ## Why these and not the usual set
 
-- **No MAU.** Clerk meters retained users, and our anonymous-preview flow means a visitor can get real value without ever appearing in any account metric. MAU would measure our traffic, not our value.
-- **No "signups."** A signup is not progress. Someone can create a Clerk account, paste nothing, and leave. Counting it flatters us.
-- **No page views.** Portfolio views are our highest-volume event and we deliberately do not store them (see `../02-architecture/nfrs.md`).
+- **No MAU.** Our anonymous-preview flow means a visitor can get real value without ever appearing in an account metric. MAU would measure our traffic, not our value.
+- **No "signups."** A signup is not progress. Someone can authenticate with Google in one tap, paste nothing, and leave. Counting it flatters us, and with Google sign-up in the flow the number would be especially flattering.
+- **No page views.** Portfolio views are our highest-volume event and we deliberately store them nowhere (see `../02-architecture/nfrs.md`).
 - **No revenue as the headline.** At our scale revenue is noisy. The trigger for R1 is one customer, not a target.
 
 ---
@@ -48,13 +48,14 @@ Not growth metrics, but these fail silently and are harder to recover from.
 
 | Check | Threshold | Why |
 |---|---|---|
-| **Turso row writes** | Alert at 50% of monthly ceiling | **Hard block on breach. Not a degradation.** |
-| Turso row reads | Alert at 50% | Scan-metered, so a bad query burns quota invisibly |
+| **Egress per day** | Alert at 50% of the 5 GB monthly budget | ~125,000 uncached renders. Exhaust it and every portfolio goes slow. |
+| Database size | Alert at 50% of 500 MB | No backups on Free, so running out is silent until it is not |
+| Project pause state | Alert on pause | A paused project degrades the builder and, briefly, the public route |
 | Razorpay webhook failures | Any sustained > 1% | Revenue correctness |
 | LCP on `/p/[handle]` | Alert above 2.5s | A recruiter on mobile data is the real user |
 | Publish failure rate | Any sustained > 0.1% | The most important user action in the product |
 
-The Turso one is the only non-negotiable monitor. Everything else in this business degrades; Turso stops.
+The egress one is the only non-negotiable monitor. Everything else in this business degrades; an exhausted egress budget takes every published portfolio down at once.
 
 ---
 
@@ -96,6 +97,6 @@ Recorded now so the decision is not emotional later.
 
 ## Reporting cadence
 
-- **Weekly:** published count, activation rate, paid count, Turso write volume.
+- **Weekly:** published count, activation rate, paid count, egress used.
 - **Monthly:** retention cohort, qualitative conversations, one honest answer to "what would make you delete this?"
 - **Never:** optimising against a metric without a user conversation behind it.

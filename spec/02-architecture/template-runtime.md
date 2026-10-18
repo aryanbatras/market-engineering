@@ -160,7 +160,7 @@ Enforcement:
 | **Live preview** | In-editor preview of unpublished data | Never |
 | **Fresh** | Owner viewing their own dashboard | Never, unless saving |
 
-The default for the public route is Cached. A Turso write on view would burn the budget at 3.8 writes/second and hard-block the database. Cached render plus tagged revalidation on publish is what makes the product survive contact with its own traffic.
+The default for the public route is Cached. An uncached read on view burns the 5 GB egress budget in about a week. Cached render plus tagged revalidation on publish is what makes the product survive contact with its own traffic — and it insulates the public route from Supabase's inactivity pausing.
 
 ---
 

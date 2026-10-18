@@ -79,7 +79,7 @@ Not a capability gap. A translation gap. Everything we build is translation — 
 Direct, and non-obvious, so they are recorded here:
 
 - **Non-technical by default.** None of them can read our stack. The product must be usable by someone who does not know what a repository is.
-- **Light backgrounds.** `design.md` §4. A resume is printed and read in daylight, often on a phone, often in a corridor. Dark portfolios are a statement they cannot afford to make.
+- **Light backgrounds.** `DESIGN.md` §4. A resume is printed and read in daylight, often on a phone, often in a corridor. Dark portfolios are a statement they cannot afford to make.
 - **Large type.** Most will read on a mid-range Android. Small grey text is how people conclude they do not belong.
 - **They cannot judge our work.** They will not assess craft quality. They will assess whether it *looks like them* — whether the person in the template resembles them in age, ambition, and register. Templates must not read as designed by a thirty-year-old in Berlin.
 - **The first five seconds decide everything.** Nobody reads. They glance, decide, and leave. Every surface must communicate what this is without scrolling.

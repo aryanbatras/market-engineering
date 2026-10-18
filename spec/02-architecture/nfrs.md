@@ -9,12 +9,12 @@ R3: fastest path that still holds at 10,000–50,000 users.
 | Dimension | v1 target | Hard ceiling before revisiting |
 |---|---|---|
 | Registered users | 10,000 | 50,000 |
-| Monthly retained users (Clerk) | 5,000 | 50,000 |
+| Monthly active users (Supabase Auth) | 5,000 | 50,000 |
 | Published portfolios | 5,000 | 50,000 |
 | Portfolio views / month | 500,000 | 5,000,000 |
 | Payingly active users | 100 | 1,000 |
 
-The interesting number is **views**. 500,000 portfolio views a month is roughly 12 requests/second at peak. Every one of them must be a cache hit, because the alternative is a database write we cannot afford and Turso will block us.
+The interesting number is **views**. 500,000 portfolio views a month is roughly 12 requests/second at peak. Every one of them must be a cache hit. The alternative is egress we cannot afford: 5 GB/month is about 125,000 uncached renders, and we are targeting 500,000 views.
 
 ---
 
@@ -55,23 +55,23 @@ The interesting number is **views**. 500,000 portfolio views a month is roughly 
 
 ---
 
-## The Turso ceiling
+## The Supabase ceiling
 
-Our binding constraint. Restated because it governs everything above:
+Our binding constraint, and it is an **egress** limit rather than a write limit. That change moves the requirement but keeps the rule.
 
-- 10M writes/month ≈ **3.8 writes/second**
-- Exceeding any metric **blocks the database**
-- Row reads are metered by **scan**, so unindexed queries are expensive by default
+- **5 GB egress/month** ≈ 125,000 uncached portfolio renders, against a 500,000 view target
+- **500 MB database** ≈ 25,000 portfolios, with **no backups** on Free
+- Project **pauses after 7 days** of inactivity
 
 **Hard requirements:**
 
-1. The public route never writes.
-2. Every filtered or sorted query has a covering index.
-3. Revisions capped at 5 per portfolio, 30-day retention.
-4. Analytics never touch our database.
-5. Monitoring on write volume from day one.
+1. `/p/[handle]` reads from CDN cache and never queries the database on a hit.
+2. Revisions capped at 3 per portfolio, 30-day retention.
+3. No analytics, view counters, or page-view writes anywhere in the database.
+4. Every filtered or sorted query has a covering or partial index.
+5. Egress and database-size monitoring from day one.
 
-The escape hatch is Turso Developer at **$5.99/month**, which has 2.5× the write ceiling and real overage billing. That is cheap enough that it should be the first spend after R1 lifts — cheaper than Clerk Pro at $25/month, and the ceiling we will hit first.
+The escape hatch is Supabase Pro at **$25/month**: 250 GB egress, 8 GB database, daily backups with 7-day retention, and no pausing. That is the first spend after R1 lifts.
 
 ---
 
@@ -89,7 +89,7 @@ The escape hatch is Turso Developer at **$5.99/month**, which has 2.5× the writ
 
 ## Accessibility
 
-Required floor, per `design.md` §15:
+Required floor, per `DESIGN.md` §15:
 
 - Responsive from 360px, no horizontal scroll at any width
 - Visible keyboard focus on every interactive element, never `outline: none` without replacement
@@ -121,7 +121,7 @@ Per `security-and-privacy.md`. Summary of the non-negotiables:
 |---|---|
 | Secrets | Environment variables only, never in the bundle, never in client components |
 | Payments | Razorpay webhook signature verification on every event, idempotent handling |
-| Auth | Clerk-managed sessions, 7-day fixed lifetime on Hobby |
+| Auth | Supabase Auth, JWT verified locally against the public key |
 | SQL injection | Drizzle parameterised queries only. No string-built SQL, ever. |
 | XSS | Portfolio data is user-supplied. Render as text, never as raw HTML. No `dangerouslySetInnerHTML` outside a sanitiser with an explicit allowlist. |
 | SSRF | We never fetch user-supplied URLs server-side. Project links are rendered as links, never proxied. |
@@ -144,4 +144,4 @@ Older browsers get a functional, unstyled portfolio rather than an error. A fres
 
 - Lighthouse CI on `/` and `/p/[handle]`, budgets enforced in CI
 - Bundle size check per template — fails the build when a chunk grows unexpectedly
-- Turso write-volume monitoring with an alert before the limit, because the failure mode is a hard block, not degradation
+- Egress and database-size monitoring with alerts before the limits, because the failure modes are a hard stop rather than a degradation

@@ -6,9 +6,9 @@ Razorpay, India-first, UPI-first. Founder decision: no GST registration, UPI and
 
 ## Why we build our own billing
 
-Clerk's billing product is Stripe-only — Stripe 2.9% plus $0.30 plus a 0.7% Clerk fee, on every plan. It is an integration, not a standalone processor.
+Supabase Auth has no billing product, and Clerk's would have been Stripe-only anyway — Stripe 2.9% plus $0.30 plus a 0.7% Clerk fee, on every plan. It is an integration, not a standalone processor.
 
-We are on Razorpay. **Clerk Billing is therefore unavailable to us.** Entitlements are our own subsystem, built on webhooks.
+We are on Razorpay. **Entitlements are our own subsystem, built on webhooks.**
 
 This is a real cost: we own the subscription state machine, the webhook handling, the failed-payment recovery, and the customer-facing billing portal. We do not get a hosted UI or a reconciliation dashboard.
 
@@ -86,7 +86,7 @@ past_due   active    cancelled
 
 - `pending` grants nothing. No free trial, no courtesy access. A ₹83 product does not need one.
 - `past_due` grants a 7-day grace window. Razorpay's retry engine handles recovery; we surface the state honestly rather than punishing a failed UPI debit.
-- Entitlement reads are cached and cheap, but **a stale cache must never grant access.** Every check that guards something real re-reads Turso.
+- Entitlement reads are cached and cheap, but **a stale cache must never grant access.** Every check that guards something real re-reads the database.
 
 ---
 

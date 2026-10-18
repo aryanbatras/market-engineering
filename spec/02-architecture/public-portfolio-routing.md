@@ -20,11 +20,13 @@ app/
 
 ## The hard constraint
 
-**This route never writes to Turso.**
+**This route never writes to the database, and on a cache hit it never reads from it either.**
 
 Not a view counter. Not a last-viewed timestamp. Not a session record. Not an analytics event.
 
-We have 3.8 writes/second to spend across the entire product, and portfolio views are by far the most frequent event in it. A single view counter turns the most-read page into the most-written page, and the free Turso plan responds to exceeding a limit by **blocking the database entirely**. One popular portfolio page could take the whole product offline.
+Supabase Free gives us **5 GB of egress per month** — roughly 125,000 uncached renders, against a 500,000 view target. Every cache miss is money out of that budget. A view counter on top would turn the most-read page into the most-expensive page, and one popular portfolio could exhaust a month of egress overnight.
+
+**We have no analytics or view tracking in the database at all.** Page views go to an external free-tier tool or nowhere.
 
 **Cached render plus tagged revalidation is not an optimisation here. It is what makes the product survive its own traffic.**
 
@@ -55,7 +57,7 @@ Handles are:
 
 Reserved words cover every `app/` route segment. `/p/admin` cannot exist because `/admin` is a system route and a recruiter following that link must never land somewhere unexpected.
 
-**Handle changes:** allowed, 3 per month, with a redirect record so old links keep working. Handles are claimed separately from the Clerk account, so a user can change them without touching auth.
+**Handle changes:** allowed, 3 per month, with a redirect record so old links keep working. Handles live in their own table keyed to the user rather than to an auth username, so a user can change them without touching auth.
 
 ---
 
@@ -120,10 +122,10 @@ The 404 page is an invitation, not an apology. Someone who mistypes a handle is 
 Rendering a portfolio requires no account. This is deliberate:
 
 - It is the strongest demonstration of the product — paste YAML, see a real site, seconds later.
-- Clerk's free tier meters **retained** users, so people who never sign up cost nothing.
+- Anonymous previews create no auth user and no database row, so people who never sign up cost nothing against any quota.
 - It removes the highest-drop-off step from the value path.
 
-Anonymous preview renders from in-memory draft data and never touches Turso. Publishing requires an account.
+Anonymous preview renders from in-memory draft data and never touches the database. Publishing requires an account.
 
 ---
 

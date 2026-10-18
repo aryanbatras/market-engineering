@@ -1,6 +1,6 @@
 # Component inventory
 
-What we use, what we built, and what we rejected. Binding constraints from `design.md` §13 apply.
+What we use, what we built, and what we rejected. Binding constraints from `DESIGN.md` apply. Portfolio templates are specced in `template-system.md`, not here.
 
 ---
 
@@ -62,7 +62,7 @@ Installed via CLI, adapted to our tokens. Each file keeps its variant map in the
 | `ConfigPanel` | Accent, density, dark mode. Three controls, deliberately. |
 | `HandleClaim` | Live availability checking as the user types. Reserved-word and profanity filtering. |
 | `SourceBadge` | Shows field provenance — `from GitHub` — with an inline override. Implements the merge model visibly. |
-| `CompileHero` | The signature element (`design.md` §3). Marketing only. |
+| `CompileHero` | The signature element (`DESIGN.md` §3). Marketing only. It is the live thing — a working editor, not a video. |
 | `SectionShell` | Consistent section spacing across templates. The rule that stops section paddings fighting each other. |
 | `ProvenanceDot` | GitHub-derived field indicator. |
 
@@ -87,9 +87,11 @@ Shadcn-compatible, restrained, each used only where it earns its place.
 
 ## MagicUI blacklist
 
-Exactly the AI-slop set. Each one appears in `design.md` §12 for the same reason.
+Exactly the AI-slop set. Each one appears in `DESIGN.md` §13 for the same reason.
 
 `Particles` · `Meteors` · `Aurora Text` · `Warp Background` · `Neon Gradient Card` · `Shine Border` · `Rainbow Button` · `Shimmer Button` · `Sparkles Text` · `Animated Gradient Text` · `Confetti` · `Retro Grid` · `Comet`
+
+**Given the three-hue palette most of these are additionally impossible.** The blacklist exists so nobody spends an afternoon discovering that.
 
 ---
 

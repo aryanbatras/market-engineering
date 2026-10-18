@@ -80,7 +80,7 @@ Contains:
 
 Depends on: nothing in `infrastructure/`. Only on ports.
 
-This is the dependency-inversion seam. `application/` defines *what* it needs; `infrastructure/` implements it and registers the implementation. Swapping Turso for Neon touches one folder.
+This is the dependency-inversion seam. `application/` defines *what* it needs; `infrastructure/` implements it and registers the implementation. Swapping Supabase for Neon touches one folder.
 
 ---
 
@@ -107,9 +107,9 @@ Templates are stricter still: they receive `data` and `config` as props and impo
 
 Contains:
 
-- Turso client and repositories
+- Supabase client and repositories
 - Drizzle schema and migrations
-- Clerk server helpers
+- Supabase Auth server helpers and session verification
 - Razorpay client and webhook verification
 - Octokit client
 - `next/og` rendering

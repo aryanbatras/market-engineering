@@ -121,7 +121,7 @@ The same Zod schema, running on blur for a field and on submit for the form. Err
 
 **Drafts persist in `localStorage`.**
 
-They are not in Turso until the user publishes, because pre-publish users are anonymous by design. A user who closes the tab and returns to an empty builder has learned that our product loses their work, and they will not trust it with a real portfolio.
+They are not in the database until the user publishes, because pre-publish users are anonymous by design. A user who closes the tab and returns to an empty builder has learned that our product loses their work, and they will not trust it with a real portfolio.
 
 ---
 
@@ -141,15 +141,15 @@ If it does not clear the bar, it does not ship, and we say so plainly rather tha
 
 ```
 YAML paste ──┐
-             ├──→ validate (Zod, client) ──→ preview ──→ publish ──→ Turso
+             ├──→ validate (Zod, client) ──→ preview ──→ publish ──→ Supabase
 Manual form ─┘
 GitHub ──────┴──→ fetch ──→ review ──→ merge (additive) ──┘
 
 Draft state ──→ localStorage, until publish
-Turso is written once, on publish. Not on every keystroke.
+The database is written once, on publish. Not on every keystroke.
 ```
 
-Writes happen on publish and on explicit save. Not continuously. Turso gives us 3.8 writes per second across the entire product and we are spending it on user actions, not on them existing.
+Writes happen on publish and on explicit save. Not continuously. Database egress is metered at 5 GB/month and every write competes with the cached reads that keep public portfolios fast. We spend it on user actions, not on them existing.
 
 ---
 

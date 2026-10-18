@@ -28,7 +28,9 @@ Optimise for the fastest path that still holds up for 10,000 to 50,000 users. A 
 
 UI and UX quality is not decoration layered on at the end. It is a requirement with the same weight as functionality.
 
-**Avoid AI slop at all costs.** The full constraints live in `design.md`, which is binding. Read it before writing any component.
+**Avoid AI slop at all costs.** The full constraints live in `DESIGN.md`, which is binding. Read it before writing any component.
+
+Three hues, no fourth. Two radii, no third. Six type steps, no seventh. Every one of those limits is deliberate: a system with fewer decisions produces more consistent work, and consistency is what reads as expensive.
 
 ---
 
@@ -74,21 +76,25 @@ Composition uses `cn` (clsx + tailwind-merge), `cva`, or `tailwind-variants`.
 
 shadcn/ui is the component substrate. It is the default and is acceptable for the wide variety of designs we support.
 
-Additional registries are permitted only when they are shadcn-compatible and appear in the MagicUI whitelist in `design.md`.
+Additional registries are permitted only when they are shadcn-compatible and appear in the MagicUI whitelist in `DESIGN.md`.
 
 ---
 
 ## R9 — Authentication
 
-Clerk, with GitHub social login.
+Supabase Auth, with Google sign-in and GitHub social login.
 
-Clerk must remain testable with a dummy email and password so that automated agents can log in and exercise authenticated flows end to end. Any auth change that makes this impossible is not permitted.
+Supabase must remain testable with a dummy email and password so that automated agents can log in and exercise authenticated flows end to end. Any auth change that makes this impossible is not permitted.
+
+GitHub sign-in is dual-purpose: identity for login, and the authorisation that unlocks repository import. It is still separate from the Octokit/GitHub App credential used to read repositories, because identity scope does not grant API scope.
 
 ---
 
-## R10 — Database and API
+## R10 — Database, ORM, and API
 
-Database is Turso (libSQL). API is Next.js serverless route handlers.
+Database is **Supabase Postgres**, accessed through **Drizzle ORM**. API is Next.js serverless route handlers.
+
+Supabase exposes an anon key intended for the browser. That key is safe **only** because of Row Level Security. We keep the RLS policy surface as small as possible, and every table that is not explicitly public-by-design is unreachable from the anon key. Service-role credentials are server-only and never reach a client component.
 
 ---
 
@@ -132,7 +138,7 @@ Do not proceed on an assumption that could send the implementation in the wrong 
 
 ## R15 — Specification before code
 
-The repository contains `AGENTS.md`, `design.md`, and `spec/`.
+The repository contains `AGENTS.md`, `DESIGN.md`, and `spec/`.
 
 Order of work: rules first, then research, then specification. Implementation follows the specification, not the other way around.
 
@@ -143,7 +149,7 @@ Order of work: rules first, then research, then specification. Implementation fo
 When resuming work, the correct sequence is:
 
 1. `AGENTS.md`
-2. `design.md`
+2. `DESIGN.md`
 3. Research (`spec/04-research/`)
 4. Specification (`spec/01`–`spec/03`, `spec/05`)
 5. Scaffold and toolchain, including lint rules enforcing R5 and R7

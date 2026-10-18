@@ -63,7 +63,7 @@ Stated up front so nobody adds them later by accident.
 Every decision serves this. A feature that adds five minutes to the path is a feature that halves our conversion.
 
 **2. Anonymous until the last moment.**
-Render a portfolio without an account. Publishing is the only gate, and it sits at the point where the user already has something they want. Clerk meters *retained* users, so previews cost nothing.
+Render a portfolio without an account. Publishing is the only gate, and it sits at the point where the user already has something they want. An anonymous preview creates no auth user and no database row, so it costs nothing against any quota.
 
 **3. The user's data is always theirs.**
 Export on every tier, free included. Data captivity signals that a free tool might vanish, and it is the fastest route to losing trust. Export is also a growth loop.

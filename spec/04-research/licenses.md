@@ -28,12 +28,13 @@ This exists because the entire business depends on templates staying closed-sour
 | `tailwind-variants` | MIT | Clear |
 | shadcn/ui components (Radix primitives) | MIT | Clear |
 | Radix UI | MIT | Clear |
-| `@clerk/nextjs` | MIT (SDK) | Clear — Clerk is a hosted service, not vendored |
-| `@libsql/client` | MIT | Clear |
+| `@supabase/supabase-js` | MIT | Clear — Supabase is a hosted service, not vendored |
+| `@supabase/ssr` | MIT | Clear |
 | `drizzle-orm`, `drizzle-kit` | Apache-2.0 | Clear |
 | `zod` | MIT | Clear |
 | `zod-to-json-schema` | MIT | Clear |
 | `yaml` | ISC | Clear |
+| `postgres` (postgres.js, used by Drizzle) | MIT | Clear |
 | `@octokit/rest`, `@octokit/graphql` | MIT | Clear |
 | `gsap` | Standard "no charge" — **ambiguous for paid tiers** | ⚠️ See below |
 | `motion` (framer-motion) | MIT | Clear |
@@ -42,6 +43,16 @@ This exists because the entire business depends on templates staying closed-sour
 | `phosphor-react` | MIT | Clear |
 | `@dnd-kit/*` | MIT | Clear |
 | `razorpay` | BSD-2-Clause | Clear |
+
+---
+
+## Removed from the stack
+
+| Was | Licence | Why removed |
+|---|---|---|
+| `@clerk/nextjs` | MIT | Replaced by Supabase Auth (R9) |
+| `@libsql/client` | MIT | Replaced by Supabase Postgres + Drizzle (R10) |
+| `tailwind-variants` | MIT | Still used, but only where a component has genuine variant cross-products. `cva` covers the rest |
 
 ---
 
@@ -70,7 +81,7 @@ We studied these. None of their code enters our repository.
 | `akkefa/developer-portfolio` | MIT | Reference |
 | `lorenzomiscoli/developer-portfolio` | MIT | Reference |
 | `BuilderIO/builder` | MIT | Evaluated for v1.5 editor |
-| `magicuidesign/magicui` | MIT | Whitelisted components only, per `design.md` §13 |
+| `magicuidesign/magicui` | MIT | Whitelisted components only, per `DESIGN.md` §13 |
 
 ---
 
@@ -78,11 +89,9 @@ We studied these. None of their code enters our repository.
 
 | Family | Licence | Note |
 |---|---|---|
-| Instrument Sans | SIL Open Font License 1.1 | Clear — permits commercial use and embedding |
-| Inter | SIL Open Font License 1.1 | Clear |
-| Geist Mono | SIL Open Font License 1.1 | Clear |
+| Geist / Geist Mono | SIL Open Font License 1.1 | Clear — permits commercial use and embedding. Vercel's typeface, founder-pinned. One family for display and text, mono for code only. |
 
-All three are OFL, which permits commercial embedding. Fonts are self-hosted via `next/font` — no runtime request to Google, no user-IP leak to a third party, and no layout shift.
+Both are OFL, which permits commercial embedding. Fonts are self-hosted via `next/font` — no runtime request to Google, no user-IP leak to a third party, and no layout shift.
 
 ---
 
