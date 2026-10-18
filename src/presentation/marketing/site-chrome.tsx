@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { footerStyles, navStyles } from "./nav.styles"
 import { Button } from "../design/button"
+import { Wordmark } from "./wordmark"
+import { siteConfig } from "@application/site/site-config"
 
 const links = [
   { href: "/features", label: "Features" },
@@ -11,14 +13,13 @@ const links = [
 const legal = [
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
+  { href: "/credits", label: "Credits" },
 ]
 
 export const SiteHeader = () => (
   <header className={navStyles.bar}>
     <div className={navStyles.inner}>
-      <Link className={navStyles.wordmark} href="/">
-        Market Engineering
-      </Link>
+      <Wordmark />
       <nav aria-label="Main" className={navStyles.links}>
         {links.map((link) => (
           <Link className={navStyles.link} href={link.href} key={link.href}>
@@ -50,7 +51,7 @@ export const SiteHeader = () => (
 export const SiteFooter = () => (
   <footer className={footerStyles.root}>
     <div className={footerStyles.top}>
-      <p className={footerStyles.wordmarkBig}>Market Engineering</p>
+      <Wordmark className={footerStyles.wordmarkBig} size="display" />
       <div className={footerStyles.column}>
         <p className={footerStyles.columnTitle}>Product</p>
         {links.map((link) => (
@@ -69,11 +70,11 @@ export const SiteFooter = () => (
       </div>
       <div className={footerStyles.column}>
         <p className={footerStyles.columnTitle}>Get in touch</p>
-        <a className={footerStyles.link} href="mailto:hello@marketengineering.dev">
-          hello@marketengineering.dev
+        <a className={footerStyles.link} href={`mailto:${siteConfig.email}`}>
+          siteConfig.email
         </a>
       </div>
     </div>
-    <p className={footerStyles.legal}>© Market Engineering. Templates stay on our servers.</p>
+    <p className={footerStyles.legal}>{`© ${new Date().getFullYear()} ${siteConfig.name}. Templates stay on our servers.`}</p>
   </footer>
 )

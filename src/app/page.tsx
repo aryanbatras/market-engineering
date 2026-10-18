@@ -4,12 +4,12 @@ import { Button } from "@presentation/design/button"
 import { Reveal } from "@presentation/motion/reveal"
 import { ScrollProgress, ScrollReveal } from "@presentation/motion/scroll-reveal"
 import { heroStyles } from "@presentation/marketing/editor.styles"
-import { FaqSection, IntroSection, ShowcaseSection, StepsSection } from "@presentation/marketing/home-sections"
+import { FaqSection, IntroSection } from "@presentation/marketing/home-sections"
+import { ShowcaseSection, StepsSection } from "@presentation/marketing/sections-flow"
 import { TemplatesSection } from "@presentation/marketing/commerce-sections"
 import { ClosingCta, PricingTable } from "@presentation/marketing/plans"
 import { CompileEditor } from "@presentation/marketing/compile-editor"
-import { AtmosphereBand } from "@presentation/marketing/atmosphere"
-import { GallerySection } from "@presentation/marketing/gallery"
+import { AtmosphereBand, GallerySection } from "@presentation/marketing/gallery"
 import { RecruiterSurfaces } from "@presentation/marketing/surfaces"
 import { SiteFooter, SiteHeader } from "@presentation/marketing/site-chrome"
 import { heroYaml } from "@application/portfolio/hero-yaml"
@@ -23,9 +23,6 @@ const HomePage = () => (
     <main>
       <div className={heroStyles.root}>
         <div className={heroStyles.copy}>
-          <Reveal as="p" className={heroStyles.kicker} distance={12}>
-            For engineering students who cannot code their way out
-          </Reveal>
           <Reveal as="h1" className={heroStyles.title} delay={60}>
             Your work, made visible
           </Reveal>
@@ -45,7 +42,7 @@ const HomePage = () => (
         <Reveal delay={120}>
           <CompileEditor initialText={heroYaml} />
           <p className={heroStyles.demoNote}>
-            The real parser, running on this page. Edit the YAML on the left and the preview follows.
+            The real parser and the real templates, running on this page.
           </p>
         </Reveal>
       </div>

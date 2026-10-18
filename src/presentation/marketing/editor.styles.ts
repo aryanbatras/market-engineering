@@ -5,6 +5,7 @@ export const editorStyles = {
   right: "flex min-w-0 flex-col",
   bar: "flex items-center justify-between gap-3 pb-3",
   file: "text-micro text-ink-45 font-medium",
+  barRight: "flex items-center gap-3",
   counter: "text-micro text-ink-45 tabular-nums",
   frame: "bg-ground overflow-hidden rounded-panel",
   editorHost: "h-[320px] md:h-[400px] overflow-hidden",
@@ -48,6 +49,7 @@ export const mediaStyles = {
   heading: "text-display text-white max-w-[16ch]",
   body: "text-lead text-white/70 mt-8 max-w-[48ch]",
   captionRow: "text-micro text-white/40 mt-6",
+  creditLink: "text-micro text-white/60 mt-8 inline-block underline underline-offset-4",
   inner: "relative mx-auto w-full max-w-[1440px] px-5 py-28 md:px-8 md:py-40",
 } as const
 
@@ -72,6 +74,7 @@ export const galleryStyles = {
   plate: "flex flex-col gap-3",
   frame: "relative aspect-[4/5] overflow-hidden rounded-panel bg-ground-sunken",
   image: "object-cover",
-  caption: "text-small text-ink-70 flex items-baseline justify-between gap-3",
-  credit: "text-micro text-ink-45 whitespace-nowrap",
+  caption: "text-small text-ink-70",
+  creditButton: "absolute right-3 bottom-3 bg-ink text-white/80 rounded-pill px-3 py-1.5 text-micro",
+  creditLink: "text-micro text-ink-45 inline-flex items-center gap-1 underline underline-offset-4 hover:text-ink",
 } as const

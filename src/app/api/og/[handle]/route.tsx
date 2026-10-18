@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og"
 import { portfolioQueries } from "@composition/portfolio-queries"
+import { siteConfig } from "@application/site/site-config"
 
 export const runtime = "edge"
 
@@ -32,7 +33,7 @@ export async function GET(_request: Request, { params }: RouteProps) {
         }}
       >
         <div style={{ display: "flex", fontSize: 20, letterSpacing: "-0.01em" }}>
-          marketengineering.dev/p/{handle}
+          {siteConfig.origin.replace(/^https?:\/\//, "")}/p/{handle}
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", fontSize: 82, fontWeight: 800, letterSpacing: "-0.045em", lineHeight: 1 }}>

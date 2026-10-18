@@ -57,7 +57,7 @@ const TermsPage = () => (
 
       <div className={pageStyles.section}>
         <h2 className={pageStyles.sectionTitle}>Contact</h2>
-        <p className={pageStyles.paragraph}>hello@marketengineering.dev</p>
+        <p className={pageStyles.paragraph}>siteConfig.email</p>
       </div>
     </div>
   </ProsePage>

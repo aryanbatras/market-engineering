@@ -1,17 +1,16 @@
 "use client"
 
 import { Button } from "@presentation/design/button"
-import { errorStyles } from "@presentation/builder/builder.styles"
-import { cn } from "@presentation/design/cn"
+import { builderStyles as styles } from "@presentation/builder/builder.styles"
 
 const PortfolioError = ({ reset }: { error: Error; reset: () => void }) => (
-  <div className={errorStyles.root}>
-    <div className={errorStyles.inner}>
-      <h1 className={errorStyles.title}>This template could not be rendered</h1>
-      <p className={errorStyles.body}>
+  <div className={styles.errorRoot}>
+    <div className={styles.errorInner}>
+      <h1 className={styles.errorTitle}>This template could not be rendered</h1>
+      <p className={styles.errorBody}>
         Your data is safe. Try again, and if it keeps failing the template is probably the problem.
       </p>
-      <div className={errorStyles.action}>
+      <div className={styles.errorAction}>
         <Button intent="primary" onClick={() => reset()}>
           Try again
         </Button>
@@ -19,7 +18,5 @@ const PortfolioError = ({ reset }: { error: Error; reset: () => void }) => (
     </div>
   </div>
 )
-
-void cn
 
 export default PortfolioError

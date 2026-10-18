@@ -23,7 +23,7 @@ const SignInPage = () => (
         </Button>
       </div>
       <p className={signInStyles.note}>
-        Email and password sign-in is also available. Google sign-in is one tap for most people.
+        Google and GitHub both sign you in. We never ask you to create a new password.
       </p>
     </div>
   </div>

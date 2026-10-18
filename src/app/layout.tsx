@@ -2,6 +2,7 @@ import { cn } from "@presentation/design/cn"
 import type { Metadata, Viewport } from "next"
 import type { ReactNode } from "react"
 import { Geist, Geist_Mono } from "next/font/google"
+import { siteConfig, siteTitle } from "@application/site/site-config"
 import "./globals.css"
 
 const geist = Geist({
@@ -17,16 +18,16 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://marketengineering.dev"),
+  metadataBase: new URL(siteConfig.origin),
   title: {
-    default: "Market Engineering — your work, made visible",
-    template: "%s · Market Engineering",
+    default: siteTitle(),
+    template: `%s · ${siteConfig.name}`,
   },
   description:
     "Turn the resume and GitHub you already have into a portfolio a recruiter actually reads. Paste YAML, pick a template, publish at your own URL.",
   openGraph: {
     type: "website",
-    siteName: "Market Engineering",
+    siteName: siteConfig.name,
   },
   robots: {
     index: true,
