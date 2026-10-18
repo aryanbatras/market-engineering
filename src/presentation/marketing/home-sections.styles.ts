@@ -1,0 +1,101 @@
+export const introStyles = {
+  column: "max-w-[34rem] md:ml-[15%]",
+  first: "text-lead text-ink",
+  body: "text-body text-ink-70 mt-6",
+  link: "text-blue text-small mt-6 inline-block underline underline-offset-4",
+} as const
+
+export const stepsStyles = {
+  grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4",
+  field: "flex min-w-0 min-h-[420px] flex-col justify-between p-8 md:min-h-[560px]",
+  fieldOne: "bg-ground",
+  fieldTwo: "bg-ground-sunken",
+  fieldThree: "bg-blue-wash",
+  fieldFour: "bg-ink",
+  clause: "text-lead text-ink",
+  clauseOnDark: "text-lead text-white",
+  card: "bg-ground rounded-panel p-5",
+  cardOnDark: "bg-white/10 rounded-panel p-5",
+  cardTitle: "text-small text-ink font-medium",
+  cardTitleOnDark: "text-small text-white font-medium",
+  cardRow: "text-micro text-ink-45 mt-2",
+  cardRowOnDark: "text-micro text-white/60 mt-2",
+  cardRowOn: "text-micro text-blue mt-2",
+  cardRowOnDarkOn: "text-micro text-white mt-2",
+  index: "text-micro text-ink-45 font-medium md:hidden",
+  indexOnDark: "text-micro text-white/50 font-medium md:hidden",
+} as const
+
+export const showcaseStyles = {
+  layout: "grid grid-cols-1 gap-12 lg:grid-cols-12",
+  labelColumn: "min-w-0 lg:col-span-3",
+  fragmentColumn: "min-w-0 lg:col-span-8 lg:col-start-5",
+  title: "text-title text-ink",
+  body: "text-body text-ink-70 mt-6 max-w-[40ch]",
+  states: "flex flex-col gap-10",
+  stateLabel: "text-small text-ink-45 mb-3",
+  fragment: "bg-ground rounded-panel overflow-hidden",
+  fragmentHead: "bg-ground-sunken text-micro text-ink-45 px-5 py-3 font-medium",
+  fragmentBody: "flex flex-col gap-3 p-5",
+  row: "bg-ground-sunken flex items-center gap-4 rounded-panel px-4 py-3 transition-colors duration-micro",
+  rowActive: "bg-blue-wash",
+  checkbox: "bg-ground text-blue size-5 shrink-0 rounded-full",
+  checkboxOn: "bg-blue",
+  rowTitle: "text-small text-ink font-medium",
+  rowMeta: "text-micro text-ink-45",
+  check: "text-white",
+} as const
+
+export const templatesStyles = {
+  heading: "text-title text-ink",
+  body: "text-body text-ink-70 mt-6 max-w-[48ch]",
+  grid: "mt-16 grid grid-cols-1 gap-6 md:grid-cols-12",
+  card: "bg-ground-sunken rounded-panel overflow-hidden",
+  spanA: "md:col-span-5",
+  spanB: "md:col-span-7",
+  cardB: "bg-ground-sunken rounded-panel overflow-hidden md:col-span-7",
+  cardHead: "flex items-center justify-between px-5 py-3",
+  cardName: "text-small text-ink font-medium",
+  cardTag: "bg-blue-wash text-blue rounded-pill px-2.5 py-1 text-micro",
+  cardBody: "flex flex-col gap-2 p-5",
+  projectName: "text-small text-ink font-medium",
+  projectBody: "text-micro text-ink-70",
+  more: "text-blue text-small mt-10 inline-block underline underline-offset-4",
+  moreTop: "mt-4",
+} as const
+
+export const pricingStyles = {
+  title: "text-title text-ink",
+  grid: "mt-16 grid grid-cols-1 items-start gap-10 md:grid-cols-3",
+  plan: "flex flex-col",
+  planName: "text-lead text-ink",
+  planBlurb: "text-small text-ink-70 mt-3 min-h-[3rem]",
+  figure: "text-display text-ink mt-8 tabular-nums",
+  figureSmall: "text-display text-ink mt-8 tabular-nums",
+  period: "text-small text-ink-45 whitespace-nowrap",
+  features: "mt-8 flex flex-col gap-3",
+  feature: "text-small text-ink-70 flex items-start gap-3",
+  featureMark: "bg-ink mt-2 size-1 shrink-0 rounded-full",
+  featureMarkOn: "bg-blue mt-2 size-1 shrink-0 rounded-full",
+  planFeatured: "text-lead text-ink flex items-center gap-2",
+  sponsored: "bg-blue-wash text-blue rounded-pill px-3 py-1 text-micro",
+  planAction: "mt-8",
+} as const
+
+export const faqStyles = {
+  layout: "grid grid-cols-1 gap-12 lg:grid-cols-12",
+  list: "flex flex-col gap-4 lg:col-span-5",
+  pane: "lg:col-span-6 lg:col-start-7",
+  heading: "text-small text-ink-45 font-medium",
+  question: "text-body text-ink-70 hover:text-ink flex items-center gap-3 transition-colors duration-micro",
+  questionActive: "text-body text-ink flex items-center gap-3",
+  dot: "bg-ink-15 size-2 shrink-0 rounded-full transition-colors duration-micro",
+  dotActive: "bg-blue size-2 shrink-0 rounded-full",
+  answer: "text-lead text-ink-70 lg:sticky lg:top-32",
+} as const
+
+export const ctaStyles = {
+  root: "mx-auto flex min-h-[60dvh] w-full max-w-[1440px] flex-col items-start justify-center px-5 md:px-8",
+  sentence: "text-lead text-ink max-w-[34ch]",
+  action: "mt-8",
+} as const

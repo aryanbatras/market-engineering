@@ -1,0 +1,17 @@
+export const minimalStyles = {
+  root: "text-ink mx-auto flex min-h-dvh w-full max-w-[560px] flex-col justify-center px-6 py-24",
+  name: "text-display text-ink tracking-[-0.05em]",
+  headline: "text-body text-ink-70 mt-10 max-w-[38ch]",
+  rule: "bg-ink-15 my-16 h-px w-12",
+  block: "mt-14",
+  blockTitle: "text-micro text-ink-45 font-medium",
+  body: "text-body text-ink mt-4",
+  muted: "text-small text-ink-70 mt-4",
+  project: "mt-8 flex flex-col gap-1.5",
+  projectName: "text-body text-ink",
+  link: "text-blue text-small",
+  linkTop: "mt-8",
+  linkStack: "mt-14 flex flex-col gap-2",
+  list: "text-small text-ink-70 mt-4 flex flex-wrap gap-x-4 gap-y-1",
+  footer: "text-ink-45 mt-32 text-micro",
+} as const
