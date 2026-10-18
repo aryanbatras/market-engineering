@@ -146,7 +146,7 @@ Enforcement:
 
 1. Heavy dependencies are imported only inside the template folder that uses them. Never lifted to a shared location.
 2. Templates declaring `three: true` never appear in the static import graph of templates that do not.
-3. `optimizePackageImports` configured for GSAP, Three, R3F, Phosphor.
+3. `optimizePackageImports` configured for GSAP, Three, R3F, and `react-icons`.
 4. Each template's `meta` drives a build-time check. If the Bento chunk contains `three`, the build fails.
 5. That check runs in CI. It is the mechanism that stops this from regressing silently as templates grow.
 

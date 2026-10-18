@@ -189,7 +189,7 @@ Sticky navigation, dropdowns, dialogs, toasts. Nothing else. A card at rest has 
 
 **Substrate:** shadcn/ui, source owned by us. **Target:** HeroUI's token architecture — radius multipliers, transparent borders, tone-stepped surfaces, OKLCH authoring. **Motion:** GSAP for scroll choreography, Motion for component state, React Three Fiber where 3D is genuinely needed.
 
-**Icons:** Phosphor, 1.5px stroke, 20px in UI. Never emoji.
+**Icons:** React Icons, **Lucide family only** (`react-icons/lu`), 2px stroke at 20px. One family for the whole product — mixing families is instantly visible because their stroke weights differ. Never emoji. Per-icon imports only; never the barrel file.
 
 ### Buttons
 
@@ -312,7 +312,7 @@ Each of these is the default output of a generic generated interface. Banned out
 |---|---|
 | Gradients, anywhere | Flat `--ink`, `--white`, or `--blue` |
 | A fourth colour | Three hues. Tone steps only. |
-| Emoji as icons or decoration | Phosphor, or nothing |
+| Emoji as icons or decoration | React Icons, or nothing |
 | Glassmorphism, frosted blur panels | Solid fill, `--shadow-float` if it truly floats |
 | Icons in rounded tinted squares | The icon alone, or the word |
 | Icon-topped feature cards | Section blueprints in §11 |

@@ -78,7 +78,7 @@ Every other template is free. The one that costs us the most is the one that cos
 
 ## "Made with love"
 
-Free tier footer. Small, `--ink-45`, a short text wordmark with a single Phosphor heart glyph. No pill, no badge chrome, no ribbon.
+Free tier footer. Small, `--ink-45`, a short text wordmark with a single heart glyph. No pill, no badge chrome, no ribbon.
 
 Deliberately understated. A loud badge would wreck the design (`DESIGN.md` §13) and would generate the resentment that turns a free user into a refund request.
 

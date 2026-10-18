@@ -35,7 +35,7 @@ We also *need* to own the component source. Our portfolio templates are the prod
 |---|---|---|---|
 | Display **and** text | **Geist** | Inter, General Sans, Space Grotesk, Instrument Sans | Founder-pinned: Vercel's typeface. One family for display and body, which halves the font payload and removes the pairing question entirely. Weight 800 carries the display work. |
 | Utility | **Geist Mono** | JetBrains Mono, IBM Plex Mono | Code and technical values only, never as decoration. |
-| Icons | **Phosphor** | Lucide, Heroicons | 1.5px stroke at 20px gives the iOS-adjacent weight the brief asks for. Lucide is the other valid choice. |
+| Icons | **React Icons** (Lucide family) | Phosphor, standalone Lucide, Heroicons | Founder-pinned. MIT, enormous catalogue, excellent tree-shaking with per-icon imports. The cost is that it aggregates multiple families with differing stroke weights, so DESIGN.md pins us to `react-icons/lu` and forbids mixing. |
 | Class composition | **`cn` (clsx + tailwind-merge)**, `cva`, `tailwind-variants` | — | Required by R7. `tailwind-variants` when a component has many slots and variant cross-products. |
 | Animation | **GSAP** | — | Founder decision. Scroll choreography. All plugins now free. |
 | State animation | **Motion** (framer-motion) | — | Component enter/exit, layout transitions. |

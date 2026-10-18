@@ -73,7 +73,8 @@ We ship five. They are deliberately spread across the space so a user can recogn
 **Commercially**
 
 - Templates stay on our infrastructure. No source download, no fork, no self-hosting. The whole business depends on this.
-- Free-tier templates carry a small "Made with love" in the footer — `--ink-45`, a single Phosphor heart glyph, no pill, no badge chrome. Removed on paid.
+- Free-tier templates carry a small "Made with love" in the footer — `--ink-45`, a single heart glyph, no pill, no badge chrome. Removed on paid.
+- **No external assets inside templates.** Illustrations, icon packs, and stock imagery are prohibited in anything we render to users. Several common licences ban exactly our business model — see `../04-research/external-assets.md`.
 
 ---
 

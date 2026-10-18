@@ -43,6 +43,7 @@ This exists because the entire business depends on templates staying closed-sour
 | `phosphor-react` | MIT | Clear |
 | `@dnd-kit/*` | MIT | Clear |
 | `razorpay` | BSD-2-Clause | Clear |
+| `react-icons` | MIT | Clear — Lucide family (`react-icons/lu`). Per-icon imports only. |
 
 ---
 

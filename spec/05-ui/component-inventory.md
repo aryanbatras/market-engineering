@@ -97,7 +97,15 @@ Exactly the AI-slop set. Each one appears in `DESIGN.md` §13 for the same reaso
 
 ## Icons
 
-**Phosphor**, regular weight, 1.5px stroke at 20px. 24px as feature markers.
+**React Icons, Lucide family only.** Founder-pinned. MIT.
+
+React Icons aggregates many families whose stroke weights and geometry differ, so the rule is stricter here than with a single-family library: **exactly one family for the whole product.** We use `react-icons/lu`, at 20px in UI and 24px as feature markers.
+
+```ts
+import { ArrowRight, Check, Github } from "react-icons/lu"
+```
+
+Per-icon imports only. Never the barrel file — it defeats tree-shaking. `optimizePackageImports` covers `react-icons` in the production build.
 
 One set, one weight, no exceptions. Mixing weights reads as carelessness and it is the fastest way to make a polished page look assembled from parts.
 
