@@ -12,14 +12,14 @@ const steps = [
   {
     clause: "Paste it, or connect GitHub.",
     rows: [
-      { label: "portfolio.yaml", value: "112 lines", on: false },
-      { label: "status", value: "valid", on: false },
+      { label: "pasted", value: "112 lines of YAML", on: true },
+      { label: "schema check", value: "passes", on: true },
     ],
   },
   {
     clause: "Every field is checked.",
     rows: [
-      { label: "name", value: "Your Name", on: true },
+      { label: "name", value: "Naina Kumari", on: true },
       { label: "headline", value: "Backend engineer", on: true },
       { label: "projects", value: "5 parsed", on: true },
     ],
@@ -29,13 +29,13 @@ const steps = [
     rows: [
       { label: "Classic", value: "selected", on: true },
       { label: "skills", value: "10 grouped", on: true },
-      { label: "handle", value: "yourname", on: true },
+      { label: "handle", value: "nainakumari", on: true },
     ],
   },
   {
     clause: "It goes live at your URL.",
     rows: [
-      { label: "standout.dev/p/yourname", value: "live", on: true },
+      { label: "published URL", value: "live", on: true },
     ],
   },
 ]

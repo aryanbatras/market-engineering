@@ -1,4 +1,5 @@
 import { LuDownload } from "react-icons/lu"
+import { siteConfig } from "@application/site/site-config"
 import { surfacesStyles } from "./surfaces.styles"
 
 type SurfacesProps = {
@@ -18,17 +19,17 @@ export const RecruiterSurfaces = ({ name, headline }: SurfacesProps) => (
 
     <div className={surfacesStyles.fragmentColumn}>
       <div className={surfacesStyles.grid}>
-        <div>
+        <div className={surfacesStyles.socialSlot}>
           <div className={surfacesStyles.socialCard} data-ui>
-            <p className={surfacesStyles.cardEyebrow}>marketengineering.dev</p>
+            <p className={surfacesStyles.cardEyebrow}>{siteConfig.origin.replace(/^https?:\/\//, "")}</p>
             <p className={surfacesStyles.cardName}>{name}</p>
             <p className={surfacesStyles.cardHeadline}>{headline}</p>
             <p className={surfacesStyles.cardFoot}>3 projects · 1 internship</p>
           </div>
-          <p className={surfacesStyles.caption}>The social card, rendered for every handle.</p>
+          <p className={surfacesStyles.caption}>Rendered for every handle.</p>
         </div>
 
-        <div>
+        <div className={surfacesStyles.pdfSlot}>
           <div className={surfacesStyles.pdf} data-ui>
             <div className={surfacesStyles.pdfBar}>
               <LuDownload aria-hidden size={15} strokeWidth={1.5} />
@@ -47,7 +48,7 @@ export const RecruiterSurfaces = ({ name, headline }: SurfacesProps) => (
               <p className={surfacesStyles.pdfLine}>Second-year compiler notes</p>
             </div>
           </div>
-          <p className={surfacesStyles.caption}>The PDF, for the application form that insists on one.</p>
+          <p className={surfacesStyles.caption}>For the application form that insists on one.</p>
         </div>
       </div>
     </div>

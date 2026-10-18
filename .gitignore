@@ -8,3 +8,6 @@ node_modules
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+# Screenshots dropped in the repo root by the founder
+Screenshot *.png

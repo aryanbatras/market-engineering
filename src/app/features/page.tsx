@@ -6,7 +6,7 @@ import { Button } from "@presentation/design/button"
 
 export const metadata: Metadata = {
   title: "Features",
-  description: "Three ways in, five templates, and the surfaces a recruiter actually opens.",
+  description: "Three ways in, a growing template library, and the surfaces a recruiter actually opens.",
 }
 
 const features = [
@@ -45,7 +45,7 @@ const surfaces = [
 
 const FeaturesPage = () => (
   <ProsePage
-    lead="Three ways to get your information in, five templates that do not look alike, and the surfaces a recruiter actually opens. Nothing you do not need."
+    lead="Three ways to get your information in, templates that do not look alike, and the surfaces a recruiter actually opens. Nothing you do not need."
     title="What it does"
   >
     <div className={pageStyles.section}>

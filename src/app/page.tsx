@@ -5,15 +5,17 @@ import { Reveal } from "@presentation/motion/reveal"
 import { ScrollProgress, ScrollReveal } from "@presentation/motion/scroll-reveal"
 import { heroStyles } from "@presentation/marketing/editor.styles"
 import { FaqSection, IntroSection } from "@presentation/marketing/home-sections"
-import { ShowcaseSection, StepsSection } from "@presentation/marketing/sections-flow"
-import { TemplatesSection } from "@presentation/marketing/commerce-sections"
+import { StepsSection } from "@presentation/marketing/sections-flow"
 import { ClosingCta, PricingTable } from "@presentation/marketing/plans"
 import { CompileEditor } from "@presentation/marketing/compile-editor"
+import { BuildTimeline } from "@presentation/marketing/build-timeline"
 import { AtmosphereBand, GallerySection } from "@presentation/marketing/gallery"
 import { RecruiterSurfaces } from "@presentation/marketing/surfaces"
+import { TemplateGallery } from "@presentation/builder/template-gallery"
 import { SiteFooter, SiteHeader } from "@presentation/marketing/site-chrome"
 import { heroYaml } from "@application/portfolio/hero-yaml"
 import { pricingStyles } from "@presentation/marketing/home-sections.styles"
+import { previewPortfolio } from "@application/portfolio/preview-portfolio"
 
 const HomePage = () => (
   <>
@@ -23,14 +25,13 @@ const HomePage = () => (
     <main>
       <div className={heroStyles.root}>
         <div className={heroStyles.copy}>
-          <Reveal as="h1" className={heroStyles.title} delay={60}>
+          <Reveal as="h1" className={heroStyles.title} delay={40}>
             Your work, made visible
           </Reveal>
-          <Reveal as="p" className={heroStyles.lead} delay={140}>
-            Paste your resume as YAML. Pick a template. Get a link a recruiter will actually open, in about
-            ten minutes.
+          <Reveal as="p" className={heroStyles.lead} delay={120}>
+            Your resume in, a portfolio site out. Ten minutes, one link, and no design decisions in between.
           </Reveal>
-          <Reveal className={heroStyles.actionRow} delay={220}>
+          <Reveal className={heroStyles.actionRow} delay={200}>
             <Link href="/builder">
               <Button intent="primary">Start building</Button>
             </Link>
@@ -39,17 +40,15 @@ const HomePage = () => (
             </Link>
           </Reveal>
         </div>
-        <Reveal delay={120}>
-          <CompileEditor initialText={heroYaml} />
-          <p className={heroStyles.demoNote}>
-            The real parser and the real templates, running on this page.
-          </p>
+        <Reveal delay={100}>
+          <div>
+            <CompileEditor initialText={heroYaml} />
+            <BuildTimeline />
+          </div>
         </Reveal>
       </div>
 
-      <Section spacing="flush">
-        <AtmosphereBand />
-      </Section>
+      <AtmosphereBand />
 
       <Section>
         <Shell>
@@ -73,21 +72,8 @@ const HomePage = () => (
 
       <Section>
         <Shell>
-          <ScrollReveal>
-            <div data-reveal>
-              <ShowcaseSection />
-            </div>
-          </ScrollReveal>
-        </Shell>
-      </Section>
-
-      <Section>
-        <Shell>
           <Reveal>
-            <RecruiterSurfaces
-              headline="Backend engineer. Builds the boring parts that keep the fast parts running."
-              name="Your Name"
-            />
+            <RecruiterSurfaces headline={previewPortfolio.identity.headline ?? ""} name={previewPortfolio.identity.name} />
           </Reveal>
         </Shell>
       </Section>
@@ -95,7 +81,7 @@ const HomePage = () => (
       <Section>
         <Shell>
           <Reveal>
-            <TemplatesSection />
+            <TemplateGallery heading="Templates" limit={3} />
           </Reveal>
         </Shell>
       </Section>

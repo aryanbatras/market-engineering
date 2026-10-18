@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "schema:generate": "tsx scripts/generate-schema.ts",
     "verify": "npm run lint && npm run typecheck && npm run mock:verify",
-    "mock:verify": "tsx scripts/verify-mock.mjs"
+    "mock:verify": "tsx scripts/verify-mock.mjs",
+    "ui:verify": "node scripts/ui-verify.mjs",
+    "design:gate": "node scripts/design-gate.mjs",
+    "gate": "npm run verify && npm run build && npm run ui:verify && npm run design:gate"
   },
   "dependencies": {
     "@codemirror/lang-yaml": "^6.1.3",

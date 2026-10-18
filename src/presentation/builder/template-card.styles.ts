@@ -1,16 +1,25 @@
 export const templateCardStyles = {
-  card: "bg-ground-sunken rounded-panel p-6 text-left",
+  heading: "text-title text-ink",
+  grid: "mt-16 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3",
+
+  card: "bg-ground-sunken rounded-panel p-5",
   cardActive: "bg-blue-wash",
+
   head: "flex items-center justify-between gap-4",
   name: "text-body text-ink font-medium",
-  forWhom: "text-body text-ink-70 mt-3 max-w-[46ch]",
+  forWhom: "text-small text-ink-70 mt-3 max-w-[46ch]",
+
+  frame: "bg-ground-sunken mt-6 h-[440px] overflow-hidden rounded-panel",
+  frameFill: "h-[calc(100dvh-280px)]",
+  stage: "size-full overflow-x-hidden overflow-y-auto",
+  canvas: "w-[1440px] origin-top-left bg-white [zoom:0.17] md:[zoom:0.2] xl:[zoom:0.23]",
+  canvasDark: "bg-ink",
+  loading: "size-full",
+
   tag: "bg-ground text-ink-70 rounded-pill px-2.5 py-1 text-micro",
   tagPro: "bg-blue text-white rounded-pill px-2.5 py-1 text-micro",
-  frame: "bg-ground mt-6 h-[360px] overflow-hidden rounded-panel",
-  scale: "w-[1440px] origin-top-left [zoom:0.25]",
-  scaleDark: "bg-ink",
-  loading: "h-full w-full",
-  live: "mt-5 flex items-center justify-between gap-3",
-  liveLink: "text-small text-blue inline-flex items-center gap-1.5 underline underline-offset-4",
-  liveNote: "text-micro text-ink-45",
+
+  viewMore:
+    "bg-ink text-white flex min-h-[320px] items-center justify-center gap-3 rounded-panel text-lead hover:bg-blue-deep md:col-span-2 xl:col-span-3",
+  viewMoreText: "text-lead",
 } as const

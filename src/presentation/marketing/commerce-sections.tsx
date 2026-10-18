@@ -27,7 +27,7 @@ const templates = [
 
 export const TemplatesSection = () => (
   <>
-    <h2 className={templatesStyles.heading}>Five templates, and they do not look alike</h2>
+    <h2 className={templatesStyles.heading}>Templates that do not look alike</h2>
     <p className={templatesStyles.body}>
       A recruiter who has seen three of ours should be able to tell them apart from the layout alone. That is
       the bar each one has to clear.

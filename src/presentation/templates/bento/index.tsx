@@ -20,10 +20,7 @@ const Bento = ({ data, showAttribution }: TemplateProps) => {
         </header>
 
         <div className={cn(bentoStyles.tileAccent, bentoStyles.tileHalf, bentoStyles.tileTall)}>
-          {data.identity.availability ? (
-            <p className={bentoStyles.eyebrowOnAccent}>Availability</p>
-          ) : null}
-          <p className={cn(bentoStyles.tileTitleOnAccent, bentoStyles.gapTop)}>
+          <p className={cn(bentoStyles.tileTitleOnAccent)}>
             {data.identity.availability ?? data.identity.headline ?? "Open to work"}
           </p>
           {data.identity.location ? <p className={cn(bentoStyles.tileBodyOnAccent, bentoStyles.gapTop)}>{data.identity.location}</p> : null}
@@ -47,7 +44,9 @@ const Bento = ({ data, showAttribution }: TemplateProps) => {
             className={cn(bentoStyles.tile, index === 0 ? bentoStyles.tileWide : bentoStyles.tileHalf)}
             key={project.name}
           >
-            <p className={bentoStyles.eyebrow}>{project.timeline ?? "Project"}</p>
+            {project.timeline ? (
+              <p className={bentoStyles.eyebrow}>{project.timeline}</p>
+            ) : null}
             <p className={cn(bentoStyles.tileTitle, bentoStyles.gapTight)}>{project.name}</p>
             {project.description ? (
               <p className={cn(bentoStyles.tileBody, bentoStyles.gapTop)}>{project.description}</p>

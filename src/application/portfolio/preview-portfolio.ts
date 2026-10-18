@@ -3,12 +3,12 @@ import type { Portfolio } from "./portfolio.schema"
 export const previewPortfolio: Portfolio = {
   portfolioVersion: 1,
   identity: {
-    name: "Your Name",
+    name: "Naina Kumari",
     headline: "Backend engineer. Builds the boring parts that keep the fast parts running.",
-    location: "Coimbatore",
+    location: "Bengaluru",
     availability: "Available from June 2027",
   },
-  links: [{ platform: "github", label: "github.com/yourname", url: "https://github.com/yourname" }],
+  links: [{ platform: "github", label: "github.com/nainakumari", url: "https://github.com/nainakumari" }],
   education: [
     {
       institution: "Karpagam College of Engineering",
@@ -50,5 +50,5 @@ export const previewPortfolio: Portfolio = {
     { name: "PostgreSQL", group: "Data" },
   ],
   highlights: ["Second place, state-level hackathon, 2025"],
-  meta: { handle: "yourname", templateId: "classic" },
+  meta: { handle: "nainakumari", templateId: "classic" },
 }

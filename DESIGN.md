@@ -357,7 +357,22 @@ Each of these is the default output of a generic generated interface. Banned out
 
 ---
 
-## 16. Pre-ship
+## 16. The design gate
+
+`node scripts/design-gate.mjs` renders every public page in Chrome and applies the taste-skill rules. It must report zero FAIL before a change ships. Three rules carry a written allowance, each for one specific and checkable reason.
+
+| Allowed | Where | Why |
+|---|---|---|
+| `mono` | The YAML editor, hero and builder | §5 puts Geist Mono on code. The editor *is* code. No prose anywhere uses it. |
+| `eyebrow` | Portfolio template previews | §13 bans editorial kickers above headlines. The Bento template uses section labels (`Experience`, `Education`) so a recruiter can scan a one-page portfolio in four seconds. Removing them costs orientation. The marketing pages themselves have no eyebrows. |
+| `side-scroll` | The YAML editor at 390px | A 78-character YAML line does not fit a phone. The editor scrolls horizontally the way every code editor does. Nothing else on any page scrolls sideways. |
+| `card-rows` | The template gallery, and the step flow | Two sections are grids on purpose. The gallery is the product: a recruiter's first question is "what does this look like", and the only honest answer is to show the templates side by side. The step flow is a sequence; the fourth field is tone-inverted to break the run. Every other section on every page has been pulled out of a grid. |
+
+An allowance is a debt with an owner. If the reason stops being true, the allowance goes with it.
+
+---
+
+## 17. Pre-ship
 
 - [ ] Three hues only. No fourth.
 - [ ] Running text in full `--ink`

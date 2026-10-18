@@ -2,6 +2,7 @@ import Link from "next/link"
 import { footerStyles, navStyles } from "./nav.styles"
 import { Button } from "../design/button"
 import { Wordmark } from "./wordmark"
+import { SessionActions } from "./session-actions"
 import { siteConfig } from "@application/site/site-config"
 
 const links = [
@@ -28,16 +29,7 @@ export const SiteHeader = () => (
           </Link>
         ))}
       </nav>
-      <div className={navStyles.actions}>
-        <Link className={navStyles.link} href="/sign-in">
-          Sign in
-        </Link>
-        <Link href="/builder">
-          <Button intent="primary" size="small">
-            Start building
-          </Button>
-        </Link>
-      </div>
+      <SessionActions />
     </div>
     <nav aria-label="Main, compact" className={navStyles.mobileRow}>
       {links.map((link) => (
@@ -72,7 +64,7 @@ export const SiteFooter = () => (
       <div className={footerStyles.column}>
         <p className={footerStyles.columnTitle}>Get in touch</p>
         <a className={footerStyles.link} href={`mailto:${siteConfig.email}`}>
-          siteConfig.email
+          {siteConfig.email}
         </a>
       </div>
     </div>

@@ -1,30 +1,34 @@
 import Image from "next/image"
 import Link from "next/link"
-import { galleryStyles } from "./editor.styles"
-import { mediaStyles } from "./editor.styles"
+import { galleryStyles, mediaStyles } from "./editor.styles"
 
 const plates = [
   {
     src: "/media/campus.jpg",
     alt: "The outside of a college building, seen from across the road",
-    caption: "Four years in rooms like this",
+    caption: "Every template, your content",
   },
   {
     src: "/media/server-room.jpg",
     alt: "Rows of server racks with cabling in a data centre",
-    caption: "What the coursework is actually for",
+    caption: "A link you can send",
   },
   {
     src: "/media/library.jpg",
     alt: "A group of students seated at a long table in a library",
-    caption: "Where the work gets done",
+    caption: "Live in ten minutes",
   },
 ]
 
 export const GallerySection = () => (
   <div className={galleryStyles.root}>
     <div className={galleryStyles.head}>
-      <h2 className={galleryStyles.heading}>The world they already study in</h2>
+      <h2 className={galleryStyles.heading}>A page that explains you</h2>
+      <p className={galleryStyles.body}>
+        Not a gallery. The shortest honest answer to why anyone should read your code: what you built, what
+        broke, what you chose, and what you would do differently. Written once, then it argues on your behalf
+        at every screen.
+      </p>
     </div>
     <div className={galleryStyles.grid}>
       {plates.map((plate) => (
@@ -61,13 +65,18 @@ export const AtmosphereBand = () => (
     />
     <div aria-hidden className={mediaStyles.scrim} />
     <div className={mediaStyles.inner}>
-      <p className={mediaStyles.heading}>Nobody saw your work.</p>
+      <p className={mediaStyles.heading}>The blank page.</p>
       <p className={mediaStyles.body}>
-        Four years of coursework, three internships nobody can find, and a profile a recruiter scrolls past.
+        The bottleneck is not talent, it is setup. You already have the commits, the screenshots and the
+        internship notes. What is missing is the two hours to stand up a site, pick a stack and deploy it
+        before the deadline. So the work stays invisible, and the strongest thing you have never gets read.
       </p>
-      <Link className={mediaStyles.creditLink} href="/credits">
-        Credits
-      </Link>
+      <div className={mediaStyles.captionRow}>
+        <span>Typed in, rendered live, published at one address.</span>
+        <Link className={mediaStyles.creditLink} href="/credits">
+          Footage credits
+        </Link>
+      </div>
     </div>
   </section>
 )

@@ -25,7 +25,7 @@ export const plans: Plan[] = [
     blurb: "A working portfolio, for as long as you want it.",
     features: [
       "One published portfolio",
-      "Four of five templates",
+      "Every template",
       "YAML, GitHub, or the form",
       "JSON-LD, social card, PDF export",
       "Export your data any time",
@@ -41,7 +41,7 @@ export const plans: Plan[] = [
     blurb: "Every template, including Immersive, and no footer badge.",
     features: [
       "Everything in Free",
-      "All five templates",
+      "Every template, including new ones",
       "Immersive, the dark one",
       "No Made with love footer",
       "First ask on new templates",

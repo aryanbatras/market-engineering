@@ -1,11 +1,12 @@
 export const navStyles = {
-  bar: "bg-ground/85 sticky top-0 z-50 backdrop-blur-md",
+  bar: "bg-ground sticky top-0 z-50",
   inner: "mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-5 md:px-8",
   wordmark: "text-body text-ink font-medium tracking-tight",
   links: "hidden items-center gap-8 md:flex",
   mobileRow: "bg-ground-sunken flex items-center gap-6 px-5 py-3 md:hidden",
   mobileLink: "text-small text-ink-70",
   link: "text-small text-ink-70 transition-colors duration-micro hover:text-ink",
+  account: "text-small text-ink underline underline-offset-4 hover:text-blue",
   actions: "flex items-center gap-3",
 } as const
 

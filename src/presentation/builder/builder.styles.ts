@@ -3,6 +3,12 @@ export const builderStyles = {
   bar: "bg-ground sticky top-0 z-40",
   barInner: "mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-5 md:px-8",
   wordmark: "text-small text-ink font-medium",
+  barLeft: "flex items-center gap-4",
+  crumb: "text-micro text-ink-45",
+  previewLink: "text-blue inline-flex items-center gap-1.5 underline underline-offset-4",
+  loading: "text-small text-ink-45 px-5 py-20",
+  pickerSlot: "block w-full text-left",
+  pickerSlotActive: "rounded-panel outline-2 outline-blue",
   actionRow: "flex items-center gap-3",
 
   layout: "mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-6 px-5 py-8 md:px-8 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)]",
@@ -10,8 +16,8 @@ export const builderStyles = {
   panelHeading: "text-small text-ink font-medium",
   panelNote: "text-micro text-ink-45",
 
-  sourceFrame: "bg-ground h-[320px] overflow-hidden rounded-panel",
-  editor: "bg-ground h-[320px] overflow-hidden rounded-panel",
+  sourceFrame: "h-[520px] md:h-[640px]",
+  editor: "h-[520px] md:h-[640px]",
 
   statusRow: "flex items-center justify-between gap-3",
   statusOk: "text-micro text-blue font-medium",
@@ -23,6 +29,7 @@ export const builderStyles = {
   handleRow: "flex flex-col gap-2",
   handleInput:
     "bg-ground border-ink-15 rounded-pill border px-5 text-small h-11 focus:border-blue focus:outline-none",
+  suggest: "text-micro text-blue self-start underline underline-offset-4",
   handleOk: "text-micro text-blue font-medium",
   handleBad: "text-micro text-ink font-medium",
 

@@ -3,15 +3,15 @@ import type { PortfolioDraft } from "./portfolio.schema"
 export const samplePortfolio: PortfolioDraft = {
   portfolioVersion: 1,
   identity: {
-    name: "Your Name",
+    name: "Naina Kumari",
     headline: "Backend engineer. Go, Postgres, and the unglamorous parts in between.",
     location: "Bengaluru, India",
-    email: "you@example.com",
+    email: "naina.kumari@example.com",
     availability: "Available from June 2027",
   },
   links: [
-    { platform: "github", label: "github.com/yourname", url: "https://github.com/yourname" },
-    { platform: "linkedin", label: "linkedin.com/in/yourname", url: "https://linkedin.com/in/yourname" },
+    { platform: "github", label: "github.com/nainakumari", url: "https://github.com/nainakumari" },
+    { platform: "linkedin", label: "linkedin.com/in/nainakumari", url: "https://linkedin.com/in/nainakumari" },
   ],
   education: [
     {
@@ -113,9 +113,9 @@ export const samplePortfolio: PortfolioDraft = {
     "Winner, national inter-college hackathon, 2025",
     "Top 5 percent, DBMS course, 2025",
   ],
-  github: { username: "yourname" },
+  github: { username: "nainakumari" },
   meta: {
-    handle: "yourname",
+    handle: "nainakumari",
     templateId: "classic",
   },
 }
