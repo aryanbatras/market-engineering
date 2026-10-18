@@ -177,6 +177,21 @@ const BuilderInner = () => {
             </div>
 
             <div className={builderStyles.promptBox}>
+              <p className={builderStyles.panelHeading}>Make it a resume too</p>
+              <p className={builderStyles.promptBody}>
+                The same data typesets as a document. Ten layouts, and you can see what a
+                recruiter&apos;s software actually reads before you send it anywhere.
+              </p>
+              <div className={builderStyles.gapTop}>
+                <Link href="/resume">
+                  <Button intent="secondary" size="small">
+                    Open the resume editor
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className={builderStyles.promptBox}>
               <p className={builderStyles.panelHeading}>Convert a resume</p>
               <pre className={builderStyles.promptText}>{importPrompt.slice(0, 300)}…</pre>
               <div className={builderStyles.gapTop}>

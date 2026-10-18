@@ -4,8 +4,16 @@
   "type": "object",
   "properties": {
     "portfolioVersion": {
-      "type": "number",
-      "const": 1
+      "anyOf": [
+        {
+          "type": "number",
+          "const": 1
+        },
+        {
+          "type": "number",
+          "const": 2
+        }
+      ]
     },
     "identity": {
       "type": "object",
@@ -135,6 +143,14 @@
             "type": "string",
             "maxLength": 80
           },
+          "board": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "score": {
+            "type": "string",
+            "maxLength": 40
+          },
           "details": {
             "type": "string",
             "maxLength": 800
@@ -191,13 +207,23 @@
           "location": {
             "type": "string",
             "maxLength": 160
+          },
+          "kind": {
+            "default": "full-time",
+            "type": "string",
+            "enum": [
+              "internship",
+              "full-time",
+              "volunteer"
+            ]
           }
         },
         "required": [
           "current",
           "start",
           "highlights",
-          "organisation"
+          "organisation",
+          "kind"
         ],
         "additionalProperties": false
       }
@@ -319,6 +345,29 @@
         "maxLength": 240
       }
     },
+    "languages": {
+      "default": [],
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "proficiency": {
+            "type": "string",
+            "maxLength": 60
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
     "github": {
       "type": "object",
       "properties": {
@@ -357,7 +406,8 @@
     "experience",
     "projects",
     "skills",
-    "highlights"
+    "highlights",
+    "languages"
   ],
   "additionalProperties": false,
   "$defs": {

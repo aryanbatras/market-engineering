@@ -176,7 +176,9 @@ When resuming work, the correct sequence is:
 12. Domain migration (R18) — `core`, `portfolio`, `resume`
 13. v1.5 block editor
 
-Steps 1 through 6 are done. Step 7 is done. Steps 8 and 9 are in progress.
+Steps 1 through 7 are done. Steps 8 and 9 are in progress.
+
+**Step 11 is partially done.** The spec, the schema extension, the LaTeX compiler, the ATS check, the editor and the layout gallery all ship and pass every gate. **The PDF engine does not.** `resolve-resume-compiler.ts` returns the mock in every environment, so "Download PDF" currently produces a placeholder. Wiring a real engine needs the licence audit recorded in `spec/04-research/licenses.md` to pass first, and until it does, the product says "not compiled here" rather than implying a PDF was produced.
 
 ---
 

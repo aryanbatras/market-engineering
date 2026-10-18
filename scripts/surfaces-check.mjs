@@ -132,6 +132,66 @@ record("templates page previews every template", gallery.count >= 5, `${gallery.
 record("templates page previews are sized", gallery.zoomed, JSON.stringify({ count: gallery.count, names: gallery.names }))
 record("templates page avoids the word five", !gallery.saysFive, `matches=${gallery.saysFive}`)
 
+
+await page.goto(`${origin}/resume`, { settleMs: 1800 })
+await sleep(1200)
+const resume = await page.eval(() => {
+  const article = document.querySelector("article")
+  const box = article ? article.getBoundingClientRect() : null
+  const text = document.body.innerText
+  return {
+    sheet: Boolean(article),
+    width: box ? Math.round(box.width) : 0,
+    sheetText: article ? article.innerText.length : 0,
+    layouts: [...document.querySelectorAll("button")].filter((node) => {
+      const first = node.querySelector("span")
+      return first !== null && /^(Rule|Compact|Header|Colour|Engineer|Atlas|Campus|Sidebar|Rail|Modern)$/.test(first.textContent.trim())
+    }).length,
+    editor: Boolean(document.querySelector(".cm-content")),
+    showsExtracted: text.includes("extracted text layer"),
+    saysMocked: /not compiled here/.test(text),
+    hasDownload: /Download PDF/.test(text) && /Download \.tex/.test(text),
+  }
+})
+record("resume renders a document sheet", resume.sheet && resume.sheetText > 200, `${resume.sheetText} chars of real text`)
+record("resume sheet is A4 width", resume.width === 794, `${resume.width}px`)
+record("resume editor shows the source", resume.editor, `editor=${resume.editor}`)
+record("resume offers every layout", resume.layouts === 10, `${resume.layouts} layouts`)
+record("resume shows the extracted text layer", resume.showsExtracted, `shown=${resume.showsExtracted}`)
+record("resume never claims a compile it has not run", resume.saysMocked, `badge=${resume.saysMocked}`)
+record("resume offers PDF and .tex", resume.hasDownload, `both=${resume.hasDownload}`)
+
+await page.eval(() => {
+  const sidebar = [...document.querySelectorAll("button")].find((node) => {
+    const first = node.querySelector("span")
+    return first !== null && first.textContent.trim().startsWith("Sidebar")
+  })
+  if (sidebar) sidebar.click()
+})
+await sleep(800)
+const twoColumn = await page.eval(() => {
+  const text = document.body.innerText
+  return { warns: /Two columns reorder in a parser/.test(text), order: /column-order/.test(text) }
+})
+record(
+  "two-column layout warns before you pick it",
+  twoColumn.warns && twoColumn.order,
+  `warning=${twoColumn.warns} check=${twoColumn.order}`,
+)
+
+await page.goto(`${origin}/resume/templates`, { settleMs: 1800 })
+await sleep(1200)
+const resumeGallery = await page.eval(() => ({
+  sheet: Boolean(document.querySelector("article")),
+  layouts: [...document.querySelectorAll("button")].filter((node) => {
+    const first = node.querySelector("span")
+    return first !== null && /^(Rule|Compact|Header|Colour|Engineer|Atlas|Campus|Sidebar|Rail|Modern)$/.test(first.textContent.trim())
+  }).length,
+  text: document.body.innerText.length,
+}))
+record("resume gallery lists every layout", resumeGallery.layouts === 10, `${resumeGallery.layouts} layouts`)
+record("resume gallery previews a real sheet", resumeGallery.sheet && resumeGallery.text > 500, `${resumeGallery.text} chars`)
+
 await page.goto(`${origin}/sign-in`, { settleMs: 1400 })
 await sleep(700)
 const signIn = await page.eval(() => {

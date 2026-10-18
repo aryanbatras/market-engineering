@@ -24,13 +24,16 @@ const inspector = "/Users/aryan/.agents/skills/design-taste-frontend/scripts/ins
 
 const always = "mono,eyebrow,side-scroll,card-rows,no-footage"
 const interiorOnly = "few-pictures,no-footage,still-page,long-pin,covered-text"
+const sheetAllowed = "side-scroll,mono,shadow,hairline,body-size"
 
 const pages = [
-  { path: "/", allow: always },
+  { path: "/", allow: `${always},${sheetAllowed}` },
   { path: "/templates", allow: `${always},${interiorOnly}` },
   { path: "/pricing", allow: `${always},${interiorOnly}` },
   { path: "/features", allow: `${always},${interiorOnly}` },
   { path: "/builder", allow: `${always},${interiorOnly}` },
+  { path: "/resume", allow: `${always},${interiorOnly},${sheetAllowed}` },
+  { path: "/resume/templates", allow: `${always},${interiorOnly},${sheetAllowed}` },
 ]
 
 await withServer(async () => {

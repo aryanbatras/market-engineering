@@ -112,6 +112,10 @@ export const Dashboard = () => {
                 <Link className={dashboardStyles.link} href="/builder">
                   Edit
                 </Link>
+                <Link className={dashboardStyles.link} href="/resume">
+                  Resume
+                  <LuArrowUpRight size={15} strokeWidth={1.5} />
+                </Link>
                 <Button intent="secondary" onClick={download} size="small">
                   <LuDownload size={16} strokeWidth={1.5} />
                   Export

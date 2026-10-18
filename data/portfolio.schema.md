@@ -10,7 +10,7 @@ resume, or fill in the form and we generate it for you.
 
 ## Root
 
-- **portfolioVersion** · number · required
+- **portfolioVersion** · any · required
 - **identity** · object · required
 - **links** · array · required
 - **education** · array · required
@@ -18,6 +18,7 @@ resume, or fill in the form and we generate it for you.
 - **projects** · array · required
 - **skills** · array · required
 - **highlights** · array · required
+- **languages** · array · required
 - **github** · object · optional
 - **meta** · object · optional
 
@@ -40,6 +41,8 @@ resume, or fill in the form and we generate it for you.
 - **end** · string · optional
 - **current** · boolean · required
 - **grade** · string · optional
+- **board** · string · optional
+- **score** · string · optional
 - **details** · string · optional
 
 ## experience
@@ -52,6 +55,7 @@ resume, or fill in the form and we generate it for you.
 - **organisation** · string · required
 - **role** · string · optional
 - **location** · string · optional
+- **kind** · string · required
 
 ## projects
 

@@ -12,3 +12,4 @@ next-env.d.ts
 # Scratch artefacts dropped in the repo root while working
 Screenshot *.png
 timeline.png
+.resume-out

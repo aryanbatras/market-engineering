@@ -17,15 +17,20 @@ export const previewPortfolio: Portfolio = {
       start: "2023",
       end: "2027",
       current: true,
+      grade: "CGPA 8.7",
+      score: "94.2%",
+      board: "CBSE",
     },
   ],
   experience: [
     {
       organisation: "Zoho",
       role: "Software engineering intern",
+      location: "Chennai",
       start: "2026-05",
       end: "2026-08",
       current: false,
+      kind: "internship",
       summary: "Owned the reporting pipeline behind a weekly business review used by four teams.",
       highlights: ["Cut report preparation from four hours a week to twenty minutes"],
     },
@@ -50,5 +55,10 @@ export const previewPortfolio: Portfolio = {
     { name: "PostgreSQL", group: "Data" },
   ],
   highlights: ["Second place, state-level hackathon, 2025"],
+  languages: [
+    { name: "English", proficiency: "Fluent" },
+    { name: "Tamil", proficiency: "Native" },
+    { name: "Hindi", proficiency: "Conversational" },
+  ],
   meta: { handle: "nainakumari", templateId: "classic" },
 }

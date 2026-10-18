@@ -11,6 +11,7 @@ import { ScrollRail } from "@presentation/marketing/scroll-rail"
 import { AtmosphereBand, GallerySection } from "@presentation/marketing/gallery"
 import { RecruiterSurfaces } from "@presentation/marketing/surfaces"
 import { TemplateGallery } from "@presentation/builder/template-gallery"
+import { ResumeBandSection } from "@presentation/resume/marketing/resume-band"
 import { SiteFooter, SiteHeader } from "@presentation/marketing/site-chrome"
 import { heroYaml } from "@application/portfolio/hero-yaml"
 import { pricingStyles } from "@presentation/marketing/home-sections.styles"
@@ -81,6 +82,8 @@ const HomePage = () => (
           </Reveal>
         </Shell>
       </Section>
+
+      <ResumeBandSection />
 
       <Section>
         <Shell>

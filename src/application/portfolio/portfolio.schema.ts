@@ -6,6 +6,8 @@ const monthYear = z
 
 const year = z.string().regex(/^\d{4}$/, "Use YYYY")
 
+const experienceKind = z.enum(["internship", "full-time", "volunteer"])
+
 const linkPlatform = z.enum([
   "github",
   "linkedin",
@@ -34,6 +36,8 @@ const educationSchema = z.object({
   end: year.optional(),
   current: z.boolean().default(false),
   grade: z.string().max(80).optional(),
+  board: z.string().max(80).optional(),
+  score: z.string().max(40).optional(),
   details: z.string().max(800).optional(),
 })
 
@@ -41,6 +45,7 @@ const experienceSchema = entrySchema.extend({
   organisation: z.string().min(1, "Organisation is required").max(160),
   role: z.string().max(160).optional(),
   location: z.string().max(160).optional(),
+  kind: experienceKind.default("full-time"),
 })
 
 const projectSchema = z.object({
@@ -62,14 +67,21 @@ const handleSchema = z
   .max(30, "Handle must be 30 characters or fewer")
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers, and single hyphens")
 
+const languageSchema = z.object({
+  name: z.string().min(1, "Name is required").max(80),
+  proficiency: z.string().max(60).optional(),
+})
+
 const linkSchema = z.object({
   platform: linkPlatform,
   label: z.string().max(80).optional(),
   url: z.string().max(400),
 })
 
+export const supportedPortfolioVersions = [1, 2] as const
+
 export const portfolioSchema = z.object({
-  portfolioVersion: z.literal(1),
+  portfolioVersion: z.union([z.literal(1), z.literal(2)]),
   identity: z.object({
     name: z.string().min(1, "Name is required").max(120),
     headline: z.string().max(160).optional(),
@@ -94,6 +106,7 @@ export const portfolioSchema = z.object({
     .max(60)
     .default([]),
   highlights: z.array(z.string().max(240)).max(12).default([]),
+  languages: z.array(languageSchema).max(8).default([]),
   github: z
     .object({
       username: z.string().max(80).optional(),
@@ -116,7 +129,7 @@ export const templateConfigSchema = z.object({
 
 export const publishedPortfolioSchema = z.object({
   handle: handleSchema,
-  schemaVersion: z.literal(1),
+  schemaVersion: z.number().int().min(1),
   templateId: z.string().min(1).max(60),
   config: templateConfigSchema,
   data: portfolioSchema,
@@ -131,3 +144,5 @@ export type Link = z.infer<typeof linkSchema>
 export type Project = z.infer<typeof projectSchema>
 export type Experience = z.infer<typeof experienceSchema>
 export type Education = z.infer<typeof educationSchema>
+export type Language = z.infer<typeof languageSchema>
+export type ExperienceKind = z.infer<typeof experienceKind>

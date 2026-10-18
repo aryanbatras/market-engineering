@@ -209,7 +209,7 @@ Sticky navigation, dropdowns, dialogs, toasts. Nothing else. A card at rest has 
 
 A resume previewing in the builder or on the homepage is **not a card**. It is a sheet of paper, and it gets paper's rules.
 
-- **A4 proportion, locked.** Never cropped, never reflowed. The proportions are the whole point.
+- **A4 width, locked at 794px** (210mm at 96dpi). Height grows with the content, because a resume that spills onto a second page does in fact become two pages. The frame scrolls; the sheet is never cropped or reflowed to fit a viewport.
 - `--ground-raised` on a `--ground-sunken` field, `--shadow-float`, **no radius**. A sheet has square corners; rounding them makes a card pretending to be a document.
 - **Real text at real size**, scaled as a unit. A sheet showing placeholder text at 6px proves nothing and looks like a placeholder.
 - **No glyphs that do not read.** No icon fonts, no symbol bullets, no dingbats. This is a hard rule inherited from the ATS constraint in `spec/02-architecture/resume-compilation.md` — a sheet carrying an envelope glyph would be a lie about the very thing it is demonstrating.
@@ -399,8 +399,9 @@ Each of these is the default output of a generic generated interface. Banned out
 | `card-rows` | The template gallery | Two sections are grids on purpose. The gallery is the product: a recruiter's first question is "what does this look like", and the only honest answer is to show the templates side by side. Every other section on every page has been pulled out of a grid. |
 | `covered-text`, on `/templates` and `/builder` only | The live previews | Both pages show a whole 1440px portfolio page inside a 440px crop you can scroll. Text that has been scrolled past the crop is invisible to a person, but its layout box still exists and the rule reads the box. The rule stays a FAIL on every other page, where it has twice caught a real defect: a frosted header sitting over the hero, and the Editorial rail escaping its crop. |
 | `no-footage` | The statement band | The band used to run screen-recording footage of someone typing code. The product's entire claim is that you do not write code, so the footage contradicted the copy. It is a still now: hands moving a card into place, which is what the product actually asks you to do. |
-| `resting-shadow` | Document sheets on `/` and `/resume` | §7 permits a shadow only on something that genuinely floats. An A4 sheet of paper is the one object in this product that genuinely floats above a surface, and a flat rectangle on a flat field would read as a panel rather than a page. The shadow is on the sheet and nothing inside it. |
-| `side-scroll` | Document sheets at 390px | Extends the allowance above to the resume sheet. An A4 page at true proportion is 210mm wide; shrinking it to a phone screen makes it unreadable, which defeats the point. It scrolls sideways in a sunken frame, like every document viewer. |
+| `shadow` | Document sheets, on `/` and `/resume` | §7 permits a shadow only on something that genuinely floats. An A4 sheet is the one object in this product that genuinely floats above a surface, and a flat rectangle on a flat field reads as a panel rather than a page. The shadow is on the sheet and on nothing inside it. |
+| `hairline` | Ruled section headings inside document sheets | The rule sits under a heading *on a typeset page*, which is typography rather than interface chrome — it is how Jake's, Deedy and McDowell all set a section. Remove it and the sheet loses the one thing that makes a resume look typeset rather than printed. It appears on a heading and nowhere else on either page. |
+| `body-size` | Document sheets, on `/` and `/resume` | A resume is set in points, not pixels, and 10pt is 13.3px at 96dpi. 13px is the correct size for the thing — inflating a document to clear a web body-text floor would make it read like a webpage, which is the failure this product exists to avoid. Nothing on the sheet goes below 13px, so `small-text` still holds. |
 
 An allowance is a debt with an owner. If the reason stops being true, the allowance goes with it.
 
