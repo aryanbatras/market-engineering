@@ -82,6 +82,23 @@ If the corpus fails these, the feature stays out and we say so plainly rather th
 
 ---
 
+## Resume toolchain
+
+| Concern | Choice | Rejected | Why |
+|---|---|---|---|
+| Document model | **Yours** — one Zod schema, two render targets | A separate resume schema | A student who types their facts once keeps them current. A second schema means a second migration every time a field changes. |
+| Preview | **React**, walking the same layout descriptor as the LaTeX emitter | Compiling LaTeX live | A 32 MB WASM engine on Indian mobile data before the preview appears. `DESIGN.md §12`. |
+| Typesetting | **Tectonic**, WASM, compiled on demand behind a port | SwiftLaTeX API, LaTeX.Online | Both paid per compile. R1. |
+| | | TeX Live on a server | ~4 GB. Not a Vercel function. R2. |
+| | | Server-side Tectonic | Binary fits at 9.7 MB, but no persistent cache means every cold instance re-fetches the bundle. **Spiked, deferred if it fails.** |
+| | | SwiftLaTeX / TeXlyre WASM | Both **AGPL-3.0**. `licenses.md` forbids copyleft in anything we ship. |
+| PDF text extraction | **`unpdf`** | `pdf-parse` | `pdf-parse` v2 broke its own API on the last release. `unpdf` is 1.2k★, MIT, ~2 MB, and ships a serverless build. Already evaluated above for PDF import. |
+| ATS check | **Ours** — diff the text layer against the source document | Any commercial "ATS score" | No real ATS publishes a score out of 100. Every tool showing one invented it. We show the extracted text. |
+
+Full analysis in `resume-templates.md` and `../02-architecture/resume-compilation.md`.
+
+---
+
 ## Future / v1.5
 
 | Concern | Choice | Rejected | Why |

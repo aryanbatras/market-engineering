@@ -66,6 +66,33 @@ Installed via CLI, adapted to our tokens. Each file keeps its variant map in the
 | `SectionShell` | Consistent section spacing across templates. The rule that stops section paddings fighting each other. |
 | `ProvenanceDot` | GitHub-derived field indicator. |
 
+### Resume components
+
+New for the second render target. Lives in the `resume` domain, not `core` — none of these are used by the portfolio.
+
+| Component | Why |
+|---|---|
+| `DocumentSheet` | A previewing resume as a sheet of paper: locked A4 proportion, `--shadow-float`, no radius, real text at real size. Per `DESIGN.md §9`. The one resting shadow in the product, with a written §16 allowance. |
+| `SheetFrame` | The sunken stage a sheet sits in, with horizontal scroll at 390px. Separated from `DocumentSheet` so the sheet stays a pure object and the frame owns the viewport behaviour. |
+| `LayoutSwitcher` | The ten resume layouts, previewed with the user's own data. Different from `TemplateSwitcher` — it switches a layout descriptor, not a React component. |
+| `ExtractedTextPane` | The ATS result. Real extracted text in Geist Mono, four to six lines, with failures named underneath. Per R19. |
+| `ParseFinding` | One failed check, in a sentence that says what to do. Weight and icon carry the state, because there is no red. |
+| `CompileAction` | "Download PDF". Says plainly that the first one prepares an engine, and never shows a spinner. |
+
+---
+
+## Domain placement
+
+Every component above belongs to exactly one domain, and the folder says which.
+
+| Domain | Components |
+|---|---|
+| `core` | `Button`, `Field`, `Card`, `Badge`, `Page`, `Shell`, `Section`, `Reveal`, `ScrollReveal`, `SourceEditor`, `JsonLd`, `Wordmark` |
+| `portfolio` | `YAMLInput`, `TemplateSwitcher`, `ConfigPanel`, `HandleClaim`, `SourceBadge`, `CompileHero`, `SectionShell`, `ProvenanceDot` |
+| `resume` | `DocumentSheet`, `SheetFrame`, `LayoutSwitcher`, `ExtractedTextPane`, `ParseFinding`, `CompileAction` |
+
+**A component moves to `core` only when a second domain needs it.** Today `core` holds only things that were already shared before the domains existed. See `../02-architecture/domain-model.md`.
+
 ---
 
 ## MagicUI whitelist
@@ -130,10 +157,15 @@ One set, one weight, no exceptions. Mixing weights reads as carelessness and it 
 | Rule | Enforces |
 |---|---|
 | `no-restricted-imports` per layer | R13 layering |
+| `no-restricted-imports` per domain | R18 — `portfolio` and `resume` never import each other; `core` never imports either |
 | No `dangerouslySetInnerHTML` outside an allowlist | XSS, per `security-and-privacy.md` |
 | No comments in `src/**` | R5 |
 | No Tailwind literals in JSX | R7 |
 | No runtime-constructed class names | R7 static-literal constraint |
 | No AI SDK imports | R1 and the privacy promise |
+| No raw LaTeX outside `application/resume/latex/` | R19 — a layout emits blocks, never document structure |
+| No icon or symbol font in a generated preamble | R19 — the ATS contact-detection trap |
 
 These ship with the scaffold, in the same change that creates the folders. A rule added later is a rule that gets violated first.
+
+The two domain rules are enabled **last**, after the folders exist and everything compiles. A rule that fails on day one of a refactor gets disabled by day two.

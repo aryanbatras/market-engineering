@@ -2,6 +2,8 @@
 
 Defines the R13 boundary. `app/` is a contract layer. The three source folders carry the actual code.
 
+Every layer folder is further divided by domain. See `domain-model.md` — that document decides which world a file belongs to, this one decides how the layers stack.
+
 ---
 
 ## The shape
@@ -13,6 +15,8 @@ src/
   presentation/           design system, components, templates
   infrastructure/         external services, persistence, BFF adapters
 ```
+
+Inside each of those, three domains: `core/`, `portfolio/`, `resume/`. Domain first, layer second — the full tree is in `domain-model.md`.
 
 ---
 
@@ -82,6 +86,8 @@ Depends on: nothing in `infrastructure/`. Only on ports.
 
 This is the dependency-inversion seam. `application/` defines *what* it needs; `infrastructure/` implements it and registers the implementation. Swapping Supabase for Neon touches one folder.
 
+**Across domains**, `application/resume/` may read one thing from `application/portfolio/`: the `Portfolio` type. Anything else between the two domains is forbidden by R18.
+
 ---
 
 ## `presentation/` — design and components
@@ -135,6 +141,8 @@ Forbidden:
 - `application` importing `infrastructure`
 - `infrastructure` importing `presentation`
 - Any folder importing `app/`
+- **Any domain importing another domain.** `portfolio` and `resume` are siblings, not parents.
+- **`core` importing `portfolio` or `resume`.** Core is the bottom.
 - Circular imports anywhere
 
 The composition root is the single place where concrete implementations are wired to ports.
@@ -154,19 +162,22 @@ The composition root is the single place where concrete implementations are wire
 
 ```json
 {
-  "@app/*":      ["./src/app/*"],
-  "@application/*": ["./src/application/*"],
-  "@presentation/*": ["./src/presentation/*"],
-  "@infrastructure/*": ["./src/infrastructure/*"]
+  "@app/*":            ["./src/app/*"],
+  "@application/*":    ["./src/application/*"],
+  "@presentation/*":   ["./src/presentation/*"],
+  "@infrastructure/*": ["./src/infrastructure/*"],
+  "@composition/*":    ["./src/composition/*"]
 }
 ```
 
-Folders carry their meaning in their names. Import paths should read like the architecture does.
+Folders carry their meaning in their names. Import paths should read like the architecture does — a path includes its domain, so `@presentation/resume/templates/rule` says at a glance which world it is in and which rules apply to it.
 
 ---
 
 ## Enforcement
 
-Linting enforces the boundary. An ESLint `no-restricted-imports` rule maps each layer's forbidden imports from R13 directly. A CI check fails the build on violation.
+Linting enforces the boundary. An ESLint `no-restricted-imports` rule maps each layer's forbidden imports from R13 directly, and a second rule maps the cross-domain forbiddance from R18. A CI check fails the build on violation.
 
 A rule that is not enforced is a suggestion. The lint config ships with the scaffold, in the same change that creates the folders — not later.
+
+For the domain rule specifically, it is enabled **last**, after the folders exist. A rule that fails on day one of a refactor gets disabled by day two. The order is in `domain-model.md` § Migration.

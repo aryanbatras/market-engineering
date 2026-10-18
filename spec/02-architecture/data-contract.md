@@ -42,15 +42,33 @@ identity
 
 links[]               { platform, label, url }   ordered, platform enum
 
-education[]           { institution, degree, field, start, end, current, grade, details }
-experience[]          { organisation, role, location, start, end, current, summary, highlights[] }
+education[]           { institution, degree, field, start, end, current, grade,
+                        board, score, details }
+experience[]          { organisation, role, location, start, end, current,
+                        summary, highlights[], kind }
 projects[]            { name, description, url, repo, tech[], image, role, timeline }
 skills[]              { name, level?, group? }
+languages[]           { name, proficiency }
 
 github                { username, connected, lastSyncedAt }   populated by import
 
 meta                  { handle, templateId, config, publishedAt }
 ```
+
+### Fields added for the resume
+
+Indian resumes are not US resumes. Four additions, all optional, all additive:
+
+| Field | Why |
+|---|---|
+| `education[].board` | `CBSE`, `ICSE`, `State Board`, `IB` — recruiters scan for the board by name |
+| `education[].score` | `94.2%` and `9.4 CGPA` occupy the same slot and neither parses from the other |
+| `experience[].kind` | `internship` \| `full-time` \| `volunteer` — Indian fresher resumes list internships separately from work |
+| `languages[]` | Standard on Indian resumes and on essentially no US ones |
+
+**Why these and not more.** The open question below previously leaned toward a generic `highlights[]` for certifications, achievements, publications and awards rather than four typed arrays. That leaning holds — four near-identical arrays is exactly the drift the versioning rules exist to prevent. If `highlights[]` proves too coarse, we add **one** array.
+
+**Both products render these.** A portfolio template can show board and score. Nothing about the addition is resume-specific, which is what one schema buys.
 
 ---
 
@@ -83,6 +101,28 @@ meta                  { handle, templateId, config, publishedAt }
 - A render against an unsupported version is a bug, caught by a fixture test rendering every template against every stored version.
 - Version upgrades run through a forward migration in `application/`, never in-place.
 - A user does not upgrade until they edit. Their existing published URL keeps rendering on its original version.
+
+### ⚠️ The literal blocks the first minor bump
+
+The schema currently reads:
+
+```ts
+portfolioVersion: z.literal(1)
+```
+
+A literal accepts exactly one value. The moment we make a minor change — adding `education[].board`, as this document now specifies — there is no way to say "1 or 2", so the schema would reject every portfolio stored before the change. That imposes a major bump's behaviour on a minor bump's trigger, and it contradicts the table directly.
+
+This has never been exercised because no additive change has been made yet. It is fixed as part of the resume work, **before** the first additive field lands:
+
+```ts
+const supportedVersions = [1, 2] as const
+
+portfolioVersion: z.union([z.literal(1), z.literal(2)])
+```
+
+`data/portfolio.schema.json` and `data/portfolio.schema.md` regenerate from it, as they always do. A published schema advertising `"const": 1` while the code accepts two versions would be the same class of drift the schema exists to prevent.
+
+**The rule this confirms:** a version is a **set of accepted values**, not a single value. Every future minor bump appends to `supportedVersions` and never edits an existing entry.
 
 ---
 
@@ -153,5 +193,19 @@ The schema cannot enforce these. Server-side checks reject:
 ## Open questions
 
 - Do we support multiple profiles per YAML (phone numbers, work address)? Leaning no for v1.
-- Do we model certifications, achievements, publications, and awards for v1? Indian resumes lean on these heavily. Leaning yes as a generic `highlights[]` rather than four typed arrays.
+- ~~Do we model certifications, achievements, publications, and awards for v1?~~ **Resolved: no typed arrays.** The generic `highlights[]` carries them. See the schema shape above.
 - Rich text or plain strings for descriptions? Plain strings, with markdown-subset rendering if needed. Full rich text creates a sanitisation surface and breaks ATS extraction.
+
+## Consumers of this contract
+
+The schema is not only a portfolio contract. It is the single document behind two render targets:
+
+| Consumer | Reads | Writes |
+|---|---|---|
+| Portfolio templates | the whole document | nothing |
+| GitHub import | `github`, `projects`, `skills` | those fields only |
+| **Resume layouts** | the whole document | **nothing** |
+
+**The resume reads the document and never writes it.** It maps `Portfolio` into its own model rather than extending this schema, so a layout change cannot alter what a published portfolio contains. The coupling rules are in `domain-model.md`; the projection lives in the resume domain.
+
+**JSON Resume interop** matters more now. A student who maintains a `resume.json` gets both outputs. Import and export it alongside YAML.

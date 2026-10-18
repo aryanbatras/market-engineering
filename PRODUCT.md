@@ -6,9 +6,9 @@ Durable product context. Read before designing or building anything.
 
 ## What this is
 
-A web platform that turns the work an engineering student already has — a resume, a GitHub profile, a LinkedIn export — into a portfolio website they can send to a recruiter.
+A web platform that turns the work an engineering student already has — a resume, a GitHub profile, a LinkedIn export — into a portfolio website and a typeset resume, both of which they can send to a recruiter.
 
-The **portfolio generator is the first feature, not the product.** The wider platform is job-market readiness: resume tailoring, LinkedIn framing, content, video. All of it attaches to the same account and the same subscription.
+The **portfolio generator is the first feature, not the product.** The wider platform is job-market readiness: the resume, resume tailoring, LinkedIn framing, content, video. All of it attaches to the same account and the same subscription, and all of it reads and writes the same document.
 
 ---
 
@@ -46,13 +46,29 @@ A focused, single-purpose tool. Light, fast, legible. One thing done properly be
 
 ---
 
+## The two outputs
+
+One document. Two render targets. A student should never type the same facts twice, and should never have to choose between a site and a resume.
+
+| | Portfolio | Resume |
+|---|---|---|
+| **The artefact** | A website at `/p/<handle>` | A PDF, typeset in LaTeX |
+| **Optimised for** | A recruiter browsing for ten seconds | A parser reading for a millisecond |
+| **Layout** | Scroll, motion, space, image | One or two dense pages of type |
+| **Built from** | The same YAML | The same YAML |
+
+The YAML is the source of truth for both. They are designed together, and neither is an export of the other — a portfolio is not a resume printed on A4, and pretending otherwise produces two mediocre documents instead of two good ones.
+
+---
+
 ## What we are not
 
 | Not this | Because |
 |---|---|
 | A website builder | Our users cannot design a layout and do not want to learn |
 | A freeform editor in v1 | Most expensive item on the list, most likely half-finished |
-| A resume builder | Wrong output. The resume is an attachment, not the artefact |
+| A generic resume builder with two hundred stock designs | Ten considered layouts beat two hundred interchangeable ones. We curate; we do not catalogue. |
+| A LaTeX tool | The `.tex` is editable and downloadable, but nobody needs a TeX compiler to apply for a job. They need a PDF that reads. |
 | A LinkedIn tool | Someone else's platform |
 | An AI product | No AI API. Users bring their own model; we ship the prompt and the schema |
 | A source-code template shop | That business ends the moment the first template is public |

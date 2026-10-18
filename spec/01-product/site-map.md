@@ -48,6 +48,16 @@ They also do real work for us: this product collects student PII in India, and a
 | `/dashboard/billing` | Required | Plan, payment method, cancel |
 | `/dashboard/data` | Required | Export YAML and JSON. Delete account. |
 
+## Resume
+
+| Route | Auth | Purpose |
+|---|---|---|
+| `/resume` | — | The resume editor. Opens without auth, like the builder. |
+| `/resume/templates` | — | The ten layouts, previewed with the user's own data |
+| `/resume/check` | — | The ATS result. Reachable from the editor, and a URL so it can be shared |
+
+**Not in the nav.** The resume is reached from the builder and the dashboard. It is the same document rendered a second way, and a nav entry would imply it is a second product.
+
 ---
 
 ## Public
@@ -55,8 +65,11 @@ They also do real work for us: this product collects student PII in India, and a
 | Route | Purpose |
 |---|---|
 | `/p/[handle]` | The published portfolio. The product. |
-| `/p/[handle]/resume` | PDF export, generated from the same data |
+| `/p/[handle]/resume` | The published resume PDF, generated from the same data |
+| `/p/[handle]/resume.tex` | The same document as downloadable LaTeX source |
 | `/api/og/[handle]` | Social card, generated per user |
+
+The resume routes under `/p/[handle]` render from the **cached** published record, never touching the database on view — same rule as the portfolio route, for the same reason. An uncached read on view burns the egress budget in about a week.
 
 ---
 
@@ -82,7 +95,9 @@ We are India-first, and English is the working language of Indian engineering ca
 
 ## What we are not building
 
-- **Multi-page marketing sprawl.** Eight pages, not thirty. Every page we do not build is a page we do not have to keep fast.
+- **Multi-page marketing sprawl.** Twelve pages, not thirty. Every page we do not build is a page we do not have to keep fast.
 - **Blog and content marketing** in v1. It is a channel, not a page, and it needs nothing from us to start.
 - **Custom domains** in v1. `/p/<handle>` is the whole model. Custom domains need a different hosting story and they are a paid-tier conversation much later.
 - **A dashboard with more than one tab.** Four settings screens, all in one place.
+- **A live LaTeX editor.** The `.tex` downloads and compiles anywhere. Editing TeX in our editor with a live preview is a separate feature.
+- **Resume tailoring.** Rewriting bullets for a job description needs an LLM, and we do not have one (R1).

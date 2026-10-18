@@ -11,10 +11,13 @@ Binding design system for Market Engineering. A contract, not a mood board. Devi
 - Marketing site — home, features, pricing, templates gallery, template detail
 - Legal — privacy policy, terms and conditions
 - The builder and dashboard
+- **The resume editor and the resume layout gallery**
 - How a portfolio is **listed, previewed, and chosen**
 - The published portfolio chrome around the user's template
 
 **This document does not cover portfolio templates.** We will ship hundreds. Each one is designed inside its own file under `spec/05-ui/template-system.md`, which inherits these tokens but owns its composition. A template may re-weight type and change layout density. It may not introduce a fourth colour or a new radius.
+
+Resume layouts work the same way, with one addition. A portfolio template inherits these tokens and owns its **composition on a screen**. A resume layout additionally has to agree with a **typeset page in LaTeX**, so it inherits a second constraint set: paper proportions, text density, and the parseability rules in `spec/05-ui/resume-system.md`. A layout that looks right in preview and reads badly as a PDF is a bug, not a preference.
 
 ---
 
@@ -202,6 +205,16 @@ Sticky navigation, dropdowns, dialogs, toasts. Nothing else. A card at rest has 
 
 `--ground-raised` on a `--ground-sunken` field, `--radius-panel`, `--space-8` padding, **no shadow at rest**. Lift only if clickable.
 
+### Document sheets
+
+A resume previewing in the builder or on the homepage is **not a card**. It is a sheet of paper, and it gets paper's rules.
+
+- **A4 proportion, locked.** Never cropped, never reflowed. The proportions are the whole point.
+- `--ground-raised` on a `--ground-sunken` field, `--shadow-float`, **no radius**. A sheet has square corners; rounding them makes a card pretending to be a document.
+- **Real text at real size**, scaled as a unit. A sheet showing placeholder text at 6px proves nothing and looks like a placeholder.
+- **No glyphs that do not read.** No icon fonts, no symbol bullets, no dingbats. This is a hard rule inherited from the ATS constraint in `spec/02-architecture/resume-compilation.md` — a sheet carrying an envelope glyph would be a lie about the very thing it is demonstrating.
+- At true size on a phone it scrolls horizontally inside a sunken frame rather than shrinking to illegibility. Same rule as the YAML editor's `side-scroll`.
+
 ### Inputs
 
 `--ground-sunken` fill, 1px `--ink-45` border at 15% opacity, `--radius-pill`, 48px min height. Label above, always. Helper text below. Placeholders show format, never replace labels.
@@ -236,11 +249,15 @@ Skeletons at final dimensions. Never a bare spinner.
 | `/builder` | The editor. |
 | `/dashboard` | Portfolio, handle, billing, export. |
 | `/p/[handle]` | Published portfolio. |
+| `/resume` | The resume editor. Same YAML, typeset. |
+| `/resume/templates` | Resume layouts. Ten of them, curated. |
 | `/privacy` | Privacy policy. |
 | `/terms` | Terms and conditions. |
 | `/sign-in`, `/sign-up` | Supabase auth. |
 
 Nav: **Features · Templates · Pricing** — then Sign in and "Start building".
+
+The resume is reached from the builder and the dashboard, **not from the nav.** It is the same document rendered a second way, not a second product, and a second nav entry would imply otherwise. The homepage section is how a stranger learns it exists.
 
 Privacy and Terms live in the footer. Both are written before launch, not after. India DPDP requires notice; see `spec/02-architecture/security-and-privacy.md`.
 
@@ -258,7 +275,7 @@ The gallery is the shop window, so it carries the brand rules harder than any ot
 
 ## 11. Homepage
 
-Eight sections. Each has a distinct composition; **no two neighbours share a layout.**
+Nine sections. Each has a distinct composition; **no two neighbours share a layout.**
 
 | # | Section | Composition |
 |---|---|---|
@@ -267,9 +284,22 @@ Eight sections. Each has a distinct composition; **no two neighbours share a lay
 | 3 | **How it works** | Four flat fields across the full viewport, butted, each a step of the same portfolio filling in — name only, then photo and headline, then projects, then published. Each field one clause. |
 | 4 | **Showcase** | The interface fragment three times, stacked, in three states. The middle one is live — the visitor can tick it and it becomes the third state. |
 | 5 | **Templates** | Three or four live template previews at true size, asymmetric widths so the row never becomes a zigzag. |
-| 6 | **Pricing** | Price very large. `--text-display` numerals. One plan per column, no card chrome, whitespace doing the separating. |
-| 7 | **FAQ** | Questions left, answer right, answer pane sticky. Selection follows hover, click, and keyboard. |
-| 8 | **CTA + Footer** | A plain sentence and one button on an almost-empty screen. Footer as a designed close: the wordmark at full width. |
+| 6 | **Resume** | One 5/7 split. Left: a two-line statement and one sentence. Right: a single A4 sheet at true proportion, real text, the extracted text layer beside it. |
+| 7 | **Pricing** | Price very large. `--text-display` numerals. One plan per column, no card chrome, whitespace doing the separating. |
+| 8 | **FAQ** | Questions left, answer right, answer pane sticky. Selection follows hover, click, and keyboard. |
+| 9 | **CTA + Footer** | A plain sentence and one button on an almost-empty screen. Footer as a designed close: the wordmark at full width. |
+
+### The resume section
+
+This is the section that earns the second output. It sits after Templates, because by then the visitor already believes the portfolio works; the job here is to say **"and you never typed it twice."**
+
+**One sheet, not a gallery.** Ten layouts would repeat the Templates section's mistake. One document, at true A4 proportion, carrying real content — a name, a role, three dates, four bullets — typeset dense enough to look like a real resume and legible enough to read at 1440px.
+
+**Beside the sheet, not inside it, four lines of proof.** The extracted text layer in Geist Mono, showing the name and the first role's dates in the order a parser reads them. This is the interface fragment: the actual output of the actual check, cropped. It answers "will this be read?" without making a claim about it.
+
+**The sheet sits on `--ground-raised` over `--ground-sunken`, with `--shadow-float`.** A sheet of paper genuinely floats. This is the one place in the marketing site where a resting shadow is correct, and it is correct because the object really is a piece of paper above a desk.
+
+**No icon glyphs anywhere on the sheet.** Not in the contact line, not as bullets. What is being sold is that a parser can read it, so the sheet must not contain a single glyph that extracts as garbage. That constraint is visible on the page as design quality — it looks like a clean typeset document.
 
 ### Imagery
 
@@ -359,7 +389,7 @@ Each of these is the default output of a generic generated interface. Banned out
 
 ## 16. The design gate
 
-`node scripts/design-gate.mjs` renders every public page in Chrome and applies the taste-skill rules. It must report zero FAIL before a change ships. Three rules carry a written allowance, each for one specific and checkable reason.
+`node scripts/design-gate.mjs` renders every public page in Chrome and applies the taste-skill rules. It must report zero FAIL before a change ships. Every rule below carries a written allowance, each for one specific and checkable reason.
 
 | Allowed | Where | Why |
 |---|---|---|
@@ -369,6 +399,8 @@ Each of these is the default output of a generic generated interface. Banned out
 | `card-rows` | The template gallery | Two sections are grids on purpose. The gallery is the product: a recruiter's first question is "what does this look like", and the only honest answer is to show the templates side by side. Every other section on every page has been pulled out of a grid. |
 | `covered-text`, on `/templates` and `/builder` only | The live previews | Both pages show a whole 1440px portfolio page inside a 440px crop you can scroll. Text that has been scrolled past the crop is invisible to a person, but its layout box still exists and the rule reads the box. The rule stays a FAIL on every other page, where it has twice caught a real defect: a frosted header sitting over the hero, and the Editorial rail escaping its crop. |
 | `no-footage` | The statement band | The band used to run screen-recording footage of someone typing code. The product's entire claim is that you do not write code, so the footage contradicted the copy. It is a still now: hands moving a card into place, which is what the product actually asks you to do. |
+| `resting-shadow` | Document sheets on `/` and `/resume` | §7 permits a shadow only on something that genuinely floats. An A4 sheet of paper is the one object in this product that genuinely floats above a surface, and a flat rectangle on a flat field would read as a panel rather than a page. The shadow is on the sheet and nothing inside it. |
+| `side-scroll` | Document sheets at 390px | Extends the allowance above to the resume sheet. An A4 page at true proportion is 210mm wide; shrinking it to a phone screen makes it unreadable, which defeats the point. It scrolls sideways in a sunken frame, like every document viewer. |
 
 An allowance is a debt with an owner. If the reason stops being true, the allowance goes with it.
 
@@ -381,7 +413,7 @@ An allowance is a debt with an owner. If the reason stops being true, the allowa
 - [ ] Every headline ≤ 2 lines at 390px
 - [ ] Six type steps, no more
 - [ ] Section gaps ≥ 160px desktop
-- [ ] No shadow on anything at rest
+- [ ] No shadow on anything at rest, except a written §16 allowance
 - [ ] No banned effect from §13
 - [ ] One primary action per screen
 - [ ] ≥ 4 real interface fragments
@@ -389,4 +421,6 @@ An allowance is a debt with an owner. If the reason stops being true, the allowa
 - [ ] Keyboard walkthrough passes
 - [ ] Reduced motion verified
 - [ ] No raw Tailwind in JSX (R7)
+- [ ] No cross-domain import outside `core` (R18)
+- [ ] Every generated PDF passes the ATS check (R19)
 - [ ] Passes the §13 logo-swap test

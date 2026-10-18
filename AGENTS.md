@@ -138,6 +138,8 @@ Three source folders sit alongside it:
 
 Dependencies point inward. `presentation` and `application` never import from `infrastructure` directly; they go through application-layer ports.
 
+Every one of those folders is further divided by domain. See R18.
+
 ---
 
 ## R15 — Never assume
@@ -164,10 +166,60 @@ When resuming work, the correct sequence is:
 2. `DESIGN.md`
 3. Research (`spec/04-research/`)
 4. Specification (`spec/01`–`spec/03`, `spec/05`)
-5. Scaffold and toolchain, including lint rules enforcing R5 and R7, and the mock layer
+5. Scaffold and toolchain, including lint rules enforcing R5, R7 and R18, and the mock layer
 6. Template runtime spike (R13) — this gates everything downstream
 7. YAML to publish end to end
 8. Portfolio templates
 9. Recruiter surfaces
 10. Monetisation
-11. v1.5 block editor
+11. Resume: spec, schema extension, LaTeX compiler, ATS check, export
+12. Domain migration (R18) — `core`, `portfolio`, `resume`
+13. v1.5 block editor
+
+Steps 1 through 6 are done. Step 7 is done. Steps 8 and 9 are in progress.
+
+---
+
+## R18 — Three domains, and only one direction between them
+
+The codebase is divided into **domains**, and every layer folder is split by domain:
+
+```
+src/
+  app/          composition/  application/  infrastructure/  presentation/
+       core/           core/         core/           core/            core/
+    portfolio/      portfolio/     portfolio/     portfolio/       portfolio/
+      resume/         resume/        resume/        resume/          resume/
+```
+
+**The three domains:**
+
+| Domain | Owns |
+|---|---|
+| `portfolio` | The website. Portfolio templates, the builder, `/p/[handle]`, publishing, GitHub import |
+| `resume` | The document. LaTeX compilation, the layout descriptor, the ATS check, PDF and `.tex` export |
+| `core` | What both genuinely share: auth, database, media, site config, the design system, the code editor, SEO |
+
+**The rules:**
+
+1. **`portfolio` and `resume` never import each other.** Not "rarely", not "with care" — never. Neither by path, neither through a type, neither through a shared barrel.
+2. **`core` imports nothing from `portfolio` or `resume`.** It is the bottom of the graph, not a place to park things that do not fit elsewhere.
+3. **A shared concept belongs in `core` only after both domains actually need it.** Moving something to `core` is a commitment that a third thing will not need to change it. Premature sharing is the failure mode, not duplication.
+4. **The only thing the two domains are allowed to share is the `Portfolio` type itself**, declared in `application/portfolio/portfolio.schema.ts` and imported as a type. The resume domain reads it; it never writes it.
+
+**Why this shape.** The portfolio and the resume are two render targets off one document. That is a real relationship, but it is a *narrow* one, and every line of code that couples them is a line that has to be understood when either one changes. The failure this prevents is concrete: a resume layout change quietly reflowing a published portfolio page at `/p/[handle]`. That is the bug R18 makes structurally impossible rather than merely discouraged.
+
+**Enforcement.** An ESLint `no-restricted-imports` rule per layer, mapping the cross-domain forbiddance above. A rule that is not enforced is a suggestion. Full model in `spec/02-architecture/domain-model.md`.
+
+---
+
+## R19 — A generated document must survive a parser
+
+We generate PDF documents that hiring software reads. A resume that looks correct and parses as noise has failed at the only job it has.
+
+Two rules, both binding on anything that emits a PDF:
+
+1. **No ligature, no icon font, no symbol glyph in the text layer.** Every generated preamble ships a ToUnicode mapping so glyphs extract as their letters. Every template uses plain text where a glyph would otherwise go. This is not a preference — it is the difference between "efficient" being found by a keyword search and being silently missed.
+2. **Every document is verified before it is offered.** The generated PDF's text layer is extracted and diffed against the source data, and the user is shown the result. A document that fails the check is still downloadable, with the failure named.
+
+Full checks in `spec/02-architecture/resume-compilation.md`. Verified by `npm run mock:verify` and the ATS check.

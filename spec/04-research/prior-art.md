@@ -50,6 +50,41 @@ All MIT. Useful as design reference and as evidence that our data schema needs t
 
 ---
 
+## Resume prior art
+
+### `yamlresume/yamlresume` — 1.5k★, MIT
+
+The closest existing implementation of what we are building. YAML in, LaTeX out, PDF at the end, twelve locales, TypeScript, with `jake` and `moderncv` layouts.
+
+**What we took.** The separation of document model from layout. Their `core/` splits into `compiler/{parser,ast,codegen}` and then `renderer/{latex,html,markdown,docx}`. A layout is one renderer file and never touches the document model. That is the right shape and it is the shape we follow.
+
+**What they did not solve.** Compilation. They shell out to `xelatex` or `tectonic` on the local machine via `execa`, and their web playground does not compile LaTeX at all — it previews with `docx-preview`. Running a real engine in a browser or a serverless function is the open problem in that project, and it is the actual hard part of ours.
+
+**Where we differ.** They have two independent renderers, LaTeX and HTML, and therefore a drift risk between them. We have one layout descriptor that both walk, so the preview cannot disagree with the PDF. Full detail in `resume-templates.md`.
+
+### Resume LaTeX layouts
+
+Studied for composition, never adapted. Most of the archetypes sit outside our allowlist or carry no licence at all, and the whole business depends on templates staying closed-source.
+
+| Archetype | Licence | Layout |
+|---|---|---|
+| `jakegut/resume` | MIT | Rule |
+| `deedy/Deedy-CV` | MIT | Compact |
+| `dnl-blkv/mcdowell-cv` | MIT | Header |
+| `posquit0/Awesome-CV` | LPPL-1.3c | Colour |
+| `sb2nov/resume` | MIT | Engineer |
+| `posquit0/AltaCV` | LPPL-1.3c | Sidebar |
+| `fky2015/resume-ng` | LPPL-1.3c | Rail |
+| `subidit/rover-resume` | CC-BY-4.0 | Atlas |
+| IIT Bombay format | none | Campus |
+| ModernCV | LPPL | Modern |
+
+### Rejected on licence
+
+`SwiftLaTeX/SwiftLaTeX` (AGPL-3.0, 2.3k★) and `TeXlyre/texlyre-busytex` (AGPL-3.0) both solve browser LaTeX compilation and both are copyleft. `licenses.md` is unambiguous. Both are out; the engine we use instead is Tectonic.
+
+---
+
 ## Tailwind v4 guidance
 
 Not prior art exactly, but it changed two decisions:
@@ -64,3 +99,5 @@ Not prior art exactly, but it changed two decisions:
 - A clean, MIT-licensed, actively maintained **drag-and-drop block portfolio editor** matching the "Windows 8 chrome, Apple restraint" direction in v1.5. devPortfolio-family projects are Bootstrap-era or unmaintained. We will build this one.
 - A **template marketplace** that keeps templates closed-source. Every existing one ships source, which is precisely the model we are rejecting for commercial reasons.
 - A **resume parser that handles Indian resume formats at ATS grade without an LLM.** Investigated in `library-decisions.md`. This is why PDF import is gated rather than committed.
+- **A permissively-licensed browser TeX engine under 5 MB.** BusyTeX is the best candidate and it is 32 MB of wasm plus a 90–400 MB data package. Everything smaller either renders to HTML instead of PDF (`LaTeX.js`) or fetches packages from a server mid-compile (`SwiftLaTeX`, and it is AGPL).
+- **An honest ATS score.** Every commercial tool showing a number out of 100 invented it. No real ATS publishes one, so we show the extracted text instead of a score.

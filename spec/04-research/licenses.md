@@ -44,6 +44,22 @@ This exists because the entire business depends on templates staying closed-sour
 | `@dnd-kit/*` | MIT | Clear |
 | `razorpay` | BSD-2-Clause | Clear |
 | `react-icons` | MIT | Clear — Lucide family (`react-icons/lu`). Per-icon imports only. |
+| `unpdf` | MIT | Clear — ATS text extraction. Already evaluated for PDF import. |
+| `busytex` | MIT (code) / TeX Live (binaries) | Evaluated, not chosen — 32 MB wasm plus a 90–400 MB data package is too large for the preview path. Kept as a documented fallback. |
+| `tectonic` | MIT (Rust) / LPPL (vendored TeX, XeTeX) / Apache-2.0 (Xdvipdfmx) | **Chosen engine.** All three permit redistribution and closed-source combination. Verified 2026-10-18 against the 0.17.0 release. **Re-audit before it ships.** |
+
+---
+
+## Rejected on licence
+
+Recorded so it does not get re-litigated later. Both of these would have solved browser LaTeX compilation, and both are out.
+
+| Project | Licence | Why rejected |
+|---|---|---|
+| `SwiftLaTeX/SwiftLaTeX` | **AGPL-3.0** | Copyleft. Shipping its WASM engine to a browser is distribution, and AGPL's network clause reaches a hosted service. 2.3k★, actively maintained, widely used — still out. |
+| `TeXlyre/texlyre-busytex` | **AGPL-3.0** | Same. Derived from BusyTeX (MIT), but the WASM wrapper is AGPL, and the wrapper is the part we would ship. |
+
+**The rule this adds:** a permissive upstream is not a permissive artefact. If a project wraps MIT code in an AGPL interface, the interface is what we ship and the interface governs.
 
 ---
 
@@ -75,7 +91,8 @@ We studied these. None of their code enters our repository.
 
 | Project | Licence | Note |
 |---|---|---|
-| `reactive-resume/reactive-resume` | **MIT** | Corrects an earlier assumption that it was AGPL. Its licence explicitly permits use, modification, distribution, sublicensing, and sale. Safe to study and adapt. We did. |
+| `reactive-resume/reactive-resume` | **MIT** | Corrects an earlier assumption that it was AGPL. Safe to study. |
+| `yamlresume/yamlresume` | **MIT** | Closest existing resume implementation. Took the model/layout split; did not solve compilation. |
 | `jsonresume.io` / JSON Resume | MIT | Interop target |
 | `BenjaminOff/portfolio` | MIT | Reference |
 | `ChoJongHoon/develofolio` | MIT | Reference |
@@ -83,6 +100,23 @@ We studied these. None of their code enters our repository.
 | `lorenzomiscoli/developer-portfolio` | MIT | Reference |
 | `BuilderIO/builder` | MIT | Evaluated for v1.5 editor |
 | `magicuidesign/magicui` | MIT | Whitelisted components only, per `DESIGN.md` §13 |
+
+### Resume layout archetypes — studied, never adapted
+
+Every resume layout we ship is written from scratch, exactly as every portfolio template is. Nine of these ten sit outside the allowlist at §Standing principle, which is the point of listing them: the design language of a popular template is not its source code, and we are allowed to know what Rule looks like without shipping a line of it.
+
+| Archetype | Licence | Disposition |
+|---|---|---|
+| `jakegut/resume` — Jake's Resume | MIT | Studied. Layout `rule`. |
+| `deedy/Deedy-CV` | MIT | Studied. Layout `compact`. |
+| `dnl-blkv/mcdowell-cv` | MIT | Studied. Layout `header`. |
+| `sb2nov/resume` | MIT | Studied. Layout `engineer`. |
+| `posquit0/Awesome-CV` | LPPL-1.3c | Outside allowlist — studied only. Layout `colour`. |
+| `posquit0/AltaCV` | LPPL-1.3c | Outside allowlist — studied only. Layout `sidebar`. |
+| `fky2015/resume-ng` | LPPL-1.3c | Outside allowlist — studied only. Layout `rail`. |
+| `subidit/rover-resume` | CC-BY-4.0 | Outside allowlist — studied only. Layout `atlas`. |
+| IIT Bombay placement format | none | No licence — studied only. Layout `campus`. |
+| ModernCV class | LPPL | Outside allowlist — studied only. Layout `modern`. |
 
 ---
 
@@ -96,6 +130,19 @@ Both are OFL, which permits commercial embedding. Fonts are self-hosted via `nex
 
 ---
 
+## Fonts in generated PDFs
+
+LaTeX ships its own fonts. We do not embed Geist in the `.tex`.
+
+| Engine | Uses | Licence |
+|---|---|---|
+| pdfLaTeX + `lmodern` | Latin Modern — a Type 1 reimplementation of Computer Modern | GUST Font Licence, LPPL-compatible. Permits embedding in a generated PDF, including a closed-source product. |
+| XeLaTeX / LuaLaTeX + `fontspec` | Whatever we point it at | Would need its own audit. **Not used in v1.** |
+
+Latin Modern is the right choice for two reasons beyond the licence. It is the traditional academic face, so the output looks like a document rather than a web page. And it is what the ATS preamble in `resume-compilation.md` already assumes, which keeps the preamble short.
+
+---
+
 ## Process
 
 1. New dependency → check licence before install.
@@ -103,3 +150,5 @@ Both are OFL, which permits commercial embedding. Fonts are self-hosted via `nex
 3. Anything not MIT/ISC/BSD/Apache-2.0/0BSD/Unlicense stops and goes to the founder.
 4. Re-audit before v1 launch and before v1.5.
 5. Keep an `oss-notices` attribution for anything we redistribute.
+
+**Before anything reaches a user as a file, check what is inside it.** A PDF embeds fonts. A WASM engine embeds a TeX distribution. The dependency tree is not the whole licence surface — the artefacts are. The resume engine audit in the table above covers the wasm and its bundled TeX files together, not the Rust crate alone.

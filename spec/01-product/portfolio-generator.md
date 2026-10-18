@@ -123,6 +123,8 @@ Share prompts appear **after** the first publish and **only** when a portfolio i
 | JSON-LD, OG image, PDF download | Resume tailoring, LinkedIn tools |
 | Razorpay subscription, three tiers | Annual plans, team plans |
 
+The resume is specified separately in `resume-builder.md` and reads the same document. It is a **second render target**, not a second data-entry path, which is why it does not appear in this table — there is nothing extra for the user to do, and nothing here that would break when it lands.
+
 ---
 
 ## Explicitly out of scope
@@ -131,7 +133,7 @@ Share prompts appear **after** the first publish and **only** when a portfolio i
 
 **Self-hosting.** Users may be told their data is exportable and always will be — but the product's defensibility is that templates never leave our infrastructure. Offering a fork option contradicts the business model.
 
-**Multiple portfolios.** One account, one portfolio, one handle. If someone wants a personal site and an OSS site, that is a different product conversation.
+**Multiple portfolios.** One account, one portfolio, one handle. If someone wants a personal site and an OSS site, that is a different product conversation. The same holds for resumes: one document, one resume, one handle.
 
 ---
 
