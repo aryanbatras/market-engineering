@@ -4,6 +4,7 @@ import type { ReactNode } from "react"
 import { Geist, Geist_Mono } from "next/font/google"
 import { siteConfig, siteTitle } from "@application/site/site-config"
 import "./globals.css"
+import "@presentation/builder/preview-canvas.css"
 
 const geist = Geist({
   variable: "--font-geist",

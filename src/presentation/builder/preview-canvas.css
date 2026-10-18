@@ -1,0 +1,67 @@
+/* The preview canvas is a 1440px page rendered at a scale. The scale has to follow the width of
+   whatever frame it lands in, not the width of the viewport, because the same component renders in
+   a 400px gallery card, a 640px picker slot and a 700px builder pane.
+   Container queries are the only way to express that. The steps ascend, because the last matching
+   min-width has to win. Each leaves headroom for the stage's own scrollbar gutter. */
+
+/* contain: paint makes the stage a containing block and a stacking context, so a template that
+   uses position: sticky or fixed cannot paint outside the crop it is being shown in. */
+.stage-canvas {
+  container-type: inline-size;
+  container-name: preview;
+  contain: paint;
+}
+
+.page-canvas {
+  width: 1440px;
+  transform-origin: top left;
+  zoom: 0.14;
+}
+
+@container preview (min-width: 300px) {
+  .page-canvas {
+    zoom: 0.19;
+  }
+}
+
+@container preview (min-width: 350px) {
+  .page-canvas {
+    zoom: 0.23;
+  }
+}
+
+@container preview (min-width: 400px) {
+  .page-canvas {
+    zoom: 0.26;
+  }
+}
+
+@container preview (min-width: 500px) {
+  .page-canvas {
+    zoom: 0.32;
+  }
+}
+
+@container preview (min-width: 600px) {
+  .page-canvas {
+    zoom: 0.43;
+  }
+}
+
+@container preview (min-width: 700px) {
+  .page-canvas {
+    zoom: 0.46;
+  }
+}
+
+@container preview (min-width: 800px) {
+  .page-canvas {
+    zoom: 0.53;
+  }
+}
+
+@container preview (min-width: 900px) {
+  .page-canvas {
+    zoom: 0.6;
+  }
+}

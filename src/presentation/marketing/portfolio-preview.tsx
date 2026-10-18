@@ -1,16 +1,29 @@
 "use client"
 
 import { memo, type ReactNode } from "react"
-import { LuMail, LuMapPin } from "react-icons/lu"
-import type { Portfolio } from "@application/portfolio/portfolio.schema"
+import { LuArrowUpRight, LuGithub, LuLinkedin, LuMail, LuMapPin } from "react-icons/lu"
+import type { Link as PortfolioLink, Portfolio } from "@application/portfolio/portfolio.schema"
 import { previewStyles } from "./preview.styles"
+
+const platformIcon = (platform: PortfolioLink["platform"]) => {
+  if (platform === "github") return <LuGithub aria-hidden size={16} strokeWidth={1.5} />
+  if (platform === "linkedin") return <LuLinkedin aria-hidden size={16} strokeWidth={1.5} />
+  if (platform === "email") return <LuMail aria-hidden size={16} strokeWidth={1.5} />
+  return <LuArrowUpRight aria-hidden size={16} strokeWidth={1.5} />
+}
 
 const Range = ({ start, end, current }: { start?: string; end?: string; current?: boolean }) => {
   const span = [start, current ? "Present" : end].filter(Boolean).join(" – ")
   return span ? <span>{span}</span> : null
 }
 
-const Entry = ({ title, org, meta, body, bullets }: {
+const Entry = ({
+  title,
+  org,
+  meta,
+  body,
+  bullets,
+}: {
   title: string
   org?: string
   meta?: ReactNode
@@ -34,7 +47,7 @@ const Entry = ({ title, org, meta, body, bullets }: {
 )
 
 const PortfolioPreview = memo(({ data }: { data: Portfolio }) => (
-  <div className={previewStyles.root}>
+  <div className={previewStyles.content}>
     <header className={previewStyles.header}>
       <p className={previewStyles.name}>{data.identity.name}</p>
       {data.identity.headline ? (
@@ -42,7 +55,7 @@ const PortfolioPreview = memo(({ data }: { data: Portfolio }) => (
       ) : null}
       <p className={previewStyles.meta}>
         {data.identity.location ? (
-          <span className={previewStyles.metaIcon}>
+          <span className={previewStyles.metaItem}>
             <LuMapPin aria-hidden size={12} strokeWidth={1.5} />
             {data.identity.location}
           </span>
@@ -54,14 +67,27 @@ const PortfolioPreview = memo(({ data }: { data: Portfolio }) => (
     {data.links.length > 0 || data.identity.email ? (
       <ul className={previewStyles.links}>
         {data.links.map((link) => (
-          <li className={previewStyles.link} key={link.platform}>
-            {link.label}
+          <li key={link.platform}>
+            <a
+              className={previewStyles.link}
+              href={link.url}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <span className={previewStyles.linkIcon}>{platformIcon(link.platform)}</span>
+              <span className={previewStyles.linkLabel}>{link.label}</span>
+              <LuArrowUpRight aria-hidden className={previewStyles.linkArrow} size={15} strokeWidth={1.5} />
+            </a>
           </li>
         ))}
         {data.identity.email ? (
-          <li className={previewStyles.link}>
-            <LuMail aria-hidden size={12} strokeWidth={1.5} />
-            {data.identity.email}
+          <li>
+            <a className={previewStyles.link} href={`mailto:${data.identity.email}`}>
+              <span className={previewStyles.linkIcon}>
+                <LuMail aria-hidden size={16} strokeWidth={1.5} />
+              </span>
+              <span className={previewStyles.linkLabel}>{data.identity.email}</span>
+            </a>
           </li>
         ) : null}
       </ul>
@@ -127,8 +153,10 @@ const PortfolioPreview = memo(({ data }: { data: Portfolio }) => (
         <ul className={previewStyles.links}>
           {data.skills.map((group) => (
             <li className={previewStyles.link} key={group.name}>
-              {group.name}
-              {group.group ? ` · ${group.group}` : ""}
+              <span className={previewStyles.linkLabel}>
+                {group.name}
+                {group.group ? ` · ${group.group}` : ""}
+              </span>
             </li>
           ))}
         </ul>

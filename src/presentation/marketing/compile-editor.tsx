@@ -4,13 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror"
 import { LuCheck } from "react-icons/lu"
 import { parsePortfolioText } from "@application/portfolio/parse-portfolio"
-import { portfolioUrl, siteConfig } from "@application/site/site-config"
 import { SourceEditor } from "@presentation/code-mirror/source-editor"
 import { editorStyles } from "./editor.styles"
 import { PortfolioPreview } from "./portfolio-preview"
 import { previewStyles } from "./preview.styles"
 
-const DEBOUNCE_MS = 600
+const DEBOUNCE_MS = 400
 
 const useDebounced = (value: string, delay: number) => {
   const [settled, setSettled] = useState(value)
@@ -38,6 +37,7 @@ export const CompileEditor = ({ initialText }: CompileEditorProps) => {
 
   const result = useMemo(() => parsePortfolioText(settled), [settled])
   const pending = draft !== settled
+  const issues = result.ok ? 0 : result.issues.length
 
   return (
     <div className={editorStyles.root}>
@@ -60,32 +60,29 @@ export const CompileEditor = ({ initialText }: CompileEditorProps) => {
               </p>
             ) : (
               <p className={editorStyles.statusBad}>
-                {result.issues.length} thing{result.issues.length === 1 ? "" : "s"} to fix
+                {issues} thing{issues === 1 ? "" : "s"} to fix
               </p>
             )}
-            {pending ? <p className={editorStyles.statusPending}>Rendering as you type</p> : null}
           </div>
         </div>
 
         <div className={editorStyles.right}>
-          <div className={editorStyles.editorShell}>
-            <div className={previewStyles.scroll}>
+          <div className={previewStyles.root}>
+            <div className={previewStyles.head}>
+              <span className={previewStyles.headLabel}>Rendered page</span>
+              <span className={previewStyles.headState}>
+                {pending ? "Applying your change" : result.ok ? "Up to date" : "Not rendering"}
+              </span>
+            </div>
+            <div className={previewStyles.stage}>
               {result.ok ? (
                 <PortfolioPreview data={result.data} />
               ) : (
                 <p className={previewStyles.empty}>
-                  {result.issues.length} thing{result.issues.length === 1 ? "" : "s"} to fix. The page
-                  appears the moment the file parses.
+                  {issues} thing{issues === 1 ? "" : "s"} to fix. The page appears the moment the file
+                  parses.
                 </p>
               )}
-            </div>
-            <div className={editorStyles.previewFoot}>
-              <span className={editorStyles.previewUrl}>
-                {result.ok
-                  ? portfolioUrl(result.data.meta?.handle ?? "nainakumari")
-                  : `${siteConfig.origin}/p/`}
-              </span>
-              <span className={editorStyles.previewLive}>live</span>
             </div>
           </div>
         </div>

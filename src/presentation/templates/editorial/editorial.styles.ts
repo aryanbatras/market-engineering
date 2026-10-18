@@ -1,6 +1,6 @@
 export const editorialStyles = {
   root: "text-ink grid min-h-dvh grid-cols-1 lg:grid-cols-[220px_1fr]",
-  rail: "border-ink-15 flex flex-col gap-6 border-b px-6 py-8 lg:sticky lg:top-0 lg:h-dvh lg:justify-between lg:border-r lg:border-b-0",
+  rail: "border-ink-15 flex flex-col gap-6 border-b px-6 py-8 lg:sticky lg:top-0 lg:justify-between lg:self-start lg:border-r lg:border-b-0",
   railName: "text-body text-ink font-medium",
   railHeadline: "text-micro text-ink-45 leading-relaxed",
   railNav: "flex flex-col gap-3",

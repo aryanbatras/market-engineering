@@ -14,4 +14,4 @@ marketing site only, as atmosphere.
 | `campus.jpg` | Exterior of a building | LensWitzRaj | https://www.pexels.com/photo/exterior-of-a-building-20200756/ |
 | `server-room.jpg` | Data center server racks | panumas nikhomkhai | https://www.pexels.com/photo/data-center-server-racks-with-active-equipment-37730212/ |
 | `library.jpg` | Group in front of a table | Yan Krukau | https://www.pexels.com/photo/group-of-people-sitting-on-chair-in-front-of-table-8199558/ |
-| `typing.mp4` | Typing of codes | Pexels | https://www.pexels.com/video/typing-of-codes-854053/ |
+| `drag-drop.jpg` | Hands organising index cards | Pexels | https://www.pexels.com/photo/hands-organizing-index-cards-on-a-desk-8035282/ |

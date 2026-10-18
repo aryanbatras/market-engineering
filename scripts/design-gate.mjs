@@ -9,8 +9,12 @@
 //   no-footage     same
 //   still-page    motion is a landing-page device; a form is not a scroll narrative
 //   long-pin      same
+//   covered-text  these two pages show whole portfolio pages inside a scrollable crop. Text scrolled
+//                 past the crop is invisible to a person but its layout box still exists, and the rule
+//                 reads the box. It stays a FAIL everywhere else, where it has twice caught a real bug:
+//                 a frosted header over the hero, and the Editorial rail escaping its crop.
 //
-// Four rules carry a written allowance everywhere. The reasoning lives in DESIGN.md section 16.
+// Five rules carry a written allowance everywhere. The reasoning lives in DESIGN.md section 16.
 //
 //   node scripts/design-gate.mjs [origin]
 
@@ -18,8 +22,8 @@ import { spawn } from "node:child_process"
 import { origin, withServer } from "./with-server.mjs"
 const inspector = "/Users/aryan/.agents/skills/design-taste-frontend/scripts/inspect.mjs"
 
-const always = "mono,eyebrow,side-scroll,card-rows"
-const interiorOnly = "few-pictures,no-footage,still-page,long-pin"
+const always = "mono,eyebrow,side-scroll,card-rows,no-footage"
+const interiorOnly = "few-pictures,no-footage,still-page,long-pin,covered-text"
 
 const pages = [
   { path: "/", allow: always },

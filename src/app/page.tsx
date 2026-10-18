@@ -5,10 +5,9 @@ import { Reveal } from "@presentation/motion/reveal"
 import { ScrollProgress, ScrollReveal } from "@presentation/motion/scroll-reveal"
 import { heroStyles } from "@presentation/marketing/editor.styles"
 import { FaqSection, IntroSection } from "@presentation/marketing/home-sections"
-import { StepsSection } from "@presentation/marketing/sections-flow"
 import { ClosingCta, PricingTable } from "@presentation/marketing/plans"
 import { CompileEditor } from "@presentation/marketing/compile-editor"
-import { BuildTimeline } from "@presentation/marketing/build-timeline"
+import { ScrollRail } from "@presentation/marketing/scroll-rail"
 import { AtmosphereBand, GallerySection } from "@presentation/marketing/gallery"
 import { RecruiterSurfaces } from "@presentation/marketing/surfaces"
 import { TemplateGallery } from "@presentation/builder/template-gallery"
@@ -41,12 +40,13 @@ const HomePage = () => (
           </Reveal>
         </div>
         <Reveal delay={100}>
-          <div>
-            <CompileEditor initialText={heroYaml} />
-            <BuildTimeline />
-          </div>
+          <CompileEditor initialText={heroYaml} />
         </Reveal>
       </div>
+
+      <Section spacing="flush">
+        <ScrollRail />
+      </Section>
 
       <AtmosphereBand />
 
@@ -64,10 +64,6 @@ const HomePage = () => (
             <GallerySection />
           </Reveal>
         </Shell>
-      </Section>
-
-      <Section spacing="flush">
-        <StepsSection />
       </Section>
 
       <Section>

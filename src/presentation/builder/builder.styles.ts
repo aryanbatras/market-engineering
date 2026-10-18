@@ -1,6 +1,6 @@
 export const builderStyles = {
   shell: "bg-ground-sunken min-h-dvh",
-  bar: "bg-ground sticky top-0 z-40",
+  bar: "bg-ground relative z-40",
   barInner: "mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-5 md:px-8",
   wordmark: "text-small text-ink font-medium",
   barLeft: "flex items-center gap-4",

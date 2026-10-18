@@ -18,8 +18,12 @@ const legal = [
   { href: "/credits", label: "Credits" },
 ]
 
-export const SiteHeader = () => (
-  <header className={navStyles.bar}>
+type SiteHeaderProps = {
+  sticky?: boolean
+}
+
+export const SiteHeader = ({ sticky = true }: SiteHeaderProps) => (
+  <header className={sticky ? navStyles.bar : navStyles.barStatic}>
     <div className={navStyles.inner}>
       <Wordmark />
       <nav aria-label="Main" className={navStyles.links}>

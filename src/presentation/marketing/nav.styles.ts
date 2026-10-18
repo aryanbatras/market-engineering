@@ -1,5 +1,6 @@
 export const navStyles = {
   bar: "bg-ground sticky top-0 z-50",
+  barStatic: "bg-ground relative z-50",
   inner: "mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-5 md:px-8",
   wordmark: "text-body text-ink font-medium tracking-tight",
   links: "hidden items-center gap-8 md:flex",

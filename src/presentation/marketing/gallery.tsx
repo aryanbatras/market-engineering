@@ -1,6 +1,22 @@
 import Image from "next/image"
 import Link from "next/link"
-import { galleryStyles, mediaStyles } from "./editor.styles"
+import { galleryStyles } from "./editor.styles"
+import { mediaStyles } from "./media.styles"
+
+const cases = [
+  {
+    label: "The pain",
+    body: "Your work exists. The page that shows it does not, and that page is a whole second project.",
+  },
+  {
+    label: "The answer",
+    body: "Fill in the fields. No code, no stack, no styling choices. Drag it until it reads like you.",
+  },
+  {
+    label: "The point",
+    body: "One live address that argues for you at every screen after this one.",
+  },
+]
 
 const plates = [
   {
@@ -54,27 +70,31 @@ export const GallerySection = () => (
 
 export const AtmosphereBand = () => (
   <section className={mediaStyles.band}>
-    <video
-      autoPlay
-      className={mediaStyles.video}
-      loop
-      muted
-      playsInline
-      poster="/media/server-room.jpg"
-      src="/media/typing.mp4"
+    <Image
+      alt="Hands moving a printed card into place among a wall of cards"
+      className={mediaStyles.plate}
+      fill
+      priority
+      sizes="100vw"
+      src="/media/drag-drop.jpg"
     />
     <div aria-hidden className={mediaStyles.scrim} />
     <div className={mediaStyles.inner}>
-      <p className={mediaStyles.heading}>The blank page.</p>
-      <p className={mediaStyles.body}>
-        The bottleneck is not talent, it is setup. You already have the commits, the screenshots and the
-        internship notes. What is missing is the two hours to stand up a site, pick a stack and deploy it
-        before the deadline. So the work stays invisible, and the strongest thing you have never gets read.
-      </p>
-      <div className={mediaStyles.captionRow}>
-        <span>Typed in, rendered live, published at one address.</span>
+      <p className={mediaStyles.heading}>The page is the bottleneck.</p>
+
+      <div className={mediaStyles.grid}>
+        {cases.map((entry) => (
+          <div className={mediaStyles.cell} key={entry.label}>
+            <p className={mediaStyles.cellLabel}>{entry.label}</p>
+            <p className={mediaStyles.cellBody}>{entry.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className={mediaStyles.creditRow}>
+        <span className={mediaStyles.creditText}>No code. No stack. No deploy.</span>
         <Link className={mediaStyles.creditLink} href="/credits">
-          Footage credits
+          Photo credits
         </Link>
       </div>
     </div>

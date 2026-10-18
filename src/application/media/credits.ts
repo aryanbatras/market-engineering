@@ -8,11 +8,11 @@ export type Credit = {
 
 export const credits: Credit[] = [
   {
-    file: "/media/typing.mp4",
-    title: "Typing of codes",
+    file: "/media/drag-drop.jpg",
+    title: "Hands organizing index cards on a desk",
     creator: "Pexels",
-    source: "https://www.pexels.com/video/typing-of-codes-854053/",
-    usage: "Muted background loop on the home page",
+    source: "https://www.pexels.com/photo/hands-organizing-index-cards-on-a-desk-8035282/",
+    usage: "Home page, the statement band",
   },
   {
     file: "/media/campus.jpg",
@@ -27,7 +27,7 @@ export const credits: Credit[] = [
     creator: "panumas nikhomkhai",
     source:
       "https://www.pexels.com/photo/data-center-server-racks-with-active-equipment-37730212/",
-    usage: "Home page and video poster frame",
+    usage: "Home page",
   },
   {
     file: "/media/library.jpg",

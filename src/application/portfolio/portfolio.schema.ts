@@ -62,6 +62,12 @@ const handleSchema = z
   .max(30, "Handle must be 30 characters or fewer")
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers, and single hyphens")
 
+const linkSchema = z.object({
+  platform: linkPlatform,
+  label: z.string().max(80).optional(),
+  url: z.string().max(400),
+})
+
 export const portfolioSchema = z.object({
   portfolioVersion: z.literal(1),
   identity: z.object({
@@ -73,15 +79,7 @@ export const portfolioSchema = z.object({
     phone: z.string().max(40).optional(),
     availability: z.string().max(160).optional(),
   }),
-  links: z
-    .array(
-      z.object({
-        platform: linkPlatform,
-        label: z.string().max(80).optional(),
-        url: z.string().max(400),
-      }),
-    )
-    .max(12)
+  links: z.array(linkSchema).max(12)
     .default([]),
   education: z.array(educationSchema).max(12).default([]),
   experience: z.array(experienceSchema).max(20).default([]),
@@ -129,6 +127,7 @@ export type Portfolio = z.infer<typeof portfolioSchema>
 export type PortfolioDraft = z.input<typeof portfolioSchema>
 export type TemplateConfig = z.infer<typeof templateConfigSchema>
 export type PublishedPortfolio = z.infer<typeof publishedPortfolioSchema>
+export type Link = z.infer<typeof linkSchema>
 export type Project = z.infer<typeof projectSchema>
 export type Experience = z.infer<typeof experienceSchema>
 export type Education = z.infer<typeof educationSchema>

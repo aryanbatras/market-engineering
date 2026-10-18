@@ -11,8 +11,8 @@ export const templateCardStyles = {
 
   frame: "bg-ground-sunken mt-6 h-[440px] overflow-hidden rounded-panel",
   frameFill: "h-[calc(100dvh-280px)]",
-  stage: "size-full overflow-x-hidden overflow-y-auto",
-  canvas: "w-[1440px] origin-top-left bg-white [zoom:0.17] md:[zoom:0.2] xl:[zoom:0.23]",
+  stage: "stage-canvas size-full overflow-x-hidden overflow-y-auto",
+  canvas: "page-canvas bg-white",
   canvasDark: "bg-ink",
   loading: "size-full",
 

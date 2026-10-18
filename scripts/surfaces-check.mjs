@@ -65,7 +65,7 @@ record("builder typing never rewinds", regressed === 0, typedPath.join(" → "))
 record("builder typing grows", typedPath.at(-1) > typedPath[0], `${typedPath[0]} → ${typedPath.at(-1)}`)
 
 const preview = await page.eval(() => {
-  const stage = document.querySelector('[class*="origin-top-left"]')
+  const stage = document.querySelector(".page-canvas")
   if (!stage) return null
   const box = stage.getBoundingClientRect()
   return { width: Math.round(box.width), height: Math.round(box.height), text: stage.innerText.length }
@@ -120,7 +120,7 @@ record(
 await page.goto(`${origin}/templates`, { settleMs: 1600 })
 await sleep(1400)
 const gallery = await page.eval(() => {
-  const stages = [...document.querySelectorAll('[class*="origin-top-left"]')]
+  const stages = [...document.querySelectorAll(".page-canvas")]
   return {
     count: stages.length,
     zoomed: stages.every((stage) => stage.getBoundingClientRect().height > 0),

@@ -17,8 +17,8 @@ const record = (name, pass, detail) => {
 const measure = () => {
   const frames = [...document.querySelectorAll("[data-template]")]
   return frames.map((frame) => {
-    const stage = frame.querySelector('[class*="overflow-y-auto"]')
-    const canvas = frame.querySelector('[class*="zoom"]')
+    const stage = frame.querySelector(".stage-canvas")
+    const canvas = frame.querySelector(".page-canvas")
     if (!stage || !canvas) return { id: frame.dataset.template, missing: true }
     const stageBox = stage.getBoundingClientRect()
     const canvasBox = canvas.getBoundingClientRect()

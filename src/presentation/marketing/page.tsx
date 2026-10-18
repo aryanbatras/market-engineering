@@ -12,7 +12,7 @@ type ProsePageProps = {
 
 export const ProsePage = ({ title, lead, children }: ProsePageProps) => (
   <>
-    <SiteHeader />
+    <SiteHeader sticky={false} />
     <main>
       <Shell className={pageStyles.proseHeader}>
         <header>

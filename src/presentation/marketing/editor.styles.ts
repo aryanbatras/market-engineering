@@ -13,31 +13,6 @@ export const editorStyles = {
   issueList: "mt-3 flex flex-col gap-2",
   issue: "bg-ground-sunken text-micro text-ink rounded-panel px-4 py-3",
   issueField: "text-blue font-medium",
-  previewPane: "bg-ground-sunken flex min-w-0 flex-1 flex-col rounded-panel",
-  previewFoot: "flex items-center justify-between gap-3 px-6 pt-3 pb-5",
-  previewUrl: "text-micro text-ink-45 tabular-nums",
-  previewBody: "flex flex-1 flex-col gap-4 p-5",
-  previewCard: "bg-ground rounded-panel p-5",
-  previewName: "text-lead text-ink",
-  previewHeadline: "text-small text-ink-70 mt-1",
-  previewMeta: "text-micro text-ink-45 mt-3",
-  previewLive: "text-micro text-blue font-medium",
-  previewExperience: "bg-ground rounded-panel p-5",
-  previewExperienceOrg: "text-small text-ink font-medium",
-  previewExperienceMeta: "text-micro text-ink-45 mt-1",
-  previewEmpty: "text-ink-45 text-small flex flex-1 items-center justify-center",
-} as const
-
-export const mediaStyles = {
-  band: "bg-ink relative min-h-[100dvh] overflow-hidden",
-  video: "absolute inset-0 size-full object-cover opacity-90",
-  scrim: "absolute inset-0 bg-ink/55",
-  caption: "absolute right-5 bottom-4 text-micro text-white/70",
-  heading: "text-display text-white max-w-[14ch]",
-  body: "text-lead text-white/85 mt-8 max-w-[48ch]",
-  captionRow: "text-micro text-white/40 mt-6",
-  creditLink: "text-micro text-white/60 mt-8 inline-block underline underline-offset-4",
-  inner: "relative mx-auto flex h-full w-full max-w-[1440px] flex-col justify-center px-5 py-24 md:px-8",
 } as const
 
 export const heroStyles = {

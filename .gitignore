@@ -9,5 +9,6 @@ node_modules
 next-env.d.ts
 .DS_Store
 
-# Screenshots dropped in the repo root by the founder
+# Scratch artefacts dropped in the repo root while working
 Screenshot *.png
+timeline.png
