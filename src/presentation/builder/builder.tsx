@@ -9,11 +9,15 @@ import { samplePortfolio } from "@application/portfolio/sample-portfolio"
 import { importPrompt } from "@application/portfolio/portfolio-copy"
 import { registry } from "@presentation/templates/registry"
 import { slugify } from "@application/portfolio/slugify"
+import { portfolioUrl } from "@application/site/site-config"
 import type { TemplateModule } from "@presentation/templates/types"
+import Link from "next/link"
 import { cn } from "@presentation/design/cn"
 import { Button } from "@presentation/design/button"
 import { builderStyles } from "./builder.styles"
 import { YamlSource } from "./yaml-source"
+import { useSession } from "@application/auth/use-session"
+import { portfolioRepository } from "@infrastructure/persistence/resolve-portfolio-repository"
 
 const seedText = stringify(samplePortfolio, { lineWidth: 0 })
 
@@ -45,7 +49,7 @@ const TemplatePreview = ({
   return <Component config={defaultConfig} data={portfolio} showAttribution={true} />
 }
 
-type BuilderStep = "template" | "edit" | "publish"
+type BuilderStep = "template" | "edit" | "signin" | "published"
 
 export const Builder = () => {
   const [step, setStep] = useState<BuilderStep>("template")
@@ -53,15 +57,47 @@ export const Builder = () => {
   const [text, setText] = useState(seedText)
   const [handle, setHandle] = useState(slugify("Your Name"))
   const [toast, setToast] = useState<string | null>(null)
+  const [handleCheck, setHandleCheck] = useState<boolean | null>(null)
+  const [busy, setBusy] = useState(false)
+  const { session, loading: sessionLoading, signIn, isMocked } = useSession()
 
   const result = useMemo(() => parsePortfolioText(text), [text])
   const portfolio = result.ok ? result.data : null
 
   const handleIsValid = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(handle) && handle.length >= 3
 
+  useEffect(() => {
+    if (!handleIsValid) return
+    let active = true
+    void portfolioRepository.isHandleAvailable(handle).then((available) => {
+      if (active) setHandleCheck(available)
+    })
+    return () => {
+      active = false
+    }
+  }, [handle, handleIsValid])
+
   const flash = (message: string) => {
     setToast(message)
     window.setTimeout(() => setToast(null), 2600)
+  }
+
+  const publish = async () => {
+    if (!portfolio || !session) return
+    setBusy(true)
+    try {
+      await portfolioRepository.save({
+        handle,
+        templateId,
+        config: defaultConfig,
+        data: portfolio,
+        visibility: "public",
+        userId: session.user.id,
+      })
+      setStep("published")
+    } finally {
+      setBusy(false)
+    }
   }
 
   const download = () => {
@@ -92,7 +128,7 @@ export const Builder = () => {
               YAML
             </Button>
             {step === "edit" ? (
-              <Button intent="primary" onClick={() => setStep("publish")} size="small">
+              <Button disabled={busy} intent="primary" onClick={() => void publish()} size="small">
                 Publish
               </Button>
             ) : null}
@@ -229,30 +265,68 @@ export const Builder = () => {
         </div>
       ) : null}
 
-      {step === "publish" ? (
+      {step === "signin" ? (
         <div className={builderStyles.publish}>
-          <h1 className={builderStyles.pickerTitle}>Sign in to publish</h1>
+          <h1 className={builderStyles.pickerTitle}>One step left</h1>
           <p className={builderStyles.pickerBody}>
-            Your work is ready. We just need an account so your URL belongs to you and not to a stranger&apos;s
+            Your work is ready. We just need an account so your URL belongs to you rather than to a stranger&apos;s
             browser.
           </p>
           <ul className={builderStyles.publishList}>
-            <li>Your URL stays yours. Sign out, come back, it is still there.</li>
+            <li>Nothing is public until you publish it.</li>
             <li>Your data exports on every plan, including free.</li>
-            <li>Nothing is published until you publish it.</li>
+            <li>You can unpublish in one click afterwards.</li>
           </ul>
           <div className={builderStyles.pickerAction}>
-            <a href="/sign-in">
-              <Button intent="primary">
-                Continue with Google
-                <LuExternalLink size={16} strokeWidth={1.5} />
-              </Button>
-            </a>
+            <Button disabled={sessionLoading} intent="primary" onClick={() => void signIn()}>
+              {isMocked ? "Sign in as Your Name (mocked)" : "Continue with GitHub"}
+              <LuArrowRight size={17} strokeWidth={1.5} />
+            </Button>
             <Button intent="quiet" onClick={() => setStep("edit")}>
               <LuArrowLeft size={16} strokeWidth={1.5} />
               Back to editing
             </Button>
           </div>
+        </div>
+      ) : null}
+
+      {step === "published" ? (
+        <div className={builderStyles.publish}>
+          <h1 className={builderStyles.pickerTitle}>
+            {session ? "Published" : "Sign in to publish"}
+          </h1>
+          <p className={builderStyles.pickerBody}>
+            {session
+              ? "Your portfolio is live. Unpublish any time from the dashboard."
+              : "Your work is ready. We just need an account so your URL belongs to you."}
+          </p>
+          {session ? (
+            <>
+              <p className={builderStyles.publishUrl}>{portfolioUrl(handle)}</p>
+              <div className={builderStyles.pickerAction}>
+                <Link href={`/p/${handle}`}>
+                  <Button intent="primary">
+                    View it live
+                    <LuExternalLink size={16} strokeWidth={1.5} />
+                  </Button>
+                </Link>
+                <Link className={builderStyles.quietLink} href="/dashboard">
+                  Open dashboard
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className={builderStyles.pickerAction}>
+              <Button disabled={sessionLoading} intent="primary" onClick={() => void signIn()}>
+                {isMocked ? "Sign in as Your Name (mocked)" : "Continue with GitHub"}
+                <LuArrowRight size={17} strokeWidth={1.5} />
+              </Button>
+              <Button intent="quiet" onClick={() => setStep("edit")}>
+                <LuArrowLeft size={16} strokeWidth={1.5} />
+                Back to editing
+              </Button>
+            </div>
+          )}
         </div>
       ) : null}
 

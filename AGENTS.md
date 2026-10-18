@@ -90,7 +90,19 @@ GitHub sign-in is dual-purpose: identity for login, and the authorisation that u
 
 ---
 
-## R10 — Database, ORM, and API
+## R10 — Mocking is mandatory
+
+Every external dependency is mocked in development: auth, database, payments, everything. A developer must be able to run the entire product, sign in, publish, read back, and hit every state without a single network call.
+
+`NEXT_PUBLIC_APP_ENV=development` serves everything from mock adapters. `production` hits live services. There is no per-feature override, and nothing outside `src/infrastructure/mock/` branches on it.
+
+**This is not testing.** No unit tests, no assertion about internals. We are checking behaviour at the interface.
+
+Full rules in `spec/02-architecture/mocking.md`. `npm run mock:verify` must pass.
+
+---
+
+## R11 — Database, ORM, and API
 
 Database is **Supabase Postgres**, accessed through **Drizzle ORM**. API is Next.js serverless route handlers.
 
@@ -98,7 +110,7 @@ Supabase exposes an anon key intended for the browser. That key is safe **only**
 
 ---
 
-## R11 — Research before building
+## R12 — Research before building
 
 Think hard about libraries that already exist before implementing anything ourselves. Do proper web research. Do not reinvent what exists.
 
@@ -106,7 +118,7 @@ For portfolio and resume work, a great deal of prior art already exists on GitHu
 
 ---
 
-## R12 — The template runtime must be solved properly
+## R13 — The template runtime must be solved properly
 
 Running React portfolio templates inside our own Next.js application is the hardest engineering problem in this product. It must be highly stable and highly efficient.
 
@@ -114,7 +126,7 @@ Plan it properly before building on top of it. See `spec/02-architecture/templat
 
 ---
 
-## R13 — Layering
+## R14 — Layering
 
 `app/` is a thin routing and HTTP contract layer only. No business logic, no data access, no styling decisions.
 
@@ -128,7 +140,7 @@ Dependencies point inward. `presentation` and `application` never import from `i
 
 ---
 
-## R14 — Never assume
+## R15 — Never assume
 
 If you are not sure about anything, ask first.
 
@@ -136,7 +148,7 @@ Do not proceed on an assumption that could send the implementation in the wrong 
 
 ---
 
-## R15 — Specification before code
+## R16 — Specification before code
 
 The repository contains `AGENTS.md`, `DESIGN.md`, and `spec/`.
 
@@ -144,7 +156,7 @@ Order of work: rules first, then research, then specification. Implementation fo
 
 ---
 
-## R16 — Build order
+## R17 — Build order
 
 When resuming work, the correct sequence is:
 
@@ -152,8 +164,8 @@ When resuming work, the correct sequence is:
 2. `DESIGN.md`
 3. Research (`spec/04-research/`)
 4. Specification (`spec/01`–`spec/03`, `spec/05`)
-5. Scaffold and toolchain, including lint rules enforcing R5 and R7
-6. Template runtime spike (R12) — this gates everything downstream
+5. Scaffold and toolchain, including lint rules enforcing R5 and R7, and the mock layer
+6. Template runtime spike (R13) — this gates everything downstream
 7. YAML to publish end to end
 8. Portfolio templates
 9. Recruiter surfaces

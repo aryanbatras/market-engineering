@@ -1,0 +1,15 @@
+{
+  "login": "yourname",
+  "id": 583231,
+  "name": "Your Name",
+  "bio": "Backend engineer. Go, Postgres, and the unglamorous parts in between.",
+  "location": "Bengaluru, India",
+  "email": "yourname@example.com",
+  "blog": "yourname.dev",
+  "avatar_url": "https://avatars.githubusercontent.com/u/583231?v=4",
+  "public_repos": 47,
+  "followers": 84,
+  "following": 31,
+  "created_at": "2020-08-02T04:12:00Z",
+  "pinned": ["consensus-log", "rate-limiter", "query-cost-dashboard"]
+}

@@ -48,6 +48,8 @@ export const builderStyles = {
 
   publish: "mx-auto flex min-h-[70dvh] w-full max-w-[1440px] flex-col justify-center px-5 py-20 md:px-8",
   publishList: "text-body text-ink-70 mt-10 flex flex-col gap-3",
+  publishUrl: "text-lead text-blue mt-10",
+  quietLink: "text-small text-ink-70 underline underline-offset-4",
 
   previewFrame: "bg-ground sticky top-[96px] h-[calc(100dvh-120px)] overflow-hidden rounded-panel",
   previewScroll: "h-full overflow-y-auto",

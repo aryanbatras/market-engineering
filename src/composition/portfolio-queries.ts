@@ -1,4 +1,6 @@
 import { createPortfolioQueries } from "@application/portfolio/portfolio-queries"
-import { portfolioRepository } from "@infrastructure/persistence/repository"
+import { portfolioRepository } from "@infrastructure/persistence/resolve-portfolio-repository"
 
 export const portfolioQueries = createPortfolioQueries(portfolioRepository)
+
+export const repositoryIsMocked = portfolioRepository.isMocked

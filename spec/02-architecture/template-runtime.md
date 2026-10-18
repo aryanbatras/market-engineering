@@ -1,6 +1,6 @@
 # Template runtime
 
-**This is the highest-risk decision in the product (R12).** Everything — five templates, the editor, the public route — sits on this. If this is wrong, we rewrite it before we write anything else.
+**This is the highest-risk decision in the product (R13).** Everything — five templates, the editor, the public route — sits on this. If this is wrong, we rewrite it before we write anything else.
 
 Status: **spike first**. Nothing else gets built until this is proven.
 

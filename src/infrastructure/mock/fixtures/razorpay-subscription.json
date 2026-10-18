@@ -1,0 +1,18 @@
+{
+  "entity": "subscription",
+  "id": "sub_MOCK0000000001",
+  "plan_id": "plan_PRO00000000001",
+  "status": "active",
+  "customer_id": "cust_MOCK0000000001",
+  "total_count": 1,
+  "paid_count": 1,
+  "quantity": 1,
+  "amount": 83,
+  "amount_due": 83,
+  "currency": "INR",
+  "period": "month",
+  "current_start": "2026-10-18T04:31:09.882Z",
+  "current_end": "2026-11-18T04:31:09.882Z",
+  "created_at": 1760740269,
+  "notes": { "user_id": "9f3c2a71-5b48-4e0d-9a1c-7d2e6b0f4a83" }
+}

@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og"
-import { portfolioQueries } from "@composition/portfolio-queries"
+import { isMockEnvironment } from "@application/site/app-environment"
 import { siteConfig } from "@application/site/site-config"
 
 export const runtime = "edge"
@@ -8,9 +8,14 @@ type RouteProps = {
   params: Promise<{ handle: string }>
 }
 
+const getLiveRecord = async (handle: string) => {
+  const { portfolioQueries } = await import("@composition/portfolio-queries")
+  return await portfolioQueries.getPublishedPortfolio(handle)
+}
+
 export async function GET(_request: Request, { params }: RouteProps) {
   const { handle } = await params
-  const record = await portfolioQueries.getPublishedPortfolio(handle)
+  const record = isMockEnvironment() ? null : await getLiveRecord(handle)
 
   const name = record?.data.identity.name ?? "Your portfolio"
   const headline = record?.data.identity.headline ?? "Publish it in ten minutes"

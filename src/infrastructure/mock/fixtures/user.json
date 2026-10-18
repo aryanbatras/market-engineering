@@ -1,0 +1,41 @@
+{
+  "id": "9f3c2a71-5b48-4e0d-9a1c-7d2e6b0f4a83",
+  "aud": "authenticated",
+  "role": "authenticated",
+  "email": "yourname@example.com",
+  "email_confirmed_at": "2026-09-12T08:14:22.104Z",
+  "phone": "",
+  "confirmed_at": "2026-09-12T08:14:22.104Z",
+  "last_sign_in_at": "2026-10-18T04:31:09.882Z",
+  "app_metadata": { "provider": "github", "providers": ["github"] },
+  "user_metadata": {
+    "avatar_url": "https://avatars.githubusercontent.com/u/583231?v=4",
+    "full_name": "Your Name",
+    "name": "yourname",
+    "preferred_username": "yourname",
+    "user_name": "yourname",
+    "iss": "https://api.github.com",
+    "sub": "583231"
+  },
+  "is_anonymous": false,
+  "factors": [],
+  "identities": [
+    {
+      "id": "583231",
+      "user_id": "9f3c2a71-5b48-4e0d-9a1c-7d2e6b0f4a83",
+      "identity_data": {
+        "id": "583231",
+        "login": "yourname",
+        "name": "Your Name",
+        "email": "yourname@example.com",
+        "avatar_url": "https://avatars.githubusercontent.com/u/583231?v=4",
+        "verified": true
+      },
+      "provider": "github",
+      "created_at": "2026-09-12T08:14:22.104Z",
+      "last_sign_in_at": "2026-10-18T04:31:09.882Z"
+    }
+  ],
+  "created_at": "2026-09-12T08:14:22.104Z",
+  "updated_at": "2026-10-18T04:31:09.882Z"
+}

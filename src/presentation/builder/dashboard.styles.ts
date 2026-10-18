@@ -1,0 +1,18 @@
+export const dashboardStyles = {
+  root: "bg-ground-sunken min-h-dvh px-5 py-14 md:px-8 md:py-20",
+  grid: "mx-auto grid w-full max-w-[1100px] grid-cols-1 gap-6 lg:grid-cols-2",
+  card: "bg-ground rounded-panel p-8",
+  cardWide: "lg:col-span-2",
+  label: "text-micro text-ink-45 font-medium",
+  title: "text-title text-ink",
+  body: "text-body text-ink-70 mt-5",
+  identity: "text-lead text-ink mt-4",
+  meta: "text-small text-ink-70 mt-2",
+  url: "text-small text-blue mt-4",
+  actions: "mt-8 flex flex-wrap items-center gap-5",
+  link: "text-small text-blue inline-flex items-center gap-1.5 underline underline-offset-4",
+  strong: "text-ink font-medium",
+  code: "text-ink font-mono",
+  mockNote: "text-micro text-ink-45 mt-6",
+  loading: "text-small text-ink-45 px-5 py-20",
+} as const

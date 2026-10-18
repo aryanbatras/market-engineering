@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "schema:generate": "tsx scripts/generate-schema.ts",
-    "verify": "npm run lint && npm run typecheck"
+    "verify": "npm run lint && npm run typecheck && npm run mock:verify",
+    "mock:verify": "tsx scripts/verify-mock.mjs"
   },
   "dependencies": {
     "@codemirror/lang-yaml": "^6.1.3",

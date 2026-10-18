@@ -1,9 +1,12 @@
-import { notFound } from "next/navigation"
 import type { Metadata } from "next"
+import { notFound } from "next/navigation"
 import { portfolioQueries } from "@composition/portfolio-queries"
 import { buildPersonJsonLd, renderTemplateFor } from "@application/portfolio/portfolio-queries"
+import { isMockEnvironment } from "@application/site/app-environment"
+import { siteConfig } from "@application/site/site-config"
 import { findMeta } from "@presentation/templates/registry"
 import { JsonLd } from "@presentation/seo/json-ld"
+import { ClientPortfolioView } from "@presentation/templates/portfolio-view"
 
 type PageProps = {
   params: Promise<{ handle: string }>
@@ -11,8 +14,15 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { handle } = await params
-  const record = await portfolioQueries.getPublishedPortfolio(handle)
 
+  if (isMockEnvironment()) {
+    return {
+      title: `Portfolio · ${siteConfig.name}`,
+      robots: { index: false, follow: false },
+    }
+  }
+
+  const record = await portfolioQueries.getPublishedPortfolio(handle)
   if (!record) return { title: "Portfolio not found", robots: { index: false, follow: false } }
 
   const name = record.data.identity.name
@@ -39,6 +49,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const PortfolioPage = async ({ params }: PageProps) => {
   const { handle } = await params
+
+  if (isMockEnvironment()) return <ClientPortfolioView handle={handle} />
+
   const record = await portfolioQueries.getPublishedPortfolio(handle)
   if (!record) notFound()
 
