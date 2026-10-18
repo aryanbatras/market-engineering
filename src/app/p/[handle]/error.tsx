@@ -1,7 +1,7 @@
 "use client"
 
-import { Button } from "@presentation/design/button"
-import { builderStyles as styles } from "@presentation/builder/builder.styles"
+import { Button } from "@presentation/core/design/button"
+import { builderStyles as styles } from "@presentation/portfolio/builder/builder.styles"
 
 const PortfolioError = ({ reset }: { error: Error; reset: () => void }) => (
   <div className={styles.errorRoot}>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
-import { ProsePage } from "@presentation/marketing/page"
-import { pageStyles } from "@presentation/marketing/page.styles"
-import { TemplateGallery } from "@presentation/builder/template-gallery"
+import { ProsePage } from "@presentation/portfolio/marketing/page"
+import { pageStyles } from "@presentation/portfolio/marketing/page.styles"
+import { TemplateGallery } from "@presentation/portfolio/builder/template-gallery"
 
 export const metadata: Metadata = {
   title: "Templates",

@@ -176,7 +176,7 @@ When resuming work, the correct sequence is:
 12. Domain migration (R18) — `core`, `portfolio`, `resume`
 13. v1.5 block editor
 
-Steps 1 through 7 are done. Steps 8 and 9 are in progress.
+Steps 1 through 7 are done, and so is step 12. Steps 8 and 9 are in progress.
 
 **Step 11 is partially done.** The spec, the schema extension, the LaTeX compiler, the ATS check, the editor and the layout gallery all ship and pass every gate. **The PDF engine does not.** `resolve-resume-compiler.ts` returns the mock in every environment, so "Download PDF" currently produces a placeholder. Wiring a real engine needs the licence audit recorded in `spec/04-research/licenses.md` to pass first, and until it does, the product says "not compiled here" rather than implying a PDF was produced.
 
@@ -211,7 +211,11 @@ src/
 
 **Why this shape.** The portfolio and the resume are two render targets off one document. That is a real relationship, but it is a *narrow* one, and every line of code that couples them is a line that has to be understood when either one changes. The failure this prevents is concrete: a resume layout change quietly reflowing a published portfolio page at `/p/[handle]`. That is the bug R18 makes structurally impossible rather than merely discouraged.
 
-**Enforcement.** An ESLint `no-restricted-imports` rule per layer, mapping the cross-domain forbiddance above. A rule that is not enforced is a suggestion. Full model in `spec/02-architecture/domain-model.md`.
+**The exception, named precisely.** The resume domain reads three paths from the portfolio domain: `portfolio.schema`, `parse-portfolio.ts` and `preview-portfolio.ts`. That is the document and the code that produces and validates it. Everything else the resume needs, the resume owns — a shared helper appears in `core` only once a second domain needs it, never because it looked reusable.
+
+**`app/` stays flat.** Next.js maps folders to URL segments, so `/resume` must live at `src/app/resume/`. Routing is the one place a folder name is dictated from outside; the domain rule governs the four folders that own code.
+
+**Enforcement.** An ESLint `no-restricted-imports` rule per layer and per domain, mapping the cross-domain forbiddance above. A rule that is not enforced is a suggestion. Full model in `spec/02-architecture/domain-model.md`.
 
 ---
 

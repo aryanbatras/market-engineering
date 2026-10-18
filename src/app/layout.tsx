@@ -1,10 +1,10 @@
-import { cn } from "@presentation/design/cn"
+import { cn } from "@presentation/core/design/cn"
 import type { Metadata, Viewport } from "next"
 import type { ReactNode } from "react"
 import { Geist, Geist_Mono } from "next/font/google"
-import { siteConfig, siteTitle } from "@application/site/site-config"
+import { siteConfig, siteTitle } from "@application/core/site/site-config"
 import "./globals.css"
-import "@presentation/builder/preview-canvas.css"
+import "@presentation/portfolio/builder/preview-canvas.css"
 
 const geist = Geist({
   variable: "--font-geist",

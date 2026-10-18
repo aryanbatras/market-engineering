@@ -1,6 +1,6 @@
-import type { PortfolioRepository } from "../ports/portfolio-repository"
+import type { PortfolioRepository } from "./ports/portfolio-repository"
 import type { PublishedPortfolio } from "./portfolio.schema"
-import { loadTemplate } from "@presentation/templates/registry"
+import { loadTemplate } from "@presentation/portfolio/templates/registry"
 
 export type PortfolioQueries = {
   getPublishedPortfolio: (handle: string) => Promise<PublishedPortfolio | null>

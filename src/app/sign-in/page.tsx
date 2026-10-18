@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { SignInView } from "@presentation/auth/sign-in-view"
+import { SignInView } from "@presentation/core/auth/sign-in-view"
 
 export const metadata: Metadata = {
   title: "Sign in",

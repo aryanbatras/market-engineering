@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Dashboard } from "@presentation/builder/dashboard"
+import { Dashboard } from "@presentation/portfolio/builder/dashboard"
 
 export const metadata: Metadata = {
   title: "Dashboard",

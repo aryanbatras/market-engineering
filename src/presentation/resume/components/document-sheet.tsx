@@ -1,5 +1,5 @@
 import type { ResumeBlock, ResumeLayout, ResumeLayoutSpec, ResumeSkin } from "@application/resume/resume-layout"
-import { cn } from "@presentation/design/cn"
+import { cn } from "@presentation/core/design/cn"
 import { sheetStyles } from "./document-sheet.styles"
 
 type DocumentSheetProps = {

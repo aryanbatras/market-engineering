@@ -3,18 +3,17 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { LuArrowLeft, LuCheck, LuDownload, LuTriangleAlert } from "react-icons/lu"
-import { parsePortfolioText } from "@application/portfolio/parse-portfolio"
-import { builderYaml } from "@application/portfolio/hero-yaml"
 import { resumeLayoutSpecs, defaultResumeLayout, defaultResumeSkin } from "@application/resume/resume-registry"
 import { renderResume } from "@application/resume/render-resume"
 import { checkResume } from "@application/resume/check-resume"
 import type { AtsReport } from "@application/resume/ats/ats-report"
 import type { ResumeLayoutSpec, ResumeSkin } from "@application/resume/resume-layout"
+import { initialResumeYaml, resumeParseResult } from "@application/resume/sample/parse-document"
 import { pdfTextExtractor } from "@infrastructure/resume/resolve-pdf-text-extractor"
 import { resumeCompiler } from "@infrastructure/resume/resolve-resume-compiler"
-import { Button } from "@presentation/design/button"
-import { Wordmark } from "@presentation/marketing/wordmark"
-import { YamlSource } from "@presentation/builder/yaml-source"
+import { Button } from "@presentation/core/design/button"
+import { Wordmark } from "@presentation/core/brand/wordmark"
+import { YamlSource } from "@presentation/core/source/yaml-source"
 import { DocumentSheet } from "@presentation/resume/components/document-sheet"
 import { ExtractedTextPane } from "@presentation/resume/components/extracted-text-pane"
 import { editorStyles } from "./resume-editor.styles"
@@ -33,7 +32,7 @@ const downloadBlob = (filename: string, blob: Blob): void => {
 }
 
 export const ResumeEditor = () => {
-  const [draft, setDraft] = useState(builderYaml)
+  const [draft, setDraft] = useState(initialResumeYaml)
   const [layoutId, setLayoutId] = useState(defaultResumeLayout.id)
   const [skin, setSkin] = useState<ResumeSkin>(defaultResumeSkin)
   const [toast, setToast] = useState<string | null>(null)
@@ -41,7 +40,7 @@ export const ResumeEditor = () => {
   const [compiled, setCompiled] = useState(false)
   const [busy, setBusy] = useState(false)
 
-  const parsed = useMemo(() => parsePortfolioText(draft), [draft])
+  const parsed = useMemo(() => resumeParseResult(draft), [draft])
   const portfolio = parsed.ok ? parsed.data : null
   const spec: ResumeLayoutSpec =
     resumeLayoutSpecs.find((entry) => entry.id === layoutId) ?? defaultResumeLayout

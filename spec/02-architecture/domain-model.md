@@ -34,6 +34,39 @@ Read the column top to bottom and you get one domain. Read across and you get on
 
 ---
 
+## The tree as shipped
+
+```
+src/
+  app/                      routing, flat — see below
+  composition/
+    portfolio/portfolio-queries.ts
+    resume/resume-compilation.ts
+  application/
+    core/       auth/  media/  ports/auth-gateway.ts  site/
+    portfolio/  portfolio.schema.ts  parse-portfolio.ts  document-yaml.ts
+                slugify.ts  portfolio-copy.ts  hero-yaml.ts  preview-portfolio.ts
+                ports/portfolio-repository.ts
+    resume/     resume.schema.ts  project-resume.ts  build-resume-layout.ts
+                render-resume.ts  resume-layouts.ts  resume-registry.ts
+                latex/  ats/  ports/  sample/
+  infrastructure/
+    core/       auth/supabase-auth-gateway.ts  supabase/
+    portfolio/  persistence/  (supabase + mock repository adapters)
+    resume/     resolve-resume-compiler.ts  resolve-pdf-text-extractor.ts
+    mock/       mock-database.ts  fixtures/
+                core-mock-auth-gateway.ts
+                portfolio/{seed,mock-portfolio-repository}.ts
+                resume/{mock-resume-compiler,mock-pdf-text-extractor}.ts
+  presentation/
+    core/       brand/wordmark  design/  code-mirror/  motion/  seo/  auth/
+                source/yaml-source
+    portfolio/  builder/  marketing/  templates/
+    resume/     components/  editor/  gallery/  marketing/
+```
+
+`app/` stays flat because Next.js maps folders to URL segments. `/resume` has to live at `src/app/resume/`, not at `src/app/portfolio/resume/`. Routing is the one place where the folder name is dictated from outside, and the domain rule applies to the four folders that actually own code.
+
 ## What each domain owns
 
 ### `portfolio` — the website
@@ -122,9 +155,23 @@ A rule that is not enforced is a suggestion.
 
 ---
 
+## What the migration surfaced
+
+Four things looked shared and turned out not to be. Each was moved to the domain that actually uses it, which is the rule working rather than the rule being inconvenient.
+
+**`hero-yaml.ts` → `document-yaml.ts`, still portfolio.** It stringifies the portfolio sample, so it is portfolio's. The resume needed the same YAML, so the resume got its own `sample/document-yaml.ts` that stringifies its own sample. Two small stringifiers instead of one shared one that neither domain owned.
+
+**`builder/yaml-source.tsx` → `core/source/yaml-source.tsx`.** The CodeMirror YAML editor was written for the builder but is used by both editors. Genuinely core.
+
+**`marketing/wordmark` → `core/brand/wordmark`.** The builder, the resume editor, the gallery and the marketing chrome all use it. Genuinely core.
+
+**The auth gateway moved to `core`.** It was in `infrastructure/auth/`, but `application/core/auth/use-session.ts` needs it and core may not import upward. Auth is shared infrastructure and was never portfolio's to begin with — the original folder was a legacy of the flat layout.
+
+**The one thing that stayed shared is the document.** `portfolio.schema`, `parse-portfolio.ts` and `preview-portfolio.ts` are read by the resume domain, and the lint rule allows exactly those three paths. Anything else the resume needs, the resume owns.
+
 ## Migration
 
-The codebase is currently flat. The move is mechanical and lands in one pass, after the resume feature works in place:
+The move is mechanical and lands in one pass, after the resume feature works in place:
 
 ```
 presentation/templates/**      → presentation/portfolio/templates/**
@@ -144,15 +191,15 @@ infrastructure/**             → split — see below
 composition/**                → split — see below
 ```
 
-**The ports split is the only judgement call.** `application/ports/portfolio-repository.ts` is portfolio. `application/ports/auth-gateway.ts` is core. `application/ports/resume-compiler.ts` and `pdf-text-extractor.ts` are resume. Nothing is moved to core that only one domain uses.
+**The ports split is the only judgement call.** `application/ports/portfolio-repository.ts` is portfolio. `application/ports/auth-gateway.ts` is core. `application/resume/ports/` are resume. Nothing is moved to core that only one domain uses.
 
-**The composition root splits with it.** `composition/portfolio-queries.ts` is portfolio. Adapter resolution that both domains depend on is core.
+**The composition root splits with it.** `composition/portfolio-queries.ts` is portfolio, `composition/resume-compilation.ts` is resume.
 
 Migration order, so the tree is never broken:
 
 1. Move `portfolio/**` into place. Everything still compiles — the domain folders exist but the cross-domain rule is not yet enabled.
 2. Move `core/**`.
-3. Enable the lint rule. Fix whatever it catches.
+3. Enable the lint rule. Fix whatever it catches. **This is the step that finds the four things above.** Every one of them was invisible until the rule existed.
 4. `npm run gate` green.
 
 Enabling the rule last is deliberate. A rule that fails on day one of a refactor gets disabled by day two.

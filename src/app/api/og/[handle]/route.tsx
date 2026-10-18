@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og"
-import { isMockEnvironment } from "@application/site/app-environment"
-import { siteConfig } from "@application/site/site-config"
+import { isMockEnvironment } from "@application/core/site/app-environment"
+import { siteConfig } from "@application/core/site/site-config"
 
 export const runtime = "edge"
 
@@ -9,7 +9,7 @@ type RouteProps = {
 }
 
 const getLiveRecord = async (handle: string) => {
-  const { portfolioQueries } = await import("@composition/portfolio-queries")
+  const { portfolioQueries } = await import("@composition/portfolio/portfolio-queries")
   return await portfolioQueries.getPublishedPortfolio(handle)
 }
 

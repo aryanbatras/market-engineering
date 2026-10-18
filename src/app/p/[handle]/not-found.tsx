@@ -1,6 +1,6 @@
 import Link from "next/link"
-import { Button } from "@presentation/design/button"
-import { cn } from "@presentation/design/cn"
+import { Button } from "@presentation/core/design/button"
+import { cn } from "@presentation/core/design/cn"
 
 const notFoundStyles = {
   root: "flex min-h-dvh flex-col items-start justify-center px-5 md:px-8",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
-import { ProsePage } from "@presentation/marketing/page"
-import { pageStyles } from "@presentation/marketing/page.styles"
+import { ProsePage } from "@presentation/portfolio/marketing/page"
+import { pageStyles } from "@presentation/portfolio/marketing/page.styles"
 
 export const metadata: Metadata = {
   title: "Privacy",

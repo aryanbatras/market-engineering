@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { portfolioQueries } from "@composition/portfolio-queries"
+import { portfolioQueries } from "@composition/portfolio/portfolio-queries"
 import { buildPersonJsonLd, renderTemplateFor } from "@application/portfolio/portfolio-queries"
-import { isMockEnvironment } from "@application/site/app-environment"
-import { siteConfig } from "@application/site/site-config"
-import { findMeta } from "@presentation/templates/registry"
-import { JsonLd } from "@presentation/seo/json-ld"
-import { ClientPortfolioView } from "@presentation/templates/portfolio-view"
+import { isMockEnvironment } from "@application/core/site/app-environment"
+import { siteConfig } from "@application/core/site/site-config"
+import { findMeta } from "@presentation/portfolio/templates/registry"
+import { JsonLd } from "@presentation/core/seo/json-ld"
+import { ClientPortfolioView } from "@presentation/portfolio/templates/portfolio-view"
 
 type PageProps = {
   params: Promise<{ handle: string }>

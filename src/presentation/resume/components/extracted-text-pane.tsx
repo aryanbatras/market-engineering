@@ -1,5 +1,5 @@
 import type { AtsReport } from "@application/resume/ats/ats-report"
-import { cn } from "@presentation/design/cn"
+import { cn } from "@presentation/core/design/cn"
 import { atsStyles } from "./extracted-text-pane.styles"
 
 type ExtractedTextPaneProps = {

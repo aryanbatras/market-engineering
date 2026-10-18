@@ -4,16 +4,15 @@ import { useMemo, useState } from "react"
 import Link from "next/link"
 import { resumeLayoutSpecs, defaultResumeLayout, defaultResumeSkin } from "@application/resume/resume-registry"
 import { renderResume } from "@application/resume/render-resume"
-import { previewPortfolio } from "@application/portfolio/preview-portfolio"
-import { portfolioSchema } from "@application/portfolio/portfolio.schema"
+import { sampleDocument } from "@application/resume/sample/sample-portfolio"
 import type { ResumeLayoutSpec } from "@application/resume/resume-layout"
 import { DocumentSheet } from "@presentation/resume/components/document-sheet"
-import { cn } from "@presentation/design/cn"
-import { Button } from "@presentation/design/button"
-import { Wordmark } from "@presentation/marketing/wordmark"
+import { cn } from "@presentation/core/design/cn"
+import { Button } from "@presentation/core/design/button"
+import { Wordmark } from "@presentation/core/brand/wordmark"
 import { galleryStyles } from "./resume-gallery.styles"
 
-const sample = portfolioSchema.parse(previewPortfolio)
+const sample = sampleDocument()
 
 const LayoutGallery = () => {
   const [layoutId, setLayoutId] = useState(defaultResumeLayout.id)

@@ -1,15 +1,12 @@
 import Link from "next/link"
-import { previewPortfolio } from "@application/portfolio/preview-portfolio"
-import { portfolioSchema } from "@application/portfolio/portfolio.schema"
 import { defaultResumeSkin } from "@application/resume/resume-registry"
-import { sampleAtsReport, sampleResumeLayout } from "@application/resume/sample-ats-report"
-import { Button } from "@presentation/design/button"
+import { sampleAtsReport, sampleResumeLayout } from "@application/resume/sample/report"
+import { Button } from "@presentation/core/design/button"
 import { DocumentSheet } from "@presentation/resume/components/document-sheet"
 import { ExtractedTextPane } from "@presentation/resume/components/extracted-text-pane"
 import { resumeBandStyles } from "./resume-band.styles"
 
-const portfolio = portfolioSchema.parse(previewPortfolio)
-const rendered = sampleResumeLayout(portfolio)
+const rendered = sampleResumeLayout()
 const report = sampleAtsReport()
 
 const ResumeBand = () => (

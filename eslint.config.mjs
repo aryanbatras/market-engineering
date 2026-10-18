@@ -81,6 +81,121 @@ const ruleSet = () => ({
   },
 })
 
+const resumeApplicationEdge = {
+  files: ["src/application/resume/**/*.{ts,tsx}"],
+  rules: {
+    "no-restricted-imports": [
+      "error",
+      {
+        patterns: [
+          {
+            group: [
+              "@application/portfolio/compile-script",
+              "@application/portfolio/portfolio-copy",
+              "@application/portfolio/portfolio-queries",
+              "@application/portfolio/slugify",
+              "@application/portfolio/ports/**",
+            ],
+            message:
+              "R18: resume reads the document and nothing else. Anything it needs beyond the schema belongs in the resume domain.",
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const documentEdge = {
+  files: ["src/application/resume/sample/**/*.{ts,tsx}"],
+  rules: {
+    "no-restricted-imports": [
+      "error",
+      {
+        patterns: [
+          {
+            group: [
+              "@application/portfolio/compile-script",
+              "@application/portfolio/portfolio-copy",
+              "@application/portfolio/portfolio-queries",
+              "@application/portfolio/slugify",
+              "@application/portfolio/ports/**",
+            ],
+            message: "R18: the sample reads the document and nothing else.",
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const domains = [
+  {
+    files: ["src/**/portfolio/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@infrastructure/resume/**", "@application/resume/**", "@presentation/resume/**"],
+              message: "R18: portfolio and resume never import each other.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/**/resume/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@infrastructure/portfolio/**",
+                "@presentation/portfolio/**",
+                "@infrastructure/mock/portfolio/**",
+              ],
+              message: "R18: resume and portfolio never import each other.",
+            },
+            {
+              group: ["@application/portfolio/**"],
+              message:
+                "R18: the only edge between the domains is the Portfolio type, imported from the schema.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/**/core/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@application/portfolio/**", "@application/resume/**"],
+              message: "R18: core is the bottom of the graph and imports no domain upward.",
+            },
+            {
+              group: ["@presentation/portfolio/**", "@presentation/resume/**"],
+              message: "R18: core is the bottom of the graph and imports no domain upward.",
+            },
+            {
+              group: ["@infrastructure/portfolio/**", "@infrastructure/resume/**"],
+              message: "R18: core is the bottom of the graph and imports no domain upward.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  ]
+
 const layers = [
   {
     files: ["src/app/**/*.{ts,tsx}"],
@@ -94,7 +209,7 @@ const layers = [
               message: "R13: app/ is a contract layer. Call an application-layer use case.",
             },
             {
-              group: ["**/presentation/design/*"],
+              group: ["**/presentation/core/design/*"],
               message: "R13: app/ carries no styling decisions.",
             },
           ],
@@ -160,6 +275,9 @@ const config = [
   js.configs.recommended,
   ...next,
   ...layers,
+  ...domains,
+  resumeApplicationEdge,
+  documentEdge,
   {
     plugins: {
       market: { rules: { "market-rules": ruleSet() } },

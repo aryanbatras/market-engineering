@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ProsePage } from "@presentation/marketing/page"
-import { pageStyles } from "@presentation/marketing/page.styles"
-import { PricingTable } from "@presentation/marketing/plans"
-import { Button } from "@presentation/design/button"
+import { ProsePage } from "@presentation/portfolio/marketing/page"
+import { pageStyles } from "@presentation/portfolio/marketing/page.styles"
+import { PricingTable } from "@presentation/portfolio/marketing/plans"
+import { Button } from "@presentation/core/design/button"
 
 export const metadata: Metadata = {
   title: "Pricing",

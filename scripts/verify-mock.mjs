@@ -7,12 +7,12 @@ globalThis.window = {
   },
 }
 
-const { mockDatabase } = await import('/Users/aryan/Documents/nov/market-engineering/src/infrastructure/mock/mock-database.ts')
-const { mockAuthGateway } = await import('/Users/aryan/Documents/nov/market-engineering/src/infrastructure/auth/mock-auth-gateway.ts')
-const { mockPortfolioRepository } = await import('/Users/aryan/Documents/nov/market-engineering/src/infrastructure/persistence/mock-portfolio-repository.ts')
-const { seedMockDatabase } = await import('/Users/aryan/Documents/nov/market-engineering/src/infrastructure/mock/seed.ts')
-const { default: mockUser } = await import('/Users/aryan/Documents/nov/market-engineering/src/infrastructure/mock/fixtures/user.json', { with: { type: 'json' } }).then((m) => ({ default: m.default }))
-const { samplePortfolio } = await import('/Users/aryan/Documents/nov/market-engineering/src/application/portfolio/sample-portfolio.ts')
+const { mockDatabase } = await import('../src/infrastructure/mock/mock-database.ts')
+const { mockAuthGateway } = await import('../src/infrastructure/mock/core-mock-auth-gateway.ts')
+const { mockPortfolioRepository } = await import('../src/infrastructure/mock/portfolio/mock-portfolio-repository.ts')
+const { seedMockDatabase } = await import('../src/infrastructure/mock/portfolio/seed.ts')
+const { default: mockUser } = await import('../src/infrastructure/mock/fixtures/user.json', { with: { type: 'json' } }).then((m) => ({ default: m.default }))
+const { samplePortfolio } = await import('../src/application/portfolio/sample-portfolio.ts')
 
 const check = (label, value) => console.log(`${value ? "PASS" : "FAIL"}  ${label}`)
 
@@ -57,15 +57,14 @@ check("remove clears the handle row", mockDatabase.select("handles").length === 
 await mockAuthGateway.signOut()
 check("sign-out clears the session", (await mockAuthGateway.getSession()) === null)
 
-const { mockResumeCompiler } = await import('/Users/aryan/Documents/nov/market-engineering/src/infrastructure/mock/mock-resume-compiler.ts')
-const { mockPdfTextExtractor } = await import('/Users/aryan/Documents/nov/market-engineering/src/infrastructure/mock/mock-pdf-text-extractor.ts')
-const { checkResume } = await import('/Users/aryan/Documents/nov/market-engineering/src/application/resume/check-resume.ts')
-const { renderResume } = await import('/Users/aryan/Documents/nov/market-engineering/src/application/resume/render-resume.ts')
-const { resumeLayoutSpecs, defaultResumeLayout, defaultResumeSkin } = await import('/Users/aryan/Documents/nov/market-engineering/src/application/resume/resume-registry.ts')
-const { portfolioSchema } = await import('/Users/aryan/Documents/nov/market-engineering/src/application/portfolio/portfolio.schema.ts')
-const { previewPortfolio } = await import('/Users/aryan/Documents/nov/market-engineering/src/application/portfolio/preview-portfolio.ts')
+const { mockResumeCompiler } = await import('../src/infrastructure/mock/resume/mock-resume-compiler.ts')
+const { mockPdfTextExtractor } = await import('../src/infrastructure/mock/resume/mock-pdf-text-extractor.ts')
+const { checkResume } = await import('../src/application/resume/check-resume.ts')
+const { renderResume } = await import('../src/application/resume/render-resume.ts')
+const { resumeLayoutSpecs, defaultResumeLayout, defaultResumeSkin } = await import('../src/application/resume/resume-registry.ts')
+const { sampleDocument } = await import('../src/application/resume/sample/sample-portfolio.ts')
 
-const resumePortfolio = portfolioSchema.parse(previewPortfolio)
+const resumePortfolio = sampleDocument()
 const rendered = renderResume(resumePortfolio, defaultResumeLayout, defaultResumeSkin)
 const atsBlock = ['\\usepackage[T1]{fontenc}', '\\usepackage{lmodern}', '\\usepackage{cmap}']
 
@@ -78,7 +77,7 @@ check("two-column layouts declare themselves unclean", resumeLayoutSpecs.filter(
 const body = rendered.tex.slice(rendered.tex.indexOf('\\begin{document}'))
 check("user data escapes every LaTeX special", body.includes('\\%') && !/\d%/.test(body) && !/\d_/.test(body))
 
-const { escapeTex } = await import('/Users/aryan/Documents/nov/market-engineering/src/application/resume/latex/escape-tex.ts')
+const { escapeTex } = await import('../src/application/resume/latex/escape-tex.ts')
 const hostile = '100% of {effort} & $5 #1 ~2^3 _x_ \\end{}\\ textperiod · en–dash'
 const escaped = escapeTex(hostile)
 check("escapeTex neutralises every special", !/[^\\][&%$#^_~{}]/.test(escaped.replace(/\\[a-zA-Z]+(\{\})?/g, '')))
