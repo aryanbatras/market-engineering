@@ -3,12 +3,12 @@ import type { Portfolio } from "./portfolio.schema"
 export const previewPortfolio: Portfolio = {
   portfolioVersion: 1,
   identity: {
-    name: "Ananya Krishnan",
-    headline: "Computer science final year. Builds things that mostly work.",
+    name: "Your Name",
+    headline: "Backend engineer. Builds the boring parts that keep the fast parts running.",
     location: "Coimbatore",
     availability: "Available from June 2027",
   },
-  links: [{ platform: "github", label: "github.com/ananyak", url: "https://github.com/ananyak" }],
+  links: [{ platform: "github", label: "github.com/yourname", url: "https://github.com/yourname" }],
   education: [
     {
       institution: "Karpagam College of Engineering",
@@ -26,23 +26,29 @@ export const previewPortfolio: Portfolio = {
       start: "2026-05",
       end: "2026-08",
       current: false,
-      summary: "Built a reporting tool that replaced a spreadsheet two teams maintained by hand.",
-      highlights: [],
+      summary: "Owned the reporting pipeline behind a weekly business review used by four teams.",
+      highlights: ["Cut report preparation from four hours a week to twenty minutes"],
     },
   ],
   projects: [
     {
-      name: "Attendance without the queue",
-      description: "A lab attendance register that stops the line at the door.",
-      tech: ["Next.js", "Postgres"],
+      name: "Ledger for a canteen that runs on IOU",
+      description: "A card scan, a ledger, and a number everyone can check.",
+      tech: ["TypeScript", "PostgreSQL", "Next.js"],
+      featured: true,
+    },
+    {
+      name: "Rate limiter that survived load testing",
+      description: "A token bucket in Redis, written to learn how rate limiting fails under traffic.",
+      tech: ["Go", "Redis"],
       featured: true,
     },
   ],
   skills: [
     { name: "TypeScript", group: "Languages" },
-    { name: "React", group: "Frontend" },
-    { name: "Postgres", group: "Data" },
+    { name: "Go", group: "Languages" },
+    { name: "PostgreSQL", group: "Data" },
   ],
-  highlights: [],
-  meta: { handle: "ananya", templateId: "classic" },
+  highlights: ["Second place, state-level hackathon, 2025"],
+  meta: { handle: "yourname", templateId: "classic" },
 }

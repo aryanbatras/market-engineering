@@ -25,15 +25,3 @@ export const compileStyles = {
   previewEmpty: "text-ink-45 text-small flex flex-1 items-center justify-center",
   previewSkeleton: "bg-ground-sunken rounded-panel",
 } as const
-
-export const heroStyles = {
-  root: "mx-auto flex w-full max-w-[1440px] flex-col gap-14 overflow-clip px-5 pb-24 pt-16 md:px-8 md:pt-24",
-  copy: "flex flex-col items-start",
-  kicker: "text-small text-ink-70",
-  title: "text-display text-ink mt-8 max-w-[13ch]",
-  lead: "text-lead text-ink-70 mt-8 max-w-[46ch]",
-  actionRow: "mt-10 flex flex-wrap items-center gap-6",
-  secondaryLink: "text-small text-ink-70 underline underline-offset-4 hover:text-ink",
-  demo: "min-w-0 w-full",
-  demoNote: "text-micro text-ink-45 mt-4",
-} as const

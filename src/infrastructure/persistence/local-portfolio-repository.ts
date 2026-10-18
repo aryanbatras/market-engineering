@@ -13,7 +13,7 @@ const defaultConfig: PublishedPortfolio["config"] = {
 
 const seed = (): PublishedPortfolio[] => [
   {
-    handle: "ananya",
+    handle: "yourname",
     schemaVersion: 1,
     templateId: "classic",
     config: defaultConfig,
