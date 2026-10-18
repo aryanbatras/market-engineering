@@ -16,24 +16,26 @@ Star count is a popularity proxy, not evidence of quality, so it is used only to
 
 ## The ten archetypes
 
-| # | Layout | Source archetype | Stars | Licence | Columns | ATS |
+**We ship them under the source project's own name, not ours.** A student searching "Jake's resume" or "Deedy CV" finds the layout they have already seen. An invented name matches nothing and has to be explained — see R22 in `AGENTS.md`. The "Layout" column below is therefore the name in the product.
+
+| # | Layout (as shipped) | Source archetype | Stars | Licence | Columns | ATS |
 |---|---|---|---|---|---|---|
-| 1 | **Rule** | `jakegut/resume` — Jake's Resume | 2.8k | MIT | 1 | Clean |
-| 2 | **Compact** | `deedy/Deedy-CV` — Deedy CV | — | MIT | 1 | Clean |
-| 3 | **Header** | `dnl-blkv/mcdowell-cv` | 2.7k | MIT | 1 | Clean |
-| 4 | **Colour** | `posquit0/Awesome-CV` | 28.7k | **LPPL-1.3c** | 1 | Clean |
-| 5 | **Engineer** | `sb2nov/resume` | 7.0k | MIT | 1 | Clean |
-| 6 | **Sidebar** | `posquit0/AltaCV` | — | **LPPL-1.3c** | 2 | ⚠️ |
-| 7 | **Rail** | `fky2015/resume-ng` | 901 | **LPPL-1.3c** | 2 | ⚠️ |
-| 8 | **Atlas** | `subidit/rover-resume` | 831 | CC-BY-4.0 | 1 | Clean |
-| 9 | **Campus** | IIT Bombay placement format | — | none | 1 | Clean |
-| 10 | **Modern** | ModernCV class proportions | — | LPPL | 1 | Clean |
+| 1 | **Jake's Resume** | `jakegut/resume` — Jake's Resume | 2.8k | MIT | 1 | Clean |
+| 2 | **Deedy CV** | `deedy/Deedy-CV` — Deedy CV | — | MIT | 1 | Clean |
+| 3 | **McDowell** | `dnl-blkv/mcdowell-cv` | 2.7k | MIT | 1 | Clean |
+| 4 | **Awesome CV** | `posquit0/Awesome-CV` | 28.7k | **LPPL-1.3c** | 1 | Clean |
+| 5 | **Simple Resume** | `sb2nov/resume` | 7.0k | MIT | 1 | Clean |
+| 6 | **AltaCV** | `posquit0/AltaCV` | — | **LPPL-1.3c** | 2 | ⚠️ |
+| 7 | **Friggeri** | `fky2015/resume-ng` | 901 | **LPPL-1.3c** | 2 | ⚠️ |
+| 8 | **Rover** | `subidit/rover-resume` | 831 | CC-BY-4.0 | 1 | Clean |
+| 9 | **IIT Bombay** | IIT Bombay placement format | — | none | 1 | Clean |
+| 10 | **ModernCV** | ModernCV class proportions | — | LPPL | 1 | Clean |
 
-Six of the ten are single-column because that is what the evidence supports, not because we avoided the pretty ones.
+Eight of the ten are single-column because that is what the evidence supports, not because we avoided the pretty ones.
 
-**On licences.** `LPPL-1.3c` and CC-BY-4.0 are outside the allowlist in `licenses.md` and stop at founder review. Every layout above is therefore studied, never adapted. `Atlas` is the one CC-BY source; it informs heading structure only, which is not protectable expression.
+**On licences.** `LPPL-1.3c` and CC-BY-4.0 are outside the allowlist in `licenses.md` and stop at founder review. Every layout above is therefore studied, never adapted. `Rover` is the one CC-BY source; it informs heading structure only, which is not protectable expression.
 
-**On India.** Layouts 1, 2, 6 and 10 are what Indian engineering students reach for, because those are what circulate on campus. Layout 9 exists because the IIT one-pager is the single most-recognised resume shape in the country and a recruiter at an IIT/NIT recognises it instantly.
+**On India.** Jake's Resume, Deedy CV, AltaCV and ModernCV are what Indian engineering students reach for, because those are what circulate on campus. The IIT Bombay one-pager exists because it is the single most-recognised resume shape in the country and a recruiter at an IIT/NIT recognises it instantly.
 
 ---
 
@@ -58,7 +60,7 @@ Jun 2024 – Aug 2024
 
 The skills land **before the work history**, and dates detach from the jobs they belong to. A keyword search for the first internship finds it, but the ordering a human would assume is not what the machine got.
 
-**What we do.** Ship Sidebar and Rail. Mark both as column-bearing in their metadata. The ATS check reports the first reading-order divergence and names the layout. The user sees the actual extracted text.
+**What we do.** Ship AltaCV and Friggeri. Mark both as column-bearing in their metadata. The ATS check reports the first reading-order divergence and names the layout. The user sees the actual extracted text.
 
 We are not going to pretend a two-column resume is as safe as a one-column one. We are going to show the difference and let them decide — which is more useful than a badge that says "ATS-friendly" on all ten.
 

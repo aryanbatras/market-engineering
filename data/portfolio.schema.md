@@ -18,7 +18,6 @@ resume, or fill in the form and we generate it for you.
 - **projects** · array · required
 - **skills** · array · required
 - **highlights** · array · required
-- **languages** · array · required
 - **github** · object · optional
 - **meta** · object · optional
 

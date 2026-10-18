@@ -2,20 +2,19 @@
 
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useEffect, useMemo, useState } from "react"
-import { LuArrowLeft, LuArrowRight, LuDownload } from "react-icons/lu"
+import { Suspense, useMemo, useState } from "react"
+import { LuArrowLeft, LuArrowRight } from "react-icons/lu"
 import { parsePortfolioText } from "@application/portfolio/parse-portfolio"
 import type { TemplateConfig } from "@application/portfolio/portfolio.schema"
 import { builderYaml } from "@application/portfolio/document-yaml"
-import { importPrompt } from "@application/portfolio/portfolio-copy"
 import { registry } from "@presentation/portfolio/templates/registry"
 import { slugify } from "@application/portfolio/slugify"
 import { portfolioUrl, siteConfig } from "@application/core/site/site-config"
 import { useSession } from "@application/core/auth/use-session"
 import { portfolioRepository } from "@infrastructure/portfolio/persistence/resolve-portfolio-repository"
 import { Button } from "@presentation/core/design/button"
-import { Wordmark } from "@presentation/core/brand/wordmark"
 import { builderStyles } from "./builder.styles"
+import { BuilderBar } from "./builder-bar"
 import { YamlSource } from "@presentation/core/source/yaml-source"
 import { TemplatePicker } from "./template-picker"
 import { LiveTemplatePreview } from "./template-gallery"
@@ -52,7 +51,11 @@ const BuilderInner = () => {
   }
 
   const publish = async () => {
-    if (!portfolio || !session) return
+    if (!session) {
+      await signIn()
+      return
+    }
+    if (!portfolio) return
     setBusy(true)
     try {
       await portfolioRepository.save({
@@ -84,36 +87,15 @@ const BuilderInner = () => {
 
   return (
     <div className={builderStyles.shell}>
-      <div className={builderStyles.bar}>
-        <div className={builderStyles.barInner}>
-          <div className={builderStyles.barLeft}>
-            <Wordmark />
-            <span className={builderStyles.crumb}>
-              {step === "template" ? "Choose a template" : currentMeta?.name}
-            </span>
-          </div>
-          <div className={builderStyles.actionRow}>
-            <Button intent="ghost" onClick={download} size="small">
-              <LuDownload size={16} strokeWidth={1.5} />
-              Export
-            </Button>
-            {session ? (
-              <Button disabled={busy} intent="primary" onClick={() => void publish()} size="small">
-                Publish
-              </Button>
-            ) : (
-              <Button
-                disabled={sessionLoading}
-                intent="primary"
-                onClick={() => void signIn()}
-                size="small"
-              >
-                {isMocked ? "Sign in to publish" : "Sign in"}
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+      <BuilderBar
+        crumb={step === "template" ? "Choose a template" : (currentMeta?.name ?? "")}
+        exportName="YAML"
+        onExport={download}
+        onPublish={() => void publish()}
+        publishBusy={busy || sessionLoading}
+        publishLabel={session ? "Publish" : isMocked ? "Sign in to publish" : "Sign in"}
+        showPublish={true}
+      />
 
       {step === "template" ? (
         <TemplatePicker onSelect={chooseTemplate} />
@@ -123,7 +105,7 @@ const BuilderInner = () => {
             <div>
               <p className={builderStyles.panelHeading}>Your data</p>
               <p className={builderStyles.panelNote}>
-                Paste YAML, or ask any AI to convert your resume with the prompt below.
+                Type it here, or use Copy for LLMs in the header to have any AI write it for you.
               </p>
             </div>
 
@@ -174,38 +156,6 @@ const BuilderInner = () => {
               ) : (
                 <p className={builderStyles.handleBad}>Lowercase letters, numbers, single hyphens.</p>
               )}
-            </div>
-
-            <div className={builderStyles.promptBox}>
-              <p className={builderStyles.panelHeading}>Make it a resume too</p>
-              <p className={builderStyles.promptBody}>
-                The same data typesets as a document. Ten layouts, and you can see what a
-                recruiter&apos;s software actually reads before you send it anywhere.
-              </p>
-              <div className={builderStyles.gapTop}>
-                <Link href="/resume">
-                  <Button intent="secondary" size="small">
-                    Open the resume editor
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            <div className={builderStyles.promptBox}>
-              <p className={builderStyles.panelHeading}>Convert a resume</p>
-              <pre className={builderStyles.promptText}>{importPrompt.slice(0, 300)}…</pre>
-              <div className={builderStyles.gapTop}>
-                <Button
-                  intent="secondary"
-                  onClick={() => {
-                    void navigator.clipboard.writeText(importPrompt)
-                    flash("Prompt copied")
-                  }}
-                  size="small"
-                >
-                  Copy the prompt
-                </Button>
-              </div>
             </div>
           </div>
 

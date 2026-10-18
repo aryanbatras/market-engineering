@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { ResumeEditor } from "@presentation/resume/editor/resume-editor"
+import { ResumeEditorRoute } from "@presentation/resume/editor/resume-editor"
 
 export const metadata: Metadata = {
   title: "Resume builder",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function ResumePage() {
-  return <ResumeEditor />
+  return <ResumeEditorRoute />
 }

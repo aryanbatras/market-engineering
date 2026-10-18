@@ -345,29 +345,6 @@
         "maxLength": 240
       }
     },
-    "languages": {
-      "default": [],
-      "maxItems": 8,
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 80
-          },
-          "proficiency": {
-            "type": "string",
-            "maxLength": 60
-          }
-        },
-        "required": [
-          "name"
-        ],
-        "additionalProperties": false
-      }
-    },
     "github": {
       "type": "object",
       "properties": {
@@ -406,8 +383,7 @@
     "experience",
     "projects",
     "skills",
-    "highlights",
-    "languages"
+    "highlights"
   ],
   "additionalProperties": false,
   "$defs": {

@@ -8,6 +8,7 @@ import { railStyles } from "./rail.styles"
 
 const steps = [
   {
+    anchor: "work",
     when: "You already have this",
     title: "The work",
     body: "Commits, screenshots, internship notes, a hackathon that went nowhere. It exists. It is scattered across places nobody visits.",
@@ -18,6 +19,7 @@ const steps = [
     ],
   },
   {
+    anchor: "page",
     when: "This is the part that eats the evening",
     title: "The page",
     body: "Turning it into something a stranger reads in thirty seconds. No stack, no build step, no styling decisions. You fill in the fields and the layout is already decided.",
@@ -28,6 +30,7 @@ const steps = [
     ],
   },
   {
+    anchor: "link",
     when: "Before the deadline",
     title: "The link",
     body: "One address you paste into the application. It renders as a page, a social card and a PDF, because all three come out of the same file.",
@@ -45,33 +48,11 @@ export const ScrollRail = () => {
 
   useEffect(() => {
     const node = scope.current
-    if (!node) return
-
-    const fill = node.querySelector<HTMLElement>("[data-rail-fill]")
-    const spine = node.querySelector<HTMLElement>("[data-rail-spine]")
-    if (!fill || !spine) return
-
-    if (reduced) {
-      fill.style.height = "100%"
-      return
-    }
+    if (!node || reduced) return
 
     gsap.registerPlugin(ScrollTrigger)
 
     const context = gsap.context(() => {
-      gsap.set(fill, { height: 0 })
-
-      gsap.to(fill, {
-        height: () => spine.offsetHeight,
-        ease: "none",
-        scrollTrigger: {
-          trigger: node,
-          start: "top 74%",
-          end: "bottom 66%",
-          scrub: 0.5,
-        },
-      })
-
       for (const step of node.querySelectorAll<HTMLElement>("[data-rail-step]")) {
         gsap.from(step, {
           y: 44,
@@ -94,12 +75,9 @@ export const ScrollRail = () => {
       </p>
 
       <div className={railStyles.track}>
-        <div className={railStyles.spine} data-rail-spine />
-        <div className={railStyles.fill} data-rail-fill />
-
         {steps.map((step, index) => (
           <div className={railStyles.step} data-rail-step key={step.title}>
-            <span className={railStyles.marker}>
+            <span className={railStyles.marker} data-flow={step.anchor}>
               <span className={index === 0 ? railStyles.markerCore : railStyles.markerRing} />
             </span>
 
@@ -120,7 +98,7 @@ export const ScrollRail = () => {
         ))}
 
         <div className={railStyles.end}>
-          <span className={railStyles.marker}>
+          <span className={railStyles.marker} data-flow="end">
             <span className={railStyles.markerCore} />
           </span>
           <p className={railStyles.endValue}>

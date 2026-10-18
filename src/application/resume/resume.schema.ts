@@ -12,7 +12,7 @@ export const resumeEntrySchema = z.object({
 export const resumeSectionSchema = z.object({
   id: z.string().max(60),
   title: z.string().max(80),
-  kind: z.enum(["experience", "education", "projects", "skills", "languages", "highlights"]),
+  kind: z.enum(["experience", "education", "projects", "skills", "highlights"]),
   entries: z.array(resumeEntrySchema).max(40),
 })
 

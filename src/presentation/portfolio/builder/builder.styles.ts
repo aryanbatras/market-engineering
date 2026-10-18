@@ -1,29 +1,24 @@
 export const builderStyles = {
   shell: "bg-ground-sunken min-h-dvh",
-  bar: "bg-ground relative z-40",
-  barInner: "mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-5 md:px-8",
-  wordmark: "text-small text-ink font-medium",
-  barLeft: "flex items-center gap-4",
-  crumb: "text-micro text-ink-45",
-  previewLink: "text-blue inline-flex items-center gap-1.5 underline underline-offset-4",
-  loading: "text-small text-ink-45 px-5 py-20",
+
+  picker: "mx-auto w-full max-w-[1440px] px-5 py-14 md:px-8 md:py-20",
+  pickerTitle: "text-title text-ink",
+  pickerBody: "text-body text-ink-70 mt-5 max-w-[48ch]",
+  pickerGrid: "mt-14 grid grid-cols-1 gap-6 lg:grid-cols-2",
   pickerSlot: "block w-full text-left",
   pickerSlotActive: "rounded-panel outline-2 outline-blue",
-  actionRow: "flex items-center gap-3",
 
   layout: "mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-6 px-5 py-8 md:px-8 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)]",
   panel: "flex flex-col gap-5",
   panelHeading: "text-small text-ink font-medium",
   panelNote: "text-micro text-ink-45",
 
-  sourceFrame: "h-[520px] md:h-[640px]",
-  editor: "h-[520px] md:h-[640px]",
-
   statusRow: "flex items-center justify-between gap-3",
   statusOk: "text-micro text-blue font-medium",
   statusBad: "text-micro text-ink font-medium",
+
   issueList: "flex flex-col gap-2",
-  issue: "bg-ground-sunken text-micro text-ink rounded-panel px-4 py-3",
+  issue: "bg-ground rounded-panel px-4 py-3 text-micro text-ink",
   issueField: "text-blue font-medium",
 
   handleRow: "flex flex-col gap-2",
@@ -33,41 +28,11 @@ export const builderStyles = {
   handleOk: "text-micro text-blue font-medium",
   handleBad: "text-micro text-ink font-medium",
 
-  promptBox: "bg-ground rounded-panel p-5",
-  promptBody: "text-micro text-ink-70 mt-2",
-  promptText: "text-micro text-ink-45 mt-3 font-mono leading-relaxed whitespace-pre-wrap",
-  gapTop: "mt-4",
-
-  picker: "mx-auto w-full max-w-[1440px] px-5 py-14 md:px-8 md:py-20",
-  pickerTitle: "text-title text-ink",
-  pickerBody: "text-body text-ink-70 mt-5 max-w-[48ch]",
-  pickerGrid: "mt-14 grid grid-cols-1 gap-6 lg:grid-cols-2",
-  pickerCard: "bg-ground-sunken rounded-panel p-5 text-left transition-colors duration-micro",
-  pickerCardActive: "bg-blue-wash",
-  pickerFrame: "bg-ground h-[300px] overflow-hidden rounded-panel",
-  pickerScale: "w-[1280px] origin-top-left [zoom:0.28]",
-  pickerHead: "mt-5 flex items-center justify-between gap-3",
-  pickerName: "text-body text-ink font-medium",
-  pickerSummary: "text-small text-ink-70 mt-2",
-  pickerAction: "mt-12 flex flex-wrap items-center gap-5",
-  tag: "bg-ground text-ink-70 rounded-pill px-2.5 py-1 text-micro",
-  tagPro: "bg-blue text-white rounded-pill px-2.5 py-1 text-micro",
-
-  publish: "mx-auto flex min-h-[70dvh] w-full max-w-[1440px] flex-col justify-center px-5 py-20 md:px-8",
-  publishList: "text-body text-ink-70 mt-10 flex flex-col gap-3",
-  publishUrl: "text-lead text-blue mt-10",
-  quietLink: "text-small text-ink-70 underline underline-offset-4",
-
   previewFrame: "bg-ground sticky top-[96px] h-[calc(100dvh-120px)] overflow-hidden rounded-panel",
   previewScroll: "h-full overflow-y-auto",
   previewHead: "bg-ground-sunken text-micro text-ink-45 flex items-center justify-between px-4 py-3",
-  previewBody: "bg-ground",
+  previewLink: "text-blue inline-flex items-center gap-1.5 underline underline-offset-4",
 
   toast: "bg-ink text-white fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-pill px-5 py-3 text-small",
-
-  errorRoot: "flex min-h-dvh flex-col items-start justify-center px-5 md:px-8",
-  errorInner: "max-w-[42ch]",
-  errorTitle: "text-title text-ink",
-  errorBody: "text-body text-ink-70 mt-6",
-  errorAction: "mt-10",
+  loading: "text-small text-ink-45 px-5 py-20",
 } as const

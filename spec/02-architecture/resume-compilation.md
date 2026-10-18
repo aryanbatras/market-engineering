@@ -40,41 +40,49 @@ Those three together eliminate almost every obvious answer.
 
 ## The decision
 
-**Two render targets, one layout descriptor, compile on export.**
+**Three render targets, one layout descriptor, no engine.**
 
 ```
 Portfolio
   → ResumeDocument
   → ResumeLayout          ← an ordered list of blocks
-       ├─→ toLatex(layout, preamble) → .tex → [engine, on demand] → pdf → ATS check
-       └─→ toHtml(layout)             → live preview, instant
+       ├─→ composeLatex(layout) → .tex        for Overleaf, for anyone who wants real LaTeX
+       ├─→ composePdf(layout)  → pdf         instant, real text layer, zero download
+       └─→ toHtml(layout)      → preview     instant, and honest by construction
 ```
 
-The critical idea is that **the preview is not a second renderer.** Both walk the same `ResumeLayout`. There is no second place where a section could be ordered differently, so the preview cannot drift from the PDF.
-
-This is what makes the whole thing viable: we do not need a fast LaTeX engine for the live path, because the live path never runs LaTeX.
+The critical idea is that **none of the three is a second renderer.** All three walk the same `ResumeLayout`. There is no second place where a section could be ordered differently, so the preview cannot drift from either download.
 
 ---
 
-## Why not compile in the browser for live preview
+## Why not a browser LaTeX engine
 
-Because of what it costs the first ten seconds.
+Because there isn't one you can install.
 
-`DESIGN.md §12` says most of our traffic is a phone on Indian mobile data. A 32 MB engine download before the preview appears is a worse product than a preview that appears in 200 ms and is honest — and honesty is guaranteed by the shared descriptor rather than by the engine being the same one.
+Verified against npm on 2026-10-18:
 
-So: instant preview, real LaTeX on export, and the `.tex` is downloadable either way.
+| Package | Reality |
+|---|---|
+| `swiftlatex` | Not on npm. Assets on GitHub Releases. |
+| `texlyre-busytex` | 153 KB wrapper. The engine is 32 MB wasm plus 90–400 MB of data files, downloaded separately. AGPL. |
+| `pdftex-wasm` | Does not exist on npm. |
+
+So client-side LaTeX is a vendoring project measured in weeks and hundreds of megabytes, shipping copyleft, on the phone traffic `DESIGN.md §12` calls our main audience.
+
+**The direct writer is not a compromise. For this product it is the better answer.** A student on a phone needs the PDF in one tap. They do not need XeTeX. And a 3 KB writer that produces a genuinely parseable text layer makes the ATS check *real*, which a mock reading a fixture never could.
+
+**What the direct writer cannot do:** tables, images, multicol, TikZ, anything requiring a package. None of those are in the ATS evidence, and all of them are available in the `.tex`.
 
 ---
 
-## The engine
+## The PDF writer
 
-Chosen: **Tectonic**, vendored, compiled on demand in the browser behind a port.
+Hand-written, about 200 lines, no dependency.
 
-- Rust, single static binary, no OS dependencies, no subprocesses. That is exactly why it cross-compiles to WebAssembly cleanly.
-- The Rust layer is MIT. The vendored TeX code is LPPL. Both are free-software licences that permit redistribution and closed-source combination. **Recorded in `licenses.md` before it ships.**
-- Rejected: anything AGPL. SwiftLaTeX and TeXlyre are both out.
-
-**It lives behind `ResumeCompiler`.** Development uses a mock adapter that returns a small fixed PDF, so `npm run mock:verify` passes and no developer downloads 32 MB to run the app (R10).
+- Base-14 Type 1 fonts (`Helvetica`, `Helvetica-Bold`) with `WinAnsiEncoding`. These are guaranteed present in every reader and never embedded, which is why the file is 3 KB instead of 300 KB.
+- Real AFM widths for wrapping and for right-aligning dates on the title line.
+- A `cmap`-equivalent is unnecessary: WinAnsi is a single-byte encoding with a standard mapping, so glyphs extract as their characters with no ToUnicode ambiguity and no ligature damage. **The ligature trap from `resume-templates.md` cannot occur in this path.**
+- Multi-page when the content overflows. One page is the target, two is fine, three is a FAIL.
 
 ---
 
@@ -82,15 +90,17 @@ Chosen: **Tectonic**, vendored, compiled on demand in the browser behind a port.
 
 ```
 application/resume/ports/resume-compiler.ts
-  compile(tex: string, options: CompileOptions): Promise<CompileResult>
+  compile(payload: ResumePayload, options: CompileOptions): Promise<CompileResult>
 
 application/resume/ports/pdf-text-extractor.ts
-  extractText(pdf: Uint8Array): Promise<string>
+  extractText(pdf: Uint8Array<ArrayBuffer>): Promise<string>
 ```
 
-`CompileResult` is a discriminated union on `ok`. It carries `pdf`, `log`, and `pages`. It never carries a thrown error — a compile failure is a normal result with a log a user can read, not an exception.
+The compiler takes the **layout descriptor**, not the `.tex` string. That matters: passing the `.tex` would mean parsing it back to typeset it, which is a pointless round-trip through a format we just generated.
 
-`unpdf` is the text extractor. MIT, ~2 MB, serverless build of pdf.js, already evaluated in `library-decisions.md`.
+`CompileResult` is a discriminated union on `ok`. It carries `pdf`, `pages` and `log`. It never carries a thrown error — a failure is a normal result with a log a user can read, not an exception.
+
+`unpdf` is the text extractor. MIT, 2 MB, serverless build of pdf.js. It is the same class of tool a real ATS uses, which is what makes the check meaningful rather than decorative.
 
 ---
 
@@ -159,15 +169,28 @@ Templates emit only those macros. **A template may not hand-write document struc
 
 ## Constraints
 
-1. **Compile on demand only.** Never automatically, never on a timer, never on a debounce.
-2. **The engine is lazy-loaded** and cached by the browser after the first use.
-3. **A first compile says so.** "Preparing the PDF engine. This happens once." Never a spinner, never a silent wait.
+1. **The PDF path must be instant.** No download, no engine, no queue. `DESIGN.md §12` says most of our traffic is a phone on Indian mobile data, and a 32 MB engine before the download button works is a worse product than no engine.
+2. **The PDF must be real.** A real text layer, extractable by a standard parser. This is asserted in `npm run mock:verify` against `unpdf`, not assumed.
+3. **The `.tex` is always downloadable**, in every layout, in every view. It costs nothing and it is the escape hatch for anyone who wants real LaTeX.
 4. **A failed compile returns the log.** The user can paste it into Overleaf and we get a bug report with a stack trace in it.
-5. **The `.tex` is always downloadable**, compiled or not. A user with a local TeX install is never blocked by ours.
-6. **No live LaTeX editing in v1.** Downloading the `.tex`, editing it in Overleaf and recompiling there is the supported round-trip. Editing LaTeX inside our editor with a live preview is a separate feature and it reopens this decision.
+5. **No live LaTeX editing in v1.** Downloading the `.tex`, editing it in Overleaf and recompiling there is the supported round-trip.
 
 ---
 
 ## What would change this
 
-If measured, server-side Tectonic turns out to hold on the Hobby tier — sub-two-second compiles, no 32 MB client download — then the export path moves to the server and the WASM engine is deleted. The layout descriptor and the ATS check are unaffected either way, which is the point of separating them.
+If the founder ever wants browser LaTeX specifically, `texlyre-busytex` is the only maintained option and it is AGPL plus a 32 MB wasm plus 90–400 MB of data files. That is a vendoring project, not a dependency, and it is written up here so the cost is visible rather than rediscovered. The direct writer is not a fallback until then — for our actual use case it is the better answer, because instant and mobile-friendly matter more to a nineteen-year-old on a phone than typesetting fidelity nobody will notice.
+
+---
+
+## Three renderers, one descriptor
+
+| Output | Renderer | Notes |
+|---|---|---|
+| `.tex` | `composeLatex` | Macro calls only, never raw document structure |
+| `.pdf` | `composePdf` | Helvetica base-14, WinAnsi, real ToUnicode |
+| Preview | `toHtml` | React, from the same block list |
+
+All three walk `ResumeLayout`. A block cannot be dropped or reordered in one and not the others, so the preview and the download are the same document by construction.
+
+**The three controls live in `ResumeMetrics`**, which all three renderers read. The PDF emitter uses Helvetica's real AFM widths for wrapping and right-alignment, so "Narrow" actually produces a narrower line of text rather than the same line with more white space.

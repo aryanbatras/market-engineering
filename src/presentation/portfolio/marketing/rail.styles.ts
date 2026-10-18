@@ -4,8 +4,6 @@ export const railStyles = {
   note: "text-body text-ink-70 mt-6 max-w-[46ch]",
 
   track: "relative mt-12 md:mt-16",
-  spine: "bg-ground-sunken absolute top-2 bottom-2 left-[11px] w-[3px] md:left-[19px] rounded-pill",
-  fill: "bg-blue absolute top-2 left-[11px] w-[3px] rounded-pill md:left-[19px]",
 
   step: "relative grid grid-cols-1 gap-4 pb-16 last:pb-0 md:grid-cols-[40px_minmax(0,1fr)] md:gap-10 md:pb-24",
 

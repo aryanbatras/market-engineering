@@ -42,16 +42,8 @@ export const CompileEditor = ({ initialText }: CompileEditorProps) => {
   return (
     <div className={editorStyles.root}>
       <div className={editorStyles.split}>
-        <div className={editorStyles.left}>
-          <div className={editorStyles.editorShell}>
-            <SourceEditor
-              editable
-              editorRef={editorRef}
-              lineNumbers={false}
-              onChange={setDraft}
-              value={draft}
-            />
-          </div>
+        <div className={editorStyles.editorShell} data-flow="parser">
+          <SourceEditor editable editorRef={editorRef} onChange={setDraft} value={draft} />
           <div className={editorStyles.statusRow}>
             {result.ok ? (
               <p className={editorStyles.statusOk}>
@@ -66,25 +58,15 @@ export const CompileEditor = ({ initialText }: CompileEditorProps) => {
           </div>
         </div>
 
-        <div className={editorStyles.right}>
-          <div className={previewStyles.root}>
-            <div className={previewStyles.head}>
-              <span className={previewStyles.headLabel}>Rendered page</span>
-              <span className={previewStyles.headState}>
-                {pending ? "Applying your change" : result.ok ? "Up to date" : "Not rendering"}
-              </span>
-            </div>
-            <div className={previewStyles.stage}>
-              {result.ok ? (
-                <PortfolioPreview data={result.data} />
-              ) : (
-                <p className={previewStyles.empty}>
-                  {issues} thing{issues === 1 ? "" : "s"} to fix. The page appears the moment the file
-                  parses.
-                </p>
-              )}
-            </div>
-          </div>
+        <div className={editorStyles.stage} data-flow="render">
+          {result.ok ? (
+            <PortfolioPreview data={result.data} />
+          ) : (
+            <p className={editorStyles.empty}>
+              {issues} thing{issues === 1 ? "" : "s"} to fix. The page appears the moment the file
+              parses.
+            </p>
+          )}
         </div>
       </div>
     </div>

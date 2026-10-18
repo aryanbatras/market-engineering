@@ -1,48 +1,47 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
-import { LuArrowLeft, LuCheck, LuDownload, LuTriangleAlert } from "react-icons/lu"
+import { Suspense, useEffect, useMemo, useState } from "react"
+import { useSearchParams } from "next/navigation"
+import { LuCheck, LuTriangleAlert } from "react-icons/lu"
+import type { AtsReport } from "@application/resume/ats/ats-report"
+import { documentSchema } from "@application/resume/document-schema"
+import type {
+  FontScale,
+  PageMargin,
+  ResumeSkin,
+  SectionGap,
+} from "@application/resume/resume-layout"
 import { resumeLayoutSpecs, defaultResumeLayout, defaultResumeSkin } from "@application/resume/resume-registry"
 import { renderResume } from "@application/resume/render-resume"
-import { checkResume } from "@application/resume/check-resume"
-import type { AtsReport } from "@application/resume/ats/ats-report"
-import type { ResumeLayoutSpec, ResumeSkin } from "@application/resume/resume-layout"
 import { initialResumeYaml, resumeParseResult } from "@application/resume/sample/parse-document"
-import { pdfTextExtractor } from "@infrastructure/resume/resolve-pdf-text-extractor"
-import { resumeCompiler } from "@infrastructure/resume/resolve-resume-compiler"
-import { Button } from "@presentation/core/design/button"
-import { Wordmark } from "@presentation/core/brand/wordmark"
+import { useSession } from "@application/core/auth/use-session"
 import { YamlSource } from "@presentation/core/source/yaml-source"
 import { DocumentSheet } from "@presentation/resume/components/document-sheet"
-import { ExtractedTextPane } from "@presentation/resume/components/extracted-text-pane"
+import { BuilderControls } from "@presentation/resume/editor/builder-controls"
+import { BuilderHeader } from "@presentation/resume/editor/builder-header"
+import { SchemaPanel } from "@presentation/resume/editor/schema-panel"
+import { TexPanel } from "@presentation/resume/editor/tex-panel"
 import { editorStyles } from "./resume-editor.styles"
 
-const downloadText = (filename: string, body: string, type: string): void => {
-  downloadBlob(filename, new Blob([body], { type }))
-}
-
-const downloadBlob = (filename: string, blob: Blob): void => {
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement("a")
-  anchor.href = url
-  anchor.download = filename
-  anchor.click()
-  URL.revokeObjectURL(url)
-}
-
 export const ResumeEditor = () => {
+  const params = useSearchParams()
+  const requested = params.get("layout")
   const [draft, setDraft] = useState(initialResumeYaml)
-  const [layoutId, setLayoutId] = useState(defaultResumeLayout.id)
+  const [layoutId, setLayoutId] = useState(
+    resumeLayoutSpecs.some((entry) => entry.id === requested)
+      ? (requested ?? defaultResumeLayout.id)
+      : defaultResumeLayout.id,
+  )
   const [skin, setSkin] = useState<ResumeSkin>(defaultResumeSkin)
-  const [toast, setToast] = useState<string | null>(null)
+  const [view, setView] = useState<"stacked" | "compact">("stacked")
+  const [showSchema, setShowSchema] = useState(true)
   const [report, setReport] = useState<AtsReport | null>(null)
-  const [compiled, setCompiled] = useState(false)
   const [busy, setBusy] = useState(false)
+  const { session, signIn } = useSession()
 
   const parsed = useMemo(() => resumeParseResult(draft), [draft])
   const portfolio = parsed.ok ? parsed.data : null
-  const spec: ResumeLayoutSpec =
+  const spec =
     resumeLayoutSpecs.find((entry) => entry.id === layoutId) ?? defaultResumeLayout
 
   const rendered = useMemo(
@@ -51,196 +50,186 @@ export const ResumeEditor = () => {
   )
 
   useEffect(() => {
-    if (portfolio === null) return
+    if (portfolio === null || rendered === null) return
     let active = true
-    void checkResume(portfolio, spec, skin, pdfTextExtractor, new Uint8Array()).then((result) => {
-      if (active) setReport(result)
+    void import("@infrastructure/resume/resolve-pdf-text-extractor").then(async ({ pdfTextExtractor }) => {
+      const text = await pdfTextExtractor.extractText(rendered.pdf)
+      const { runAtsCheck } = await import("@application/resume/ats/run-ats-check")
+      if (active) setReport(runAtsCheck(rendered.document, text, spec))
     })
     return () => {
       active = false
     }
-  }, [portfolio, spec, skin])
+  }, [portfolio, rendered, spec])
 
-  const visibleReport = portfolio === null ? null : report
+  const fileBase = portfolio
+    ? portfolio.identity.name.replace(/\s+/g, "-").toLowerCase()
+    : "resume"
 
-  const flash = (message: string) => {
-    setToast(message)
-    window.setTimeout(() => setToast(null), 2600)
+  const triggerDownload = (url: string, name: string): void => {
+    const anchor = document.createElement("a")
+    anchor.href = url
+    anchor.download = name
+    anchor.click()
+    URL.revokeObjectURL(url)
   }
 
-  const fileBase = portfolio ? portfolio.identity.name.replace(/\s+/g, "-").toLowerCase() : "resume"
+  const downloadText = (name: string, body: string, type: string): void => {
+    triggerDownload(URL.createObjectURL(new Blob([body], { type })), name)
+  }
+
+  const downloadBytes = (name: string, body: Uint8Array<ArrayBuffer>, type: string): void => {
+    triggerDownload(URL.createObjectURL(new Blob([body], { type })), name)
+  }
 
   const downloadPdf = () => {
-    if (portfolio === null || rendered === null) return
+    if (rendered === null) return
     setBusy(true)
-    void resumeCompiler
-      .compile(rendered.tex, { timeoutMs: 60000 })
-      .then(async (result) => {
-        if (!result.ok) {
-          flash("The compile failed. Download the .tex and we will look at it.")
-          return
-        }
-        const next = await checkResume(portfolio, spec, skin, pdfTextExtractor, result.pdf)
-        setCompiled(true)
-        setReport(next)
-        downloadBlob(`${fileBase}.pdf`, new Blob([result.pdf], { type: "application/pdf" }))
-        flash(`PDF downloaded · ${result.pages} page${result.pages === 1 ? "" : "s"}`)
-      })
-      .finally(() => setBusy(false))
+    window.setTimeout(() => {
+      downloadBytes(`${fileBase}.pdf`, rendered.pdf, "application/pdf")
+      setBusy(false)
+    }, 60)
   }
+
+  const sheetPane = rendered ? (
+    <DocumentSheet layout={rendered.layout} skin={skin} spec={spec} />
+  ) : null
 
   return (
     <div className={editorStyles.shell}>
-      <div className={editorStyles.bar}>
-        <div className={editorStyles.barInner}>
-          <div className={editorStyles.barLeft}>
-            <Wordmark />
-            <span className={editorStyles.crumb}>Resume</span>
-          </div>
-          <div className={editorStyles.actionRow}>
-            <Link href="/builder">
-              <Button intent="ghost" size="small">
-                <LuArrowLeft size={16} strokeWidth={1.5} />
-                Portfolio builder
-              </Button>
-            </Link>
-            <Button
-              intent="secondary"
-              onClick={() => {
-                if (!rendered) return
-                downloadText(`${fileBase}.tex`, rendered.tex, "application/x-tex")
-                flash("LaTeX downloaded")
-              }}
-              size="small"
-            >
-              <LuDownload size={16} strokeWidth={1.5} />
-              Download .tex
-            </Button>
-            <Button
-              disabled={busy || portfolio === null}
-              intent="primary"
-              onClick={downloadPdf}
-              size="small"
-            >
-              <LuDownload size={16} strokeWidth={1.5} />
-              {busy ? "Preparing" : "Download PDF"}
-            </Button>
-          </div>
-        </div>
-      </div>
+      <BuilderHeader
+        busy={busy}
+        canExport={rendered !== null}
+        controls={
+          <BuilderControls
+            fontScale={skin.metrics.fontScale}
+            layoutId={layoutId}
+            margin={skin.metrics.margin}
+            onFontScale={(fontScale: FontScale) =>
+              setSkin((current) => ({ ...current, metrics: { ...current.metrics, fontScale } }))
+            }
+            onLayout={setLayoutId}
+            onMargin={(margin: PageMargin) =>
+              setSkin((current) => ({ ...current, metrics: { ...current.metrics, margin } }))
+            }
+            onSectionGap={(sectionGap: SectionGap) =>
+              setSkin((current) => ({ ...current, metrics: { ...current.metrics, sectionGap } }))
+            }
+            sectionGap={skin.metrics.sectionGap}
+          />
+        }
+        onDownloadPdf={downloadPdf}
+        onDownloadTex={() =>
+          rendered ? downloadText(`${fileBase}.tex`, rendered.tex, "application/x-tex") : undefined
+        }
+        onSignIn={() => void signIn()}
+        onToggleSchema={() => setShowSchema((value) => !value)}
+        onView={setView}
+        schemaOpen={showSchema}
+        signedIn={session !== null}
+        view={view}
+      />
 
-      <div className={editorStyles.layout}>
-        <div className={editorStyles.side}>
-          <div>
-            <h1 className={editorStyles.heading}>Your resume, typeset</h1>
-            <p className={editorStyles.lead}>
-              The same data as your portfolio, laid out as a document. Edit the YAML on the left, and the
-              sheet on the right rebuilds as you type.
-            </p>
-          </div>
+      <div className={editorStyles.stage}>
+        {spec.atsClean ? null : (
+          <p className={editorStyles.warning}>
+            <LuTriangleAlert className={editorStyles.warningMark} size={14} strokeWidth={1.5} />
+            {spec.name} is two columns. A parser reads one column before the other, so the sections
+            come out in a different order than they appear.
+          </p>
+        )}
 
-          <div className={editorStyles.panel}>
-            <p className={editorStyles.panelHeading}>Layout</p>
-            <p className={editorStyles.panelNote}>
-              Ten layouts. Six read cleanly in a parser; two are two-column and reorder it, and say so.
-            </p>
-            <div className={editorStyles.layoutList}>
-              {resumeLayoutSpecs.map((entry) => (
-                <button
-                  className={entry.id === layoutId ? editorStyles.layoutButtonActive : editorStyles.layoutButton}
-                  key={entry.id}
-                  onClick={() => setLayoutId(entry.id)}
-                  type="button"
-                >
-                  <span className={editorStyles.layoutName}>{entry.name}</span>
-                  <span className={editorStyles.layoutMeta}>
-                    {entry.columns === 2 ? "Two columns · reorders in a parser" : "One column"}
+        {view === "compact" ? (
+          <div className={editorStyles.compact}>
+            <div className={editorStyles.compactPane}>
+              <p className={editorStyles.paneTitle}>Structure</p>
+              <div className={editorStyles.schema}>
+                {documentSchema.map((group) => (
+                  <div className={editorStyles.schemaGroup} key={group.title}>
+                    <p className={editorStyles.schemaKey}>{group.title}</p>
+                    {group.fields.map((field) => (
+                      <p className={editorStyles.schemaValue} key={field.key}>
+                        {field.key}: {field.example}
+                      </p>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={editorStyles.compactPane}>
+              <p className={editorStyles.paneTitle}>YAML</p>
+              <div className={editorStyles.editorFill}>
+                <YamlSource fill onChange={setDraft} value={draft} />
+              </div>
+            </div>
+
+            <div className={editorStyles.compactPane}>
+              <p className={editorStyles.paneTitle}>LaTeX</p>
+              <TexPanel source={rendered?.tex ?? ""} />
+            </div>
+
+            <div className={editorStyles.compactPane}>
+              <p className={editorStyles.paneTitle}>{spec.name}</p>
+              <div className={editorStyles.sheetScroll}>{sheetPane}</div>
+            </div>
+          </div>
+        ) : (
+          <div className={editorStyles.stacked}>
+            <div className={editorStyles.stackedRow}>
+              {showSchema ? <SchemaPanel /> : null}
+              <div className={editorStyles.pane}>
+                <div className={editorStyles.paneHead}>
+                  <span className={editorStyles.paneTitle}>YAML</span>
+                  <span className={parsed.ok ? editorStyles.ok : editorStyles.bad}>
+                    {parsed.ok ? (
+                      <>
+                        <LuCheck size={14} strokeWidth={2} /> Valid
+                      </>
+                    ) : (
+                      `${parsed.issues.length} to fix`
+                    )}
                   </span>
-                </button>
-              ))}
+                </div>
+                <div className={editorStyles.band}>
+                  <YamlSource fill onChange={setDraft} value={draft} />
+                </div>
+              </div>
             </div>
-            <div className={editorStyles.configRow}>
-              <span className={editorStyles.configLabel}>Density</span>
-              <Button
-                intent={skin.density === "comfortable" ? "secondary" : "ghost"}
-                onClick={() => setSkin((current) => ({ ...current, density: "comfortable" }))}
-                size="small"
-              >
-                Comfortable
-              </Button>
-              <Button
-                intent={skin.density === "compact" ? "secondary" : "ghost"}
-                onClick={() => setSkin((current) => ({ ...current, density: "compact" }))}
-                size="small"
-              >
-                Compact
-              </Button>
-              <span className={editorStyles.configLabel}>Accent</span>
-              <Button
-                intent={skin.accent === "blue" ? "secondary" : "ghost"}
-                onClick={() => setSkin((current) => ({ ...current, accent: "blue" }))}
-                size="small"
-              >
-                Blue
-              </Button>
-              <Button
-                intent={skin.accent === "ink" ? "secondary" : "ghost"}
-                onClick={() => setSkin((current) => ({ ...current, accent: "ink" }))}
-                size="small"
-              >
-                Ink
-              </Button>
+
+            <div className={editorStyles.stackedRow}>
+              <div className={editorStyles.pane}>
+                <div className={editorStyles.paneHead}>
+                  <span className={editorStyles.paneTitle}>Generated LaTeX</span>
+                  <span className={editorStyles.paneNote}>{rendered?.pages ?? 0} pages</span>
+                </div>
+                <div className={editorStyles.band}>
+                  <TexPanel source={rendered?.tex ?? ""} />
+                </div>
+              </div>
+              <div className={editorStyles.pane}>
+                <div className={editorStyles.paneHead}>
+                  <span className={editorStyles.paneTitle}>{spec.name}</span>
+                  {report && report.passed ? (
+                    <span className={editorStyles.ok}>Reads in order</span>
+                  ) : null}
+                </div>
+                <div className={editorStyles.band}>
+                  <div className={editorStyles.sheetScroll}>{sheetPane}</div>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div className={editorStyles.panel}>
-            <div className={editorStyles.panelHead}>
-              <p className={editorStyles.panelHeading}>Your data</p>
-              <p className={portfolio === null ? editorStyles.statusBad : editorStyles.statusOk}>
-                {portfolio === null ? (
-                  `${parsed.ok ? 0 : parsed.issues.length} thing${parsed.issues.length === 1 ? "" : "s"} to fix`
-                ) : (
-                  <span className={editorStyles.validRow}>
-                    <LuCheck size={14} strokeWidth={2} /> Valid
-                  </span>
-                )}
-              </p>
-            </div>
-            <div className={editorStyles.sourceFrame}>
-              <YamlSource onChange={setDraft} value={draft} />
-            </div>
-          </div>
-        </div>
-
-        <div className={editorStyles.side}>
-          <div className={editorStyles.sheetPane}>
-            <div className={editorStyles.sheetHead}>
-              <span className={editorStyles.sheetName}>{spec.name}</span>
-              {spec.atsClean ? null : (
-                <span className={editorStyles.sheetWarning}>
-                  <LuTriangleAlert size={13} strokeWidth={1.5} className={editorStyles.warningMark} />
-                  Two columns reorder in a parser
-                </span>
-              )}
-            </div>
-            <div className={editorStyles.sheetBody}>
-              {rendered ? (
-                <DocumentSheet layout={rendered.layout} skin={skin} spec={spec} />
-              ) : (
-                <p className={editorStyles.panelNote}>Fix the YAML and the sheet comes back.</p>
-              )}
-            </div>
-          </div>
-
-          {visibleReport ? (
-            <div className={editorStyles.ats}>
-              <ExtractedTextPane mocked={!compiled} report={visibleReport} />
-            </div>
-          ) : null}
-        </div>
+        )}
       </div>
-
-      {toast ? <div className={editorStyles.toast}>{toast}</div> : null}
     </div>
   )
 }
+
+const ResumeEditorSuspense = () => (
+  <Suspense fallback={<div className={editorStyles.loading}>Loading the editor…</div>}>
+    <ResumeEditor />
+  </Suspense>
+)
+
+export const ResumeEditorRoute = ResumeEditorSuspense

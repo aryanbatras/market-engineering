@@ -1,9 +1,5 @@
 export const previewStyles = {
-  root: "bg-blue-wash flex h-full min-h-0 flex-col gap-3 rounded-panel p-4 md:p-5",
-
-  head: "flex items-center justify-between gap-3",
-  headLabel: "text-micro text-ink-70",
-  headState: "text-micro text-blue font-medium",
+  root: "bg-ground-sunken flex h-full min-h-0 flex-col gap-3 rounded-panel p-4 md:p-5",
 
   stage: "bg-ground min-h-0 flex-1 overflow-y-auto rounded-panel",
   content: "flex flex-col gap-7 px-6 py-7",

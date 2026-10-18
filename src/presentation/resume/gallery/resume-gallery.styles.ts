@@ -1,7 +1,8 @@
 export const galleryStyles = {
   shell: "bg-ground-sunken min-h-dvh",
   bar: "bg-ground relative z-40",
-  barInner: "mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-5 md:px-8",
+  barInner: "mx-auto flex h-[72px] w-full max-w-[1440px] items-center gap-4 px-5 md:px-8",
+  crumb: "text-micro text-ink-45",
 
   head: "mx-auto w-full max-w-[1440px] px-5 pt-20 pb-12 md:px-8 md:pt-28",
   title: "text-display text-ink",
@@ -20,5 +21,6 @@ export const galleryStyles = {
   stageName: "text-title text-ink",
   stageSummary: "text-body mt-3 max-w-[52ch] text-ink-70",
   stageFor: "text-small mt-2 max-w-[52ch] text-ink-45",
+  stageActions: "mt-8",
   sheetWrap: "mt-8",
 } as const

@@ -46,13 +46,17 @@ We ship five. They are deliberately spread across the space so a user can recogn
 
 | # | Template | Composition | Type | Character |
 |---|---|---|---|---|
-| 1 | **Classic** | Single column, linear scroll | Display weight 800, generous leading | The safe choice, executed precisely. ATS-friendly, unambiguous. What a recruiter expects. |
+| 1 | **Classic** | Single column, linear scroll | Display weight 800, generous leading | The safe choice, executed precisely. What a recruiter expects. |
 | 2 | **Bento** | Asymmetric grid, varied tile spans | Title scale, tight | Confident, project-forward. The grid carries the hierarchy, not type size. |
 | 3 | **Editorial** | Split — fixed nav rail, fluid content column | Large display, wide leading | Considered. Reads as deliberate rather than generated. |
 | 4 | **Minimal** | Wide margins, almost nothing on screen | Display only for the name, everything else micro | Restraint as a flex. The hardest one to get right. |
-| 5 | **Immersive** | Full-bleed hero, content below | Display over GSAP and R3F | The paid flagship. Highest effort, highest differentiation. |
+| 5 | **Immersive** | Full-bleed hero, content below | Display over GSAP | The paid flagship. Highest effort, highest differentiation. |
 
 **Templates must not share a composition.** A recruiter who has seen three of ours should identify them from layout alone, with logos and names stripped. That is the test.
+
+**Five, not dozens.** Every additional template is a surface to review, a card to load live in the gallery, and a choice the user has to read the sentence under before they can make. Five sentences is already a decision for a first-time visitor. The catalogue grows on evidence, not on ambition — see R22 in `AGENTS.md` for the naming rule that governs what a new one is called.
+
+**The card is the button.** Clicking a template card opens the editor with it loaded. There is no "Use this" beneath a card that is already a target. Two controls for one decision is one too many, and the one underneath is the one that reads as an ad.
 
 ---
 
@@ -116,6 +120,8 @@ Per template, before it ships:
 
 - [ ] Three hues only, two radii only, six type steps only
 - [ ] No composition shared with an existing template
+- [ ] The name is the real one a user would search for
+- [ ] The gallery card is the only control on it
 - [ ] Real text in the DOM, selectable, ATS-readable
 - [ ] Mobile designed first at 390px
 - [ ] Contrast ≥ 4.5:1, focus visible, reduced motion respected

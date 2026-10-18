@@ -4,8 +4,10 @@ export const templateCardStyles = {
 
   card: "bg-ground-sunken rounded-panel p-5",
   cardActive: "bg-blue-wash",
+  cardLink: "block transition-colors duration-micro ease-out hover:bg-blue-wash",
 
   head: "flex items-center justify-between gap-4",
+  headLinked: "text-ink",
   name: "text-body text-ink font-medium",
   forWhom: "text-small text-ink-70 mt-3 max-w-[46ch]",
 

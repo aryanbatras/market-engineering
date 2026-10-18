@@ -9,6 +9,7 @@ export const pageStyles = {
   section: "mt-20",
   sectionTitle: "text-title text-ink",
   paragraph: "text-body text-ink-70 mt-6 max-w-[58ch]",
+  paragraphLink: "text-blue underline underline-offset-4",
   list: "text-body text-ink-70 mt-6 flex flex-col gap-3",
   listItem: "text-body text-ink-70 flex items-start gap-3",
   mark: "bg-ink mt-2.5 size-1 shrink-0 rounded-full",

@@ -55,10 +55,5 @@ export const previewPortfolio: Portfolio = {
     { name: "PostgreSQL", group: "Data" },
   ],
   highlights: ["Second place, state-level hackathon, 2025"],
-  languages: [
-    { name: "English", proficiency: "Fluent" },
-    { name: "Tamil", proficiency: "Native" },
-    { name: "Hindi", proficiency: "Conversational" },
-  ],
   meta: { handle: "nainakumari", templateId: "classic" },
 }

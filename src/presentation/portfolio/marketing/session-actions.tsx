@@ -6,7 +6,7 @@ import { Button } from "@presentation/core/design/button"
 import { navStyles } from "./nav.styles"
 
 export const SessionActions = () => {
-  const { session, loading, signIn } = useSession()
+  const { session, loading } = useSession()
 
   if (session) {
     return (
@@ -14,7 +14,7 @@ export const SessionActions = () => {
         <Link className={navStyles.account} href="/dashboard">
           {session.user.fullName ?? session.user.username}
         </Link>
-        <Link href="/builder">
+        <Link href="/start">
           <Button intent="primary" size="small">
             Start building
           </Button>
@@ -28,8 +28,8 @@ export const SessionActions = () => {
       <Link className={navStyles.link} href="/sign-in">
         Sign in
       </Link>
-      <Link href="/builder">
-        <Button disabled={loading} intent="primary" onClick={() => void signIn()} size="small">
+      <Link href="/start">
+        <Button disabled={loading} intent="primary" size="small">
           Start building
         </Button>
       </Link>

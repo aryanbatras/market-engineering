@@ -13,6 +13,16 @@
 //                 past the crop is invisible to a person but its layout box still exists, and the rule
 //                 reads the box. It stays a FAIL everywhere else, where it has twice caught a real bug:
 //                 a frosted header over the hero, and the Editorial rail escaping its crop.
+//   no-hero      an editor opens on the document, not on a slogan. The rule demands a focal statement
+//                in the first viewport; in the builders the focal object is the YAML pane beside the
+//                rendered page, and a headline above it would push both below the fold.
+//   hairline     the builder header carries a bottom rule, which is the one place a 1px line is the
+//                mechanism rather than a divider: it is what tells you the panes below scroll under a
+//                fixed surface. It appears on one element and nowhere else on either editor.
+//   first-action the rule looks for a button in the first screen. On /start the two cards are links,
+//                because the card is the control. Adding a "Choose" button underneath a card that
+//                already goes somewhere is the two-controls-for-one-decision problem DESIGN.md 13
+//                bans, and the visitor's eye goes to the button and hesitates.
 //
 // Five rules carry a written allowance everywhere. The reasoning lives in DESIGN.md section 16.
 //
@@ -31,8 +41,9 @@ const pages = [
   { path: "/templates", allow: `${always},${interiorOnly}` },
   { path: "/pricing", allow: `${always},${interiorOnly}` },
   { path: "/features", allow: `${always},${interiorOnly}` },
-  { path: "/builder", allow: `${always},${interiorOnly}` },
-  { path: "/resume", allow: `${always},${interiorOnly},${sheetAllowed}` },
+  { path: "/start", allow: `${always},${interiorOnly},first-action` },
+  { path: "/builder", allow: `${always},${interiorOnly},hairline,no-hero` },
+  { path: "/resume", allow: `${always},${interiorOnly},${sheetAllowed},no-hero` },
   { path: "/resume/templates", allow: `${always},${interiorOnly},${sheetAllowed}` },
 ]
 

@@ -66,18 +66,20 @@ The closest existing implementation of what we are building. YAML in, LaTeX out,
 
 Studied for composition, never adapted. Most of the archetypes sit outside our allowlist or carry no licence at all, and the whole business depends on templates staying closed-source.
 
-| Archetype | Licence | Layout |
+| Archetype | Licence | Layout (as shipped) |
 |---|---|---|
-| `jakegut/resume` | MIT | Rule |
-| `deedy/Deedy-CV` | MIT | Compact |
-| `dnl-blkv/mcdowell-cv` | MIT | Header |
-| `posquit0/Awesome-CV` | LPPL-1.3c | Colour |
-| `sb2nov/resume` | MIT | Engineer |
-| `posquit0/AltaCV` | LPPL-1.3c | Sidebar |
-| `fky2015/resume-ng` | LPPL-1.3c | Rail |
-| `subidit/rover-resume` | CC-BY-4.0 | Atlas |
-| IIT Bombay format | none | Campus |
-| ModernCV | LPPL | Modern |
+| `jakegut/resume` | MIT | Jake's Resume |
+| `deedy/Deedy-CV` | MIT | Deedy CV |
+| `dnl-blkv/mcdowell-cv` | MIT | McDowell |
+| `posquit0/Awesome-CV` | LPPL-1.3c | Awesome CV |
+| `sb2nov/resume` | MIT | Simple Resume |
+| `posquit0/AltaCV` | LPPL-1.3c | AltaCV |
+| `fky2015/resume-ng` | LPPL-1.3c | Friggeri |
+| `subidit/rover-resume` | CC-BY-4.0 | Rover |
+| IIT Bombay format | none | IIT Bombay |
+| ModernCV | LPPL | ModernCV |
+
+Each ships under the source project's own name. A student searching that name finds the layout they have already seen; an invented name finds nothing. See R22 in `AGENTS.md`.
 
 ### Rejected on licence
 

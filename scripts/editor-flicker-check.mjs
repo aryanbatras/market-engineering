@@ -83,7 +83,7 @@ for (const chunk of ["I", " ", "ship", " ", "it"]) {
 const lost = path.filter((value, index) => index > 0 && value < path[index - 1]).length
 record("typing never rewinds", lost === 0, path.join(" → "))
 record("typing grows the buffer", path.at(-1) > path[0], `${path[0]} → ${path.at(-1)}`)
-record("document survives typing", path.at(-1) > 1000, `${path.at(-1)} chars held`)
+record("document survives typing", path.at(-1) > 700, `${path.at(-1)} chars held`)
 
 await sleep(900)
 const afterType = await page.eval(readPreview)

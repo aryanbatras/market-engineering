@@ -66,7 +66,6 @@ export type ResumeLayoutSpec = {
   educationTitle: string
   projectsTitle: string
   skillsTitle: string
-  languagesTitle: string
   highlightsTitle: string
   headlineFirst: boolean
 }
@@ -75,8 +74,21 @@ export type ResumeDensity = "compact" | "comfortable"
 
 export type ResumeAccent = "blue" | "ink"
 
+export type FontScale = "small" | "medium" | "large"
+
+export type SectionGap = "tight" | "normal" | "roomy"
+
+export type PageMargin = "narrow" | "normal" | "wide"
+
+export type ResumeMetrics = {
+  fontScale: FontScale
+  sectionGap: SectionGap
+  margin: PageMargin
+}
+
 export type ResumeSkin = {
   accent: ResumeAccent
   density: ResumeDensity
   dark: boolean
+  metrics: ResumeMetrics
 }

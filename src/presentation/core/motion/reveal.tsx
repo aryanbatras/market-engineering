@@ -9,9 +9,18 @@ type RevealProps = {
   as?: ElementType
   delay?: number
   distance?: number
+  "data-flow"?: string
+  "data-flow-trunk"?: string
 }
 
-export const Reveal = ({ children, className, as: Tag = "div", delay = 0, distance = 24 }: RevealProps) => {
+export const Reveal = ({
+  children,
+  className,
+  as: Tag = "div",
+  delay = 0,
+  distance = 24,
+  ...anchors
+}: RevealProps) => {
   const ref = useRef<HTMLElement | null>(null)
   const [shown, setShown] = useState(false)
   const reduced = usePrefersReducedMotion()
@@ -40,6 +49,7 @@ export const Reveal = ({ children, className, as: Tag = "div", delay = 0, distan
 
   return (
     <Tag
+      {...anchors}
       className={className}
       ref={ref}
       style={

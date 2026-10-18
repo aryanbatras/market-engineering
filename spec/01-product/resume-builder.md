@@ -1,76 +1,109 @@
-# The resume builder
+# Resume builder
 
-The second render target. Same document, same account, same ten minutes.
+The second render target. Same document, two outputs, one set of facts.
 
 ---
 
 ## What it is
 
-The student pastes their YAML once. They get a portfolio **and** a typeset resume, and neither is an export of the other.
+The student enters their data once. They get a portfolio **and** a resume, and neither is an export of the other.
 
 ```
 one document
    ├─→ a website at /p/<handle>       scroll, motion, ten seconds of attention
-   └─→ a PDF, typeset in LaTeX        a parser, a millisecond of attention
+   └─→ a PDF + a .tex                a parser, a millisecond of attention
 ```
 
-The reason this is one product and not two: the data entry is the expensive part. A student who has typed their facts once will keep them current. A student asked to type them twice will stop after the first.
+The reason this is one product and not two: the data entry is the expensive part. A student who has typed their facts once will keep them current. A student asked to type them twice stops after the first.
 
 ---
 
 ## The flow
 
 ```
-1. Arrive          From the builder or the dashboard. No second account, no second upload.
-2. Choose a layout Ten curated layouts, previewed with the user's own data.
-3. Check           The ATS result, with the extracted text shown.
-4. Download       PDF, .tex, or both.
-5. Publish         Optional. Attach the resume to the published portfolio at /p/<handle]/resume.
+/start               Which output first. Two cards. This is the first thing
+                     "Start building" asks, because the answer changes which
+                     gallery comes next.
+  ↓
+/templates           Portfolio templates.  Click one, you are in the editor.
+/resume/templates    Resume layouts.       Click one, you are in the editor.
+  ↓
+/builder             the editor, template already loaded
+/resume              the editor, layout already loaded
+  ↓
+Download PDF or .tex. Publish is optional and comes last.
 ```
 
-**Steps 2 through 4 need no account.** Same rule as the portfolio builder: the preview renders from in-memory data, publishing is the only authenticated step, and a visitor who renders and bounces costs us nothing.
+**Nothing between choosing and editing.** A template card is the button. There is no confirm step, because a confirm step is a question the visitor has already answered by clicking, and a second button under a card that is already a target is the place a visitor's eye goes to hesitate.
+
+**Choosing a portfolio goes through the gallery, not straight into an editor.** Picking "A portfolio website" on `/start` lands on the template picker, never on a default template the visitor did not choose. The whole point of asking which output they came for is that the next screen is a choice, not a default.
+
+**Both routes stay open.** The editor header carries "Make it a portfolio" on the resume side and "Make it a resume" in the portfolio builder. Switching never re-enters anything.
 
 ---
 
-## Step 2 — Choose a layout
+## The ten layouts
 
-Ten layouts, previewed with the user's actual YAML, at true A4 proportion.
+Named after the ones Indian engineering students actually use, because a student searching for "resume template" is searching for those names. Nine of the ten are outside our licence allowlist and are studied, never adapted — see `../04-research/licenses.md`.
 
-**Preview is the product.** Same rule as the template gallery: a static screenshot would be the one place we lie about what they get. The preview renders from the same `ResumeLayout` descriptor that produces the LaTeX, so it cannot diverge from the PDF.
+| Layout | Source archetype | Columns | ATS |
+|---|---|---|---|
+| **Jake's Resume** | `jakegut/resume` | 1 | Clean |
+| **Deedy CV** | `deedy/Deedy-CV` | 1 | Clean |
+| **McDowell** | `dnl-blkv/mcdowell-cv` | 1 | Clean |
+| **Awesome CV** | `posquit0/Awesome-CV` | 1 | Clean |
+| **Rover** | `subidit/rover-resume` | 1 | Clean |
+| **Simple Resume** | `sb2nov/resume` | 1 | Clean |
+| **ModernCV** | ModernCV class proportions | 1 | Clean |
+| **IIT Bombay** | The IIT/NIT one-pager | 1 | Clean |
+| **AltaCV** | `posquit0/AltaCV` | 2 | ⚠️ Warns |
+| **Friggeri** | `fky2015/resume-ng` | 2 | ⚠️ Warns |
 
-| Layout | Character | ATS |
+Eight single-column because the ATS evidence supports it. The two two-column layouts ship with a warning, because they are the ones students choose for how they look and forbidding them would be dishonest.
+
+**The name is the feature.** Jake's Resume is called Jake's Resume because that is what a student types into a search box, and because it is the one an IIT recruiter has already read four hundred times. Every layout ships under its upstream project's own name, spelled the way that project spells it. An invented name ranks against nothing, has to be explained, and is a worse product for a user who already knew which one they wanted. R22 in `AGENTS.md` makes this binding, and it also binds the corollary: **we do not add a field the user did not ask for.** There is no spoken-language list and no proficiency scale on this schema. A recruiter reading for six seconds is not helped by a line saying the candidate speaks Tamil.
+
+---
+
+## Customisation
+
+Three controls, and only three.
+
+| Control | Values | Effect |
 |---|---|---|
-| **Rule** | One column, ruled section headers, 10pt. The safe choice. | Clean |
-| **Compact** | One column, dense, small type. Fits the most in a page. | Clean |
-| **Header** | One column with a strong header block for name, role and contact. | Clean |
-| **Colour** | One column, coloured section headings. Reads as designed. | Clean |
-| **Engineer** | One column, almost nothing but the work. | Clean |
-| **Sidebar** | Two columns, tinted rail on the left for skills and contact. | ⚠️ Warns |
-| **Rail** | Two columns, dense, the rail carries everything secondary. | ⚠️ Warns |
-| **Atlas** | One column, headings tuned for section detection. | Clean |
-| **Campus** | The IIT/NIT one-pager. Familiar to every Indian recruiter. | Clean |
-| **Modern** | ModernCV's proportions — a widely recognised academic shape. | Clean |
+| **Font** | Small, Medium, Large | 9pt, 10pt, 11.5pt body |
+| **Section gap** | Tight, Normal, Roomy | 9pt, 15pt, 23pt before each heading |
+| **Margin** | Narrow, Normal, Wide | 32pt, 48pt, 68pt |
 
-**Two-column layouts ship, and they warn.** They are the ones students choose because they look the most designed, and telling them not to would be dishonest. So we ship them, and the ATS check shows them the actual reading order their file produces. They decide with evidence instead of a rule.
+**Why three.** `template-system.md` caps portfolio templates at three controls, and a resume that needs twelve is a resume builder with a layout picker bolted on. Three is a decision; twelve is a project.
+
+**All three change the PDF, not just the preview.** `npm run mock:verify` asserts that each control measurably moves the output — the margin shifts the text origin, the font scales the type, the gap moves the second heading. A control that only changes the preview would be a lie.
+
+**Beyond three, the `.tex` is the escape hatch.** A user who wants line spacing or a custom column ratio edits the downloaded LaTeX in Overleaf. That is a supported round-trip, not a workaround.
 
 ---
 
-## Step 3 — Check
+## The two views
 
-The screen shows the extracted text layer and any failures, in sentences that say what to do.
+**Full sections** (default) — the field guide and the YAML side by side, then the generated LaTeX and the rendered page side by side. Each band is a full-width, bounded-height region. This is the view for editing.
 
-This is the section that earns trust. Every other resume tool claims "ATS-friendly" in a badge nobody can verify. We show the parse.
+**One screen** (compact) — all four panes in a single row: structure, YAML, LaTeX, page. Nothing scrolls. This is the view for seeing whether the document is right.
 
-**Copy:** "This is what a recruiter's software reads." Not "ATS optimised."
+**Field guide toggle** — the schema panel can be hidden independently. Someone who already knows the format does not want to read the key list.
+
+All three live in one dropdown at the centre of the header. The dropdown opens left to right, and it is the only overlay in the editor.
+
+**Everything else lives in the header too.** Layout, the three size controls, Copy for LLMs, both downloads, and the switch to the other output. Nothing that changes the output is on a side panel or a second screen, in either editor. A control you have to go looking for is a control most people never find, and the person who would have found it is the person who already had a `.tex` file.
 
 ---
 
-## Step 4 — Download
+## Download
 
-- **PDF** — compiled on demand, one-time engine download on first use.
-- **`.tex`** — always, immediately, no engine required. The user can edit it in Overleaf and recompile there.
+**PDF** — typeset directly from the layout descriptor. Instant, no engine, no download, and the text layer is real and parseable. See `../02-architecture/resume-compilation.md`.
 
-The `.tex` being available without a compile is what keeps this honest. If our engine is slow on their phone, they are never stuck.
+**.tex** — genuine LaTeX, generated from the same descriptor, for Overleaf and for anyone who wants to compile it properly themselves.
+
+Both come out of the same `ResumeLayout`, so they are the same document. Verified: `npm run mock:verify` extracts the generated PDF with `unpdf` and asserts the name, the email, the dates, the headings and the absence of ligature damage.
 
 ---
 
@@ -78,38 +111,24 @@ The `.tex` being available without a compile is what keeps this honest. If our e
 
 | In | Not in |
 |---|---|
-| 10 layouts, previewed with the user's data | Live LaTeX editing with live compile |
-| YAML in, one document | A second document model |
+| 10 layouts, named after the real ones | Live LaTeX editing with live compile |
+| Three size controls | Full Overleaf-style typography control |
+| Field guide, YAML, LaTeX and preview | A server-side compile service |
+| Real PDF and `.tex`, both downloadable | Tailoring to a job description |
 | ATS check on the generated PDF | An invented "ATS score" out of 100 |
-| PDF and `.tex` download | Tailoring to a job description |
-| Public resume at `/p/[handle]/resume` | Multiple resumes per account |
-| Mocked engine in development | A server-side LaTeX service |
+| Two views, one toggle | Multiple resumes per account |
+| Every control in the header | A settings page |
+| Card-is-the-button in both galleries | A confirm step after choosing |
 
 ---
 
 ## Explicitly not this
 
-**Not a resume tailor.** Rewriting bullets for a job description needs an LLM, and we do not have one (R1). The schema has room for it and the surface does not exist.
+**Not a LaTeX tool.** Nobody needs a TeX compiler to apply for a job. They need a PDF that reads, and the `.tex` is there for the people who want it.
 
-**Not a document editor.** The user edits YAML, not a word processor. Someone who wants to move a comma uses the `.tex`.
+**Not a tailor.** Rewriting bullets for a job description needs an LLM, and we do not have one (R1). The "Tailor to a job" prompt in the Copy-for-LLMs dropdown is the honest version: the student brings their own model.
 
-**Not a source of truth.** The portfolio YAML is the source of truth. The resume is a projection. A user who edits the `.tex` and recompiles it elsewhere gets a PDF we will never see, and that is fine — that is what the `.tex` is for.
-
----
-
-## Why the schema grows
-
-Indian resumes are not US resumes. Three additions, all optional so existing data stays valid:
-
-| Addition | Why |
-|---|---|
-| `education[].board` and `.score` | "CBSE, 94.2%" and "9.4 CGPA" are not the same field. Recruiters scan for them. |
-| `experience[].kind` | Internships and full-time work are listed separately on almost every Indian fresher resume. |
-| `languages[]` | Standard on Indian resumes and on essentially no US ones. |
-
-**No `certifications[]`, `achievements[]`, or `awards[]`.** `data-contract.md` already leaned toward a generic `highlights[]` for exactly this, and three typed arrays is the drift the versioning table warns about. If it proves too coarse, add one array, not four.
-
-Portfolio templates can render these too. That is the whole point of one schema.
+**Not a source of truth.** The document is the source of truth. The resume is a projection.
 
 ---
 
@@ -117,10 +136,14 @@ Portfolio templates can render these too. That is the whole point of one schema.
 
 | Stage | Measure | Target |
 |---|---|---|
-| Activation | Reaches a rendered resume preview without signing up | > 25% of resume-route visitors |
+| Activation | Reaches `/start` and picks an output | > 50% of new visitors |
+| Activation | Chooses a template by clicking, no confirm | > 90% reach the editor |
 | Quality | Downloads a PDF or `.tex` | > 40% of previews |
-| Quality | Passes the ATS check on first export | > 80% |
-| Quality | Returns to change layout | > 30% within 7 days |
-| Value | Publishes the resume to their portfolio | > 20% of downloads |
+| Quality | PDF passes the ATS check on first export | > 80% |
+| Quality | Uses at least one size control | > 25% |
+| Value | Switches to make the other output | > 15% |
+| Value | Copies a prompt out of Copy for LLMs | > 10% |
 
-The ATS pass rate is the one to watch. If it is below 80% the templates are wrong, not the users.
+**On the last one.** It measures the ceiling of what this product can be without an LLM on our side. Every prompt we ship is a thing the student runs on a model they already pay for. If most of them never copy one, that is evidence the entry flow is wrong, not evidence they did not need the help.
+
+If the ATS pass rate falls below 80%, the templates are wrong, not the users.

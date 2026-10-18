@@ -1,3 +1,11 @@
+import type { ResumeLayout, ResumeLayoutSpec, ResumeSkin } from "../resume-layout"
+
+export type ResumePayload = {
+  layout: ResumeLayout
+  spec: ResumeLayoutSpec
+  skin: ResumeSkin
+}
+
 export type CompileOptions = {
   timeoutMs: number
 }
@@ -17,6 +25,6 @@ export type CompileFailure = {
 export type CompileResult = CompileSuccess | CompileFailure
 
 export type ResumeCompiler = {
-  compile: (tex: string, options: CompileOptions) => Promise<CompileResult>
+  compile: (payload: ResumePayload, options: CompileOptions) => Promise<CompileResult>
   isMocked: boolean
 }

@@ -15,8 +15,6 @@ const sectionTitle = (spec: ResumeLayoutSpec, kind: ResumeSectionKind): string =
       return spec.projectsTitle
     case "skills":
       return spec.skillsTitle
-    case "languages":
-      return spec.languagesTitle
     case "highlights":
       return spec.highlightsTitle
   }

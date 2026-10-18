@@ -219,6 +219,16 @@ A resume previewing in the builder or on the homepage is **not a card**. It is a
 
 `--ground-sunken` fill, 1px `--ink-45` border at 15% opacity, `--radius-pill`, 48px min height. Label above, always. Helper text below. Placeholders show format, never replace labels.
 
+### The builder header
+
+Both editors open on a sticky header carrying **every** control. Nothing that changes the output lives in a side panel, a settings page, or a second screen.
+
+The header is one row on desktop and wraps on a phone. Left: wordmark, a crumb saying which layout or template is loaded, and the tune control. Centre: the view toggle. Right: everything else, ending in the one primary action.
+
+**The tune control is a panel, not a sidebar.** One button labelled `Layout and size` opens a panel that sweeps out from left to right under the header. Opening and closing is transform and opacity on a `scale-x` origin at the left edge, so it reads as a drawer coming off the button rather than a dialog appearing.
+
+**A control that does not change the output does not ship.** R20 in `AGENTS.md` binds this. The three metrics — type size, section gap, page margin — each have a byte-level assertion in `npm run mock:verify`.
+
 ### Forms
 
 One column. Errors below the field, in `--ink` with a blue marker — **we have no red**, so errors are marked by weight, an icon, and the message, never colour alone. Errors state what to do: "That project needs a name", not "Validation failed".
@@ -244,20 +254,20 @@ Skeletons at final dimensions. Never a bare spinner.
 | `/` | Home. Long, sectioned. The demo lives here. |
 | `/features` | What it does, in full |
 | `/pricing` | Three tiers |
-| `/templates` | Gallery. Grows to hundreds. |
-| `/templates/[slug]` | One template, live preview, publish to it |
-| `/builder` | The editor. |
-| `/dashboard` | Portfolio, handle, billing, export. |
+| `/start` | **The first click.** Portfolio or resume. One question, two cards. |
+| `/templates` | Portfolio template gallery. Every card is the link. |
+| `/builder` | The portfolio editor. Opens on the template picker, then the editor. |
+| `/dashboard` | The only account surface. Portfolio, resume, environment. |
 | `/p/[handle]` | Published portfolio. |
 | `/resume` | The resume editor. Same YAML, typeset. |
-| `/resume/templates` | Resume layouts. Ten of them, curated. |
+| `/resume/templates` | Resume template gallery. Ten popular layouts. |
 | `/privacy` | Privacy policy. |
 | `/terms` | Terms and conditions. |
 | `/sign-in`, `/sign-up` | Supabase auth. |
 
-Nav: **Features · Templates · Pricing** — then Sign in and "Start building".
+Nav: **Features · Portfolio templates · Resume templates · Pricing** — then Sign in and "Start building". The two galleries are named separately because they are different products and a visitor looking for one should not have to guess which label means it.
 
-The resume is reached from the builder and the dashboard, **not from the nav.** It is the same document rendered a second way, not a second product, and a second nav entry would imply otherwise. The homepage section is how a stranger learns it exists.
+The resume is reached from the builder, the dashboard and the nav. It stopped being a second product once it got its own gallery, and hiding it now reads as a secret rather than as restraint.
 
 Privacy and Terms live in the footer. Both are written before launch, not after. India DPDP requires notice; see `spec/02-architecture/security-and-privacy.md`.
 
@@ -268,6 +278,8 @@ The gallery is the shop window, so it carries the brand rules harder than any ot
 - **Preview is the product.** Every card renders the real template at true size, not a screenshot. A static thumbnail would be the one place we lie about what users get.
 - Cards on a `--ground-sunken` field, `--radius-panel`, name in `--text-title` scale, no shadow until hovered.
 - Each card states what the template is *for* in one sentence. Not "Modern template." — "For engineers whose projects deserve the front page."
+- **The card is the button.** Clicking a template opens the editor with it loaded. There is no second "Use this template" underneath a card that is already a target — a card that looks clickable and is not, next to one that is, is the exact failure DESIGN §13 exists to prevent.
+- Template names are the names people already search for. See R22 in `AGENTS.md`.
 - Filters are tone, not chrome. One row, left-aligned.
 - Lazy-loaded. A gallery of hundreds cannot render hundreds of live templates on mobile data.
 
@@ -277,17 +289,42 @@ The gallery is the shop window, so it carries the brand rules harder than any ot
 
 Nine sections. Each has a distinct composition; **no two neighbours share a layout.**
 
+### The line
+
+**One line runs the length of the page, behind everything.** It is not decoration and it is not a divider. It is the diagram of the product, and it is drawn to the elements it describes rather than placed by hand.
+
+The route, in order: it leaves the bottom of **Start building**, drops to a horizontal at the page centre, carries a caption, turns down into the **YAML editor**, runs right across into the **rendered page**, drops past the hero, turns back left to the margin, and then runs down through **the three things**, threading each marker on the way, before continuing on to the resume sheet.
+
+Rules:
+
+- **Anchored, never positioned.** Each element on the route carries `data-flow`. The route measures them at layout time and routes orthogonally between whatever it finds. Change a section's height and the line follows. It is rebuilt on resize and on the first two settles after mount.
+- **One line, not two.** The rail that runs through the three things *is* this line. There is no separate spine underneath it. Two lines tracking each other is the visual equivalent of two shadows.
+- **Drawn on scroll, per segment.** Each leg is its own path with `pathLength="1"`, and its offset is driven by the viewport sweeping past that leg's own endpoints. Revealing one long path by total length is wrong here: the route's horizontal detours make its length a poor proxy for its height, and the line would lag hundreds of pixels behind the content it is describing.
+- **`--ink-45` at 50% opacity, 2px.** A background line, so it sits behind text without competing with it. It is never blue — blue is reserved for the one accent.
+- **Rounded corners, 20px.** Every turn is a quadratic. A hard 90° on a drawn line reads as a chart; a rounded one reads as a route.
+- **No line at all below 1024px**, and the caption with it. On a phone the route has nowhere to run without crossing text.
+- Reduced motion shows the finished line immediately.
+
 | # | Section | Composition |
 |---|---|---|
 | 1 | **Hero** | Alignment 27% from the left. Headline at display scale, weight 800, two lines. One supporting sentence. One action. Below it the Compile demo rising into view. Right half blank on purpose. |
 | 2 | **Intro** | Narrow column at 15% viewport width. Five short paragraphs. First in full ink, rest in `--ink-70`. Nothing above it. |
 | 3 | **How it works** | Four flat fields across the full viewport, butted, each a step of the same portfolio filling in — name only, then photo and headline, then projects, then published. Each field one clause. |
 | 4 | **Showcase** | The interface fragment three times, stacked, in three states. The middle one is live — the visitor can tick it and it becomes the third state. |
-| 5 | **Templates** | Three or four live template previews at true size, asymmetric widths so the row never becomes a zigzag. |
+| 5 | **Portfolio templates** | Three live template previews at true size, asymmetric widths so the row never becomes a zigzag. Each card is a link into the editor. |
 | 6 | **Resume** | One 5/7 split. Left: a two-line statement and one sentence. Right: a single A4 sheet at true proportion, real text, the extracted text layer beside it. |
-| 7 | **Pricing** | Price very large. `--text-display` numerals. One plan per column, no card chrome, whitespace doing the separating. |
-| 8 | **FAQ** | Questions left, answer right, answer pane sticky. Selection follows hover, click, and keyboard. |
-| 9 | **CTA + Footer** | A plain sentence and one button on an almost-empty screen. Footer as a designed close: the wordmark at full width. |
+| 7 | **Resume templates** | A horizontal rail of six real document sheets, each labelled with its upstream name, scrolling on a phone. Each is a link into the resume editor. |
+| 8 | **Pricing** | Price very large. `--text-display` numerals. One plan per column, no card chrome, whitespace doing the separating. |
+| 9 | **FAQ** | Questions left, answer right, answer pane sticky. Selection follows hover, click, and keyboard. |
+| 10 | **CTA + Footer** | A plain sentence and one button on an almost-empty screen. Footer as a designed close: the wordmark at full width. |
+
+**Portfolio templates and resume templates get separate sections.** They are different products with different buyers, different previews and different failure modes, and merging them under one "Templates" heading makes the visitor work out which one they are looking at. The portfolio section previews a scrolling page; the resume section previews a printed page. Two sections, two headings, two galleries.
+
+### The hero preview
+
+**The preview frame is `--ground-sunken`, never `--blue-wash`.** This was a blue-tinted panel behind an already-white page, which nested a document inside a decoration. The page is the thing; the frame around it only has to separate it from the ground.
+
+**No label above the preview says "Rendered" or "Rendered page" or "Up to date".** The YAML is on the left and the page is on the right, in the same component, live. A caption claiming the obvious is the single most common way an interface admits it is a mockup. The only status text is the parse result — `Valid`, or the number of things to fix — because that is the one thing the visitor cannot see for themselves.
 
 ### The resume section
 
@@ -350,6 +387,11 @@ Each of these is the default output of a generic generated interface. Banned out
 | "Trusted by" logo walls | Real numbers, or nothing |
 | Infinite marquees of buzzwords | A static capability list |
 | Eyebrow labels, small caps above headlines | In the headline, or dropped |
+| A caption that restates the obvious next to it | Only status the visitor cannot infer |
+| A tinted panel wrapping an already-white page | `--ground-sunken`, nothing else |
+| An invented product name where a real one exists | The real name. See R22 |
+| A field a campus recruiter never reads | Cut it. See R22 |
+| A second control where the card was already the target | One control |
 | `01 / 02 / 03` index numbers | Position and order |
 | Hairline dividers | Space, or a tone step |
 | Shadows on resting cards | Tone step |
@@ -393,15 +435,18 @@ Each of these is the default output of a generic generated interface. Banned out
 
 | Allowed | Where | Why |
 |---|---|---|
-| `mono` | The YAML editor, hero and builder | §5 puts Geist Mono on code. The editor *is* code. No prose anywhere uses it. |
+| `mono` | The YAML editor, hero, builder and resume editor | §5 puts Geist Mono on code. The editor *is* code. The resume editor also sets the LaTeX pane and the field guide in it — both are source the visitor may copy into another tool. No prose anywhere uses it. |
 | `eyebrow` | Portfolio template previews | §13 bans editorial kickers above headlines. The Bento template uses section labels (`Experience`, `Education`) so a recruiter can scan a one-page portfolio in four seconds. Removing them costs orientation. The marketing pages themselves have no eyebrows. |
 | `side-scroll` | The YAML editor at 390px | A 78-character YAML line does not fit a phone. The editor scrolls horizontally the way every code editor does. Nothing else on any page scrolls sideways. |
 | `card-rows` | The template gallery | Two sections are grids on purpose. The gallery is the product: a recruiter's first question is "what does this look like", and the only honest answer is to show the templates side by side. Every other section on every page has been pulled out of a grid. |
 | `covered-text`, on `/templates` and `/builder` only | The live previews | Both pages show a whole 1440px portfolio page inside a 440px crop you can scroll. Text that has been scrolled past the crop is invisible to a person, but its layout box still exists and the rule reads the box. The rule stays a FAIL on every other page, where it has twice caught a real defect: a frosted header sitting over the hero, and the Editorial rail escaping its crop. |
 | `no-footage` | The statement band | The band used to run screen-recording footage of someone typing code. The product's entire claim is that you do not write code, so the footage contradicted the copy. It is a still now: hands moving a card into place, which is what the product actually asks you to do. |
 | `shadow` | Document sheets, on `/` and `/resume` | §7 permits a shadow only on something that genuinely floats. An A4 sheet is the one object in this product that genuinely floats above a surface, and a flat rectangle on a flat field reads as a panel rather than a page. The shadow is on the sheet and on nothing inside it. |
-| `hairline` | Ruled section headings inside document sheets | The rule sits under a heading *on a typeset page*, which is typography rather than interface chrome — it is how Jake's, Deedy and McDowell all set a section. Remove it and the sheet loses the one thing that makes a resume look typeset rather than printed. It appears on a heading and nowhere else on either page. |
+| `hairline` | Ruled section headings inside document sheets | The rule sits under a heading *on a typeset page*, which is typography rather than interface chrome — it is how Jake's Resume, Deedy CV and McDowell all set a section. Remove it and the sheet loses the one thing that makes a resume look typeset rather than printed. It appears on a heading and nowhere else on either page. |
 | `body-size` | Document sheets, on `/` and `/resume` | A resume is set in points, not pixels, and 10pt is 13.3px at 96dpi. 13px is the correct size for the thing — inflating a document to clear a web body-text floor would make it read like a webpage, which is the failure this product exists to avoid. Nothing on the sheet goes below 13px, so `small-text` still holds. |
+| `no-hero` | The two editors | An editor opens on the document, not on a slogan. The rule asks for a focal statement in the first viewport; in `/builder` and `/resume` the focal object is the YAML pane beside the rendered page. A display headline above them would push both below the fold, which is the one thing an editor must not do. The crumb in the header names what is loaded, which is the statement this page actually needs. |
+| `hairline` | The editor header, on `/builder` and `/resume` | The header carries a 1px bottom rule. It is the one place on either editor where a hairline is the mechanism rather than a divider: it is what tells you the panes below scroll under a fixed surface. One element, one edge, and nothing else on either page. |
+| `first-action` | `/start` | The rule looks for a button in the first screen. On `/start` the two cards are links, because the card is the control. A "Choose portfolio" button sitting under a card that already goes somewhere is two controls for one decision, and the visitor's eye lands on the button first and hesitates there. |
 
 An allowance is a debt with an owner. If the reason stops being true, the allowance goes with it.
 
@@ -424,4 +469,8 @@ An allowance is a debt with an owner. If the reason stops being true, the allowa
 - [ ] No raw Tailwind in JSX (R7)
 - [ ] No cross-domain import outside `core` (R18)
 - [ ] Every generated PDF passes the ATS check (R19)
+- [ ] Every layout name is a real one (R22)
+- [ ] One account surface, no `/settings` (R23)
+- [ ] Editor controls all live in the header
+- [ ] Every gallery card is the link
 - [ ] Passes the §13 logo-swap test

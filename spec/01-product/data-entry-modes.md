@@ -45,6 +45,17 @@ Human-readable. An LLM produces it reliably when given a clear schema and an exa
 
 ### The prompt we ship
 
+Four of them, behind one **Copy for LLMs** menu in the builder header:
+
+| Option | What it does |
+|---|---|
+| **Resume to YAML** | The full conversion prompt. Paste a resume, get YAML back. |
+| **Fix my YAML** | Paste YAML you have already written. Corrects the shape, never the content. |
+| **Tailor to a job** | Same facts, reordered and reworded for one posting. |
+| **Fit one page** | Cuts to what survives one page. Never invents to fill space. |
+
+The first is the base prompt:
+
 > Here is my resume. Convert it to the portfolio YAML format defined below.
 > Keep my wording where it is accurate.
 > Do not invent projects, employers, dates, or skills.
@@ -52,7 +63,7 @@ Human-readable. An LLM produces it reliably when given a clear schema and an exa
 
 Two lines are load-bearing. **"Do not invent"** — models will fabricate a plausible internship, and a fabricated project is worse than a missing one because it can cost the user a job. **"Leave it out rather than guess"** — gives correct behaviour under uncertainty instead of confident fabrication.
 
-We ship the prompt, the schema reference, and one complete worked example.
+**We do not run any of them.** No model runs on our side, at import or at any point. Every one of these prompts is copy-to-clipboard, and the user pastes it into whatever they already pay for. That is the whole reason the product works on a hobby tier (R1), and it is also why "resume to YAML" is a menu item rather than a button.
 
 ### Validation
 
@@ -137,7 +148,13 @@ If it does not clear the bar, it does not ship, and we say so plainly rather tha
 
 ---
 
-## Data flow
+## The schema
+
+One document, two render targets. Everything that has ever been built for this product — the portfolio at `/p/[handle]`, the PDF, the `.tex`, and both previews — comes out of `portfolio.schema.ts`.
+
+**One entry point.** `/start` asks which output the visitor came for, and routes them to the matching gallery. After that the YAML editor, the field guide, the parse result and the error copy are identical in both editors. There is no "portfolio data" schema and no "resume data" schema, and there is never going to be one, because the user's résumé is the same facts whether it renders as a page or as a page of paper.
+
+**What is deliberately not in it.** No `languages`. No `proficiency`. No self-assessment of anything. R22 in `AGENTS.md` covers why: a field a campus recruiter never reads makes the document worse, and completeness for its own sake is not a feature.
 
 ```
 YAML paste ──┐
@@ -149,6 +166,8 @@ Draft state ──→ localStorage, until publish
 The database is written once, on publish. Not on every keystroke.
 ```
 
+The same validated document feeds the resume renderer. Nothing is re-entered, nothing is re-mapped, and nothing is asked for twice.
+
 Writes happen on publish and on explicit save. Not continuously. Database egress is metered at 5 GB/month and every write competes with the cached reads that keep public portfolios fast. We spend it on user actions, not on them existing.
 
 ---
@@ -158,6 +177,7 @@ Writes happen on publish and on explicit save. Not continuously. Database egress
 | Case | Behaviour |
 |---|---|
 | YAML with a key we do not recognise | Warn, ignore, keep the rest. Never reject the whole file. |
+| YAML with a `languages` or `proficiency` key | Ignored like any other unrecognised key. We never defined those fields. See R22. |
 | GitHub returns nothing usable | Say so and point at the other two paths. Not an error state. |
 | User connects GitHub, then pastes YAML | GitHub projects remain. Identity fields come from YAML. |
 | User pastes YAML twice | Second paste overwrites the first. Warn if the first had content. |
@@ -176,3 +196,5 @@ The builder's copy is written for someone who has never configured a data format
 - **"Try the form instead"** not "Manual entry".
 - **"Connect GitHub to add your projects"** — names the benefit, not the mechanic.
 - **Errors state what to do**, not what went wrong. "That project needs a name" beats "Validation failed".
+
+**The header says what the editor is, and nothing else.** No "Your data", no "Import", no "Rendered page" above the preview. The YAML is on the left and the page is on the right in one component, live; a label claiming the obvious is the standard tell of a mockup. The only status text is the parse result, because that is the one thing the user genuinely cannot see.

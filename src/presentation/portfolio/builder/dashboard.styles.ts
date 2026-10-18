@@ -1,4 +1,13 @@
 export const dashboardStyles = {
+  shell: "bg-ground min-h-dvh",
+  bar: "bg-ground sticky top-0 z-40 border-b border-ink-15",
+  barInner:
+    "mx-auto flex min-h-[64px] w-full max-w-[1440px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3 md:px-8",
+  barLeft: "flex min-w-0 items-center gap-3",
+  crumb: "text-micro text-ink-45 truncate",
+  barRight: "flex items-center gap-1",
+  account: "text-small text-ink",
+
   root: "bg-ground-sunken min-h-dvh px-5 py-14 md:px-8 md:py-20",
   grid: "mx-auto grid w-full max-w-[1100px] grid-cols-1 gap-6 lg:grid-cols-2",
   card: "bg-ground rounded-panel p-8",

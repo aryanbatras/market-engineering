@@ -77,16 +77,6 @@ const groupSkills = (portfolio: Portfolio): { label: string; items: string[] }[]
   return [...groups.entries()].map(([label, items]) => ({ label, items }))
 }
 
-const languageEntries = (portfolio: Portfolio): ResumeEntry[] =>
-  portfolio.languages.map((language) => ({
-    title: language.name,
-    organisation: "",
-    dates: "",
-    meta: language.proficiency ?? "",
-    summary: "",
-    bullets: [],
-  }))
-
 const highlightEntries = (portfolio: Portfolio): ResumeEntry[] =>
   portfolio.highlights.map((line) => ({
     title: line,
@@ -111,7 +101,6 @@ const sections = (portfolio: Portfolio): ResumeSection[] =>
     section("education", "Education", "education", educationEntries(portfolio)),
     section("projects", "Projects", "projects", projectEntries(portfolio)),
     section("skills", "Skills", "skills", []),
-    section("languages", "Languages", "languages", languageEntries(portfolio)),
     section("highlights", "Achievements", "highlights", highlightEntries(portfolio)),
   ].filter((entry) => entry.entries.length > 0 || entry.kind === "skills")
 

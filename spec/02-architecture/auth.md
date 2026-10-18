@@ -136,16 +136,21 @@ The upside of this design: even if we ship a bug that leaks a query, RLS stops i
 | Route | Requirement |
 |---|---|
 | `/` marketing | Public |
-| `/templates/*` | Public |
+| `/start` | Public |
+| `/templates/*`, `/resume/templates` | Public |
+| `/builder` | Public. Signing in is required to publish, not to build. |
+| `/resume` | Public, for the same reason. |
 | `/p/[handle]` | Public |
 | `/privacy`, `/terms` | Public |
-| `/builder/*`, `/dashboard/*` | Authenticated |
+| `/dashboard` | Authenticated. One route, one surface. |
 | Publishing a change | Authenticated |
 | Claiming a handle | Authenticated |
 | Starting a payment | Authenticated |
 | Razorpay webhook | Signature-verified. No session — webhooks have none |
 
 **Middleware** checks session presence only. Authorisation lives in the application layer where it can be tested, not in middleware, which runs on every request and is the wrong place for logic to accumulate.
+
+**Account actions appear only once there is a session.** Before sign-in the nav offers one action, "Start building", and it does the same thing either way. A "Dashboard" button that appears after sign-in and sits next to the account name is two routes to one place; R23 in `AGENTS.md` covers why we ship one.
 
 ---
 

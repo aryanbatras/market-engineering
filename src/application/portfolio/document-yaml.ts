@@ -24,7 +24,6 @@ export const builderYaml = stringify(
     experience: source.experience,
     projects: source.projects,
     skills: source.skills,
-    languages: source.languages,
   },
   { lineWidth: 0 },
 )

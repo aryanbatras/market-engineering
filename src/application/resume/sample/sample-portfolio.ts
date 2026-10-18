@@ -7,6 +7,8 @@ export const sampleDocument = (): Portfolio =>
     identity: {
       name: "Naina Kumari",
       headline: "Backend engineer. Builds the boring parts that keep the fast parts running.",
+      email: "nainakumari@example.com",
+      phone: "+91 98765 43210",
       location: "Bengaluru",
       availability: "Available from June 2027",
     },
@@ -57,10 +59,5 @@ export const sampleDocument = (): Portfolio =>
       { name: "PostgreSQL", group: "Data" },
     ],
     highlights: ["Second place, state-level hackathon, 2025"],
-    languages: [
-      { name: "English", proficiency: "Fluent" },
-      { name: "Tamil", proficiency: "Native" },
-      { name: "Hindi", proficiency: "Conversational" },
-    ],
     meta: { handle: "nainakumari", templateId: "classic" },
   })

@@ -16,13 +16,13 @@ export const sheetStyles = {
   entryTitle: "text-[14px] font-bold text-ink",
   entryDates: "shrink-0 text-[13px] text-ink-70",
   entryMeta: "mt-0.5 text-[13px] text-ink-70",
-  entrySummary: "mt-1 text-[13.5px] leading-[1.45] text-ink",
+  entrySummary: "mt-1 text-[14px] leading-[1.45] text-ink",
   bullets: "mt-1 flex list-none flex-col gap-0.5 pl-0",
-  bullet: "text-[13.5px] leading-[1.45] text-ink",
+  bullet: "text-[14px] leading-[1.45] text-ink",
   bulletMark: "mr-1.5 inline-block w-2 text-ink-70",
 
   skills: "mt-1.5 flex flex-col gap-1",
-  skillLine: "text-[13.5px] leading-[1.45] text-ink",
+  skillLine: "text-[14px] leading-[1.45] text-ink",
   skillLabel: "font-bold text-ink",
 
   columns: "mt-6 flex gap-8",

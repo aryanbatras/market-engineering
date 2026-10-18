@@ -67,11 +67,6 @@ const handleSchema = z
   .max(30, "Handle must be 30 characters or fewer")
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers, and single hyphens")
 
-const languageSchema = z.object({
-  name: z.string().min(1, "Name is required").max(80),
-  proficiency: z.string().max(60).optional(),
-})
-
 const linkSchema = z.object({
   platform: linkPlatform,
   label: z.string().max(80).optional(),
@@ -106,7 +101,6 @@ export const portfolioSchema = z.object({
     .max(60)
     .default([]),
   highlights: z.array(z.string().max(240)).max(12).default([]),
-  languages: z.array(languageSchema).max(8).default([]),
   github: z
     .object({
       username: z.string().max(80).optional(),
@@ -144,5 +138,4 @@ export type Link = z.infer<typeof linkSchema>
 export type Project = z.infer<typeof projectSchema>
 export type Experience = z.infer<typeof experienceSchema>
 export type Education = z.infer<typeof educationSchema>
-export type Language = z.infer<typeof languageSchema>
 export type ExperienceKind = z.infer<typeof experienceKind>

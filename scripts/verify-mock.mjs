@@ -58,7 +58,6 @@ await mockAuthGateway.signOut()
 check("sign-out clears the session", (await mockAuthGateway.getSession()) === null)
 
 const { mockResumeCompiler } = await import('../src/infrastructure/mock/resume/mock-resume-compiler.ts')
-const { mockPdfTextExtractor } = await import('../src/infrastructure/mock/resume/mock-pdf-text-extractor.ts')
 const { checkResume } = await import('../src/application/resume/check-resume.ts')
 const { renderResume } = await import('../src/application/resume/render-resume.ts')
 const { resumeLayoutSpecs, defaultResumeLayout, defaultResumeSkin } = await import('../src/application/resume/resume-registry.ts')
@@ -84,21 +83,68 @@ check("escapeTex neutralises every special", !/[^\\][&%$#^_~{}]/.test(escaped.re
 check("escapeTex keeps the dash as LaTeX", escapeTex('a–b') === 'a--b' && escapeTex('a—b') === 'a---b')
 check("escapeTex does not escape its own output", !escaped.includes('textbackslash{}text'))
 
-const compiled = await mockResumeCompiler.compile(rendered.tex, { timeoutMs: 1000 })
+const compiled = await mockResumeCompiler.compile(
+  { layout: rendered.layout, spec: defaultResumeLayout, skin: defaultResumeSkin },
+  { timeoutMs: 1000 },
+)
 check("mock compiler returns a pdf", compiled.ok === true && compiled.pdf.length > 0)
 
-const extracted = await mockPdfTextExtractor.extractText(new Uint8Array())
-check("mock extractor returns text", extracted.includes('Naina Kumari'))
+const { unpdfTextExtractor } = await import('../src/infrastructure/resume/unpdf-text-extractor.ts')
+const extracted = await unpdfTextExtractor.extractText(rendered.pdf)
+check("the generated PDF has a real text layer", extracted.includes('Naina Kumari'), `${extracted.length} chars`)
+check("the PDF text layer keeps the email intact", /nainakumari@example\.com/.test(extracted))
+check("the PDF text layer keeps dates intact", /May 2026 . Aug 2026/.test(extracted))
+check("the PDF text layer has no ligature damage", !/[ﬁﬂﬀﬃﬄ]/.test(extracted))
+check("the PDF text layer carries every heading", ['Internships', 'Projects', 'Education', 'Skills', 'Achievements'].every((h) => extracted.includes(h)))
+check("the PDF is one page of real text", rendered.pages === 1 && extracted.replace(/\s+/g, '').length > 600, `pages=${rendered.pages}`)
 
-const pdf = compiled.ok ? compiled.pdf : new Uint8Array()
-const report = await checkResume(resumePortfolio, defaultResumeLayout, defaultResumeSkin, mockPdfTextExtractor, pdf)
-check("ATS check passes on a clean single-column layout", report.passed === true)
+const pdf = rendered.pdf
+const report = await checkResume(resumePortfolio, defaultResumeLayout, defaultResumeSkin, unpdfTextExtractor, pdf)
+check("ATS check passes against the real PDF", report.passed === true)
+check("ATS check finds no failures on a clean layout", report.findings.filter((f) => f.severity === 'failure').length === 0)
+
+const everyLayoutParses = []
+for (const spec of resumeLayoutSpecs) {
+  const out = renderResume(resumePortfolio, spec, defaultResumeSkin)
+  const text = await unpdfTextExtractor.extractText(out.pdf)
+  everyLayoutParses.push(text.includes('Naina Kumari') && out.pdf.length > 1200)
+}
+check("every one of the ten layouts emits a readable PDF", everyLayoutParses.every(Boolean), `${everyLayoutParses.filter(Boolean).length}/10`)
+
+const withMetrics = (metrics) => renderResume(resumePortfolio, defaultResumeLayout, { ...defaultResumeSkin, metrics })
+
+const xOffsetOf = (pdf) => {
+  const text = new TextDecoder().decode(pdf)
+  const match = text.match(/1 0 0 1 ([\d.]+) [\d.]+ Tm/)
+  return match ? Number.parseFloat(match[1]) : -1
+}
+
+const margins = ['narrow', 'normal', 'wide'].map((margin) => xOffsetOf(withMetrics({ fontScale: 'medium', sectionGap: 'normal', margin }).pdf))
+check("the margin control moves the text origin", margins[0] < margins[1] && margins[1] < margins[2], JSON.stringify(margins))
+
+const sizes = ['small', 'medium', 'large'].map((fontScale) => {
+  const text = new TextDecoder().decode(withMetrics({ fontScale, sectionGap: 'normal', margin: 'normal' }).pdf)
+  const match = text.match(/\/F2 ([\d.]+) Tf/)
+  return match ? Number.parseFloat(match[1]) : -1
+})
+check("the font control scales the type", sizes[0] < sizes[1] && sizes[1] < sizes[2], JSON.stringify(sizes))
+
+const gaps = ['tight', 'normal', 'roomy'].map((sectionGap) => {
+  const text = new TextDecoder().decode(withMetrics({ fontScale: 'medium', sectionGap, margin: 'normal' }).pdf)
+  const ys = [...text.matchAll(/1 0 0 1 [\d.]+ ([\d.]+) Tm/g)].map((m) => Number.parseFloat(m[1]))
+  return ys[4] ?? -1
+})
+check("the section gap control moves the second heading", gaps[0] > gaps[1] && gaps[1] > gaps[2], JSON.stringify(gaps))
+
+const { extractText, getDocumentProxy } = await import('unpdf')
+const stillText = await extractText(await getDocumentProxy(new Uint8Array(rendered.pdf)), { mergePages: false })
+check("the PDF is readable by a standard parser", typeof stillText === 'object' && Array.isArray(stillText.text) && stillText.totalPages === 1)
 check("ATS check reports no ligature damage", !report.findings.some((f) => f.check === 'ligature'))
 check("ATS check finds a clean email", !report.findings.some((f) => f.check === 'clean-email'))
 check("ATS check does not warn on one column", !report.findings.some((f) => f.check === 'column-order'))
 
 const twoColumn = resumeLayoutSpecs.find((spec) => spec.columns === 2)
-const railReport = await checkResume(resumePortfolio, twoColumn, defaultResumeSkin, mockPdfTextExtractor, pdf)
+const railReport = await checkResume(resumePortfolio, twoColumn, defaultResumeSkin, unpdfTextExtractor, pdf)
 check("two-column layout warns about column order", railReport.findings.some((f) => f.check === 'column-order'))
 check("a warning does not fail the document", railReport.passed === true)
 

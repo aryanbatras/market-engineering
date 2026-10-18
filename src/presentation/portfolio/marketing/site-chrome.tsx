@@ -7,9 +7,9 @@ import { siteConfig } from "@application/core/site/site-config"
 
 const links = [
   { href: "/features", label: "Features" },
-  { href: "/templates", label: "Templates" },
+  { href: "/templates", label: "Portfolio templates" },
+  { href: "/resume/templates", label: "Resume templates" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/dashboard", label: "Dashboard" },
 ]
 
 const legal = [

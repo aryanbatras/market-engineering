@@ -24,6 +24,4 @@ export const sampleExtract = [
   "Data: PostgreSQL",
   "Achievements",
   "Second place, state-level hackathon, 2025",
-  "Languages",
-  "English",
 ].join("\n")

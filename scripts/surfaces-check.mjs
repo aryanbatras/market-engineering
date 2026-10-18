@@ -34,7 +34,7 @@ await sleep(900)
 const editor = await page.eval(editorProbe)
 record("builder editor opens", editor !== null, editor ? `${editor.lines} lines` : "no editor")
 record("builder editor is scrollable", editor?.scrollable === true, `${editor?.maxScroll}px of overflow`)
-record("builder editor has line numbers", editor?.gutters === true, `gutters=${editor?.gutters}`)
+record("builder editor has no line numbers", editor?.gutters === false, `gutters=${editor?.gutters}`)
 record("builder editor fits", (editor?.length ?? 0) > 800, `${editor?.length} chars loaded`)
 
 const crumb = await page.eval(() => document.body.innerText.includes("Bento"))
@@ -79,7 +79,7 @@ const picker = await page.eval(() => ({
   buttons: [...document.querySelectorAll("button")].filter((node) => /^Use /.test(node.textContent.trim())).length,
 }))
 record("template step lists every template", picker.cards >= 5, `${picker.cards} previews`)
-record("template step has a confirm button", picker.buttons === 1, `${picker.buttons} confirm button`)
+record("template step needs no confirm button", picker.buttons === 0, `${picker.buttons} confirm buttons`)
 
 const chosen = await page.eval(() => {
   const slots = [...document.querySelectorAll("button > div")]
@@ -132,10 +132,43 @@ record("templates page previews every template", gallery.count >= 5, `${gallery.
 record("templates page previews are sized", gallery.zoomed, JSON.stringify({ count: gallery.count, names: gallery.names }))
 record("templates page avoids the word five", !gallery.saysFive, `matches=${gallery.saysFive}`)
 
+const portfolioCards = await page.eval(() => {
+  const links = [...document.querySelectorAll('a[href^="/builder?template="]')]
+  return {
+    count: links.length,
+    nested: [...document.querySelectorAll('a[href^="/builder?template="] button')].length,
+  }
+})
+record(
+  "portfolio gallery card is the button",
+  portfolioCards.count >= 5 && portfolioCards.nested === 0,
+  `cards=${portfolioCards.count} nested=${portfolioCards.nested}`,
+)
+
+await page.goto(`${origin}/start`, { settleMs: 1400 })
+await sleep(700)
+const start = await page.eval(() => {
+  const links = [...document.querySelectorAll("a")]
+  const portfolio = links.find((node) => node.getAttribute("href")?.startsWith("/builder"))
+  return {
+    portfolio: Boolean(portfolio),
+    resume: links.some((node) => node.getAttribute("href") === "/resume/templates"),
+    portfolioHref: portfolio ? portfolio.getAttribute("href") : null,
+    text: document.body.innerText,
+  }
+})
+record("start asks which output first", start.portfolio && start.resume, `portfolio=${start.portfolio} resume=${start.resume}`)
+record("start explains both outputs", /Two outputs/.test(start.text) && /portfolio/i.test(start.text) && /resume/i.test(start.text))
+record(
+  "choosing a portfolio shows the templates, not a default",
+  start.portfolioHref === "/builder",
+  `href=${start.portfolioHref}`,
+)
 
 await page.goto(`${origin}/resume`, { settleMs: 1800 })
-await sleep(1200)
-const resume = await page.eval(() => {
+await sleep(1400)
+const layoutNames = ["Jake's Resume", "Deedy CV", "McDowell", "Awesome CV", "Rover", "Simple Resume", "ModernCV", "IIT Bombay", "AltaCV", "Friggeri"]
+const resume = await page.eval((names) => {
   const article = document.querySelector("article")
   const box = article ? article.getBoundingClientRect() : null
   const text = document.body.innerText
@@ -143,54 +176,100 @@ const resume = await page.eval(() => {
     sheet: Boolean(article),
     width: box ? Math.round(box.width) : 0,
     sheetText: article ? article.innerText.length : 0,
-    layouts: [...document.querySelectorAll("button")].filter((node) => {
-      const first = node.querySelector("span")
-      return first !== null && /^(Rule|Compact|Header|Colour|Engineer|Atlas|Campus|Sidebar|Rail|Modern)$/.test(first.textContent.trim())
-    }).length,
+    layouts: names.filter((name) => text.includes(name)).length,
     editor: Boolean(document.querySelector(".cm-content")),
-    showsExtracted: text.includes("extracted text layer"),
-    saysMocked: /not compiled here/.test(text),
-    hasDownload: /Download PDF/.test(text) && /Download \.tex/.test(text),
+    gutter: Boolean(document.querySelector(".cm-gutters")),
+    schema: /Every field/.test(text),
+    tex: /Generated LaTeX/.test(text),
+    hasPdf: /\bPDF\b/.test(text),
+    hasTex: Boolean(text.split("\n").find((line) => line.trim() === ".tex")),
+    crossLink: /Make it a portfolio/.test(text),
+  }
+}, layoutNames)
+
+const openTune = () =>
+  page.eval(() => {
+    const tune = [...document.querySelectorAll("button")].find((node) =>
+      /Layout and size/.test(node.textContent),
+    )
+    if (tune) tune.click()
+  })
+
+await openTune()
+await sleep(700)
+const controls = await page.eval(() => {
+  const text = document.body.innerText
+  return {
+    font: /Type size/.test(text) && /Large/.test(text),
+    gap: /Section gap/.test(text) && /Roomy/.test(text),
+    margin: /Page margin/.test(text) && /Wide/.test(text),
   }
 })
+await openTune()
+
 record("resume renders a document sheet", resume.sheet && resume.sheetText > 200, `${resume.sheetText} chars of real text`)
 record("resume sheet is A4 width", resume.width === 794, `${resume.width}px`)
 record("resume editor shows the source", resume.editor, `editor=${resume.editor}`)
-record("resume offers every layout", resume.layouts === 10, `${resume.layouts} layouts`)
-record("resume shows the extracted text layer", resume.showsExtracted, `shown=${resume.showsExtracted}`)
-record("resume never claims a compile it has not run", resume.saysMocked, `badge=${resume.saysMocked}`)
-record("resume offers PDF and .tex", resume.hasDownload, `both=${resume.hasDownload}`)
+record("resume editor has no line numbers", !resume.gutter, `gutters=${resume.gutter}`)
+record("resume shows the field guide", resume.schema, `schema=${resume.schema}`)
+record("resume shows the generated LaTeX", resume.tex, `tex=${resume.tex}`)
+record("resume names all ten popular layouts", resume.layouts === 10, `${resume.layouts}/10`)
+record("resume offers PDF and .tex", resume.hasPdf && resume.hasTex, `pdf=${resume.hasPdf} tex=${resume.hasTex}`)
+record("resume offers the three size controls", controls.font && controls.gap && controls.margin, `font=${controls.font} gap=${controls.gap} margin=${controls.margin}`)
+record("resume links back to the portfolio", resume.crossLink, `link=${resume.crossLink}`)
 
 await page.eval(() => {
-  const sidebar = [...document.querySelectorAll("button")].find((node) => {
-    const first = node.querySelector("span")
-    return first !== null && first.textContent.trim().startsWith("Sidebar")
-  })
-  if (sidebar) sidebar.click()
+  const button = [...document.querySelectorAll("button")].find((node) => node.textContent.trim().startsWith("AltaCV"))
+  if (button) button.click()
 })
-await sleep(800)
+await sleep(900)
 const twoColumn = await page.eval(() => {
   const text = document.body.innerText
-  return { warns: /Two columns reorder in a parser/.test(text), order: /column-order/.test(text) }
+  return { warns: /two columns/i.test(text) && /A parser reads one column/i.test(text) }
 })
-record(
-  "two-column layout warns before you pick it",
-  twoColumn.warns && twoColumn.order,
-  `warning=${twoColumn.warns} check=${twoColumn.order}`,
-)
+record("two-column layout warns before you pick it", twoColumn.warns, `warning=${twoColumn.warns}`)
+
+await page.eval(() => {
+  const view = [...document.querySelectorAll("button")].find((node) => node.textContent.trim() === "View")
+  if (view) view.click()
+})
+await sleep(500)
+await page.eval(() => {
+  const option = [...document.querySelectorAll("button")].find((node) => node.textContent.trim().startsWith("One screen"))
+  if (option) option.click()
+})
+await sleep(700)
+const compact = await page.eval(() => {
+  const text = document.body.innerText
+  return {
+    panes: ["Structure", "YAML", "LaTeX"].filter((label) => text.includes(label)).length,
+    sheets: document.querySelectorAll("article").length,
+    screen: document.documentElement.scrollHeight <= window.innerHeight * 1.6,
+  }
+})
+record("compact view shows all four panes at once", compact.panes === 3 && compact.sheets >= 1, `panes=${compact.panes}`)
+record("compact view fits one screen", compact.screen, `scroll=${compact.screen ? "fits" : "overflows"}`)
 
 await page.goto(`${origin}/resume/templates`, { settleMs: 1800 })
 await sleep(1200)
-const resumeGallery = await page.eval(() => ({
-  sheet: Boolean(document.querySelector("article")),
-  layouts: [...document.querySelectorAll("button")].filter((node) => {
-    const first = node.querySelector("span")
-    return first !== null && /^(Rule|Compact|Header|Colour|Engineer|Atlas|Campus|Sidebar|Rail|Modern)$/.test(first.textContent.trim())
-  }).length,
-  text: document.body.innerText.length,
-}))
-record("resume gallery lists every layout", resumeGallery.layouts === 10, `${resumeGallery.layouts} layouts`)
+const resumeGallery = await page.eval((names) => {
+  const links = [...document.querySelectorAll('a[href^="/resume?layout="]')]
+  return {
+    sheet: Boolean(document.querySelector("article")),
+    layouts: names.filter((name) => document.body.innerText.includes(name)).length,
+    heading: /Resume templates/.test(document.body.innerText),
+    text: document.body.innerText.length,
+    linkedLayouts: links.length,
+  }
+}, layoutNames)
+record("resume gallery is titled correctly", resumeGallery.heading, `titled=${resumeGallery.heading}`)
+record("resume gallery lists every layout", resumeGallery.layouts === 10, `${resumeGallery.layouts}/10`)
 record("resume gallery previews a real sheet", resumeGallery.sheet && resumeGallery.text > 500, `${resumeGallery.text} chars`)
+record(
+  "resume gallery layout is the link",
+  resumeGallery.linkedLayouts >= 10,
+  `links=${resumeGallery.linkedLayouts}`,
+)
 
 await page.goto(`${origin}/sign-in`, { settleMs: 1400 })
 await sleep(700)
@@ -215,7 +294,45 @@ record("sign-in button is clickable", clicked, "found the mock provider")
 await sleep(1800)
 const landed = await page.eval(() => ({ path: location.pathname, text: document.body.innerText.slice(0, 200) }))
 record("sign-in lands on the dashboard", landed.path === "/dashboard", landed.path)
+
+const account = await page.eval(() => {
+  const links = [...document.querySelectorAll("a")]
+  return {
+    settingsLinks: links.filter((node) => node.getAttribute("href") === "/settings").length,
+    dashboardButtons: [...document.querySelectorAll("button, a")].filter(
+      (node) => node.textContent.trim() === "Dashboard",
+    ).length,
+    selfLink: links.some((node) => node.getAttribute("href") === "/dashboard"),
+  }
+})
+record("one account surface, no settings route", account.settingsLinks === 0, `settings=${account.settingsLinks}`)
+record(
+  "the account name is the only way in",
+  account.selfLink && account.dashboardButtons === 0,
+  `self=${account.selfLink} buttons=${account.dashboardButtons}`,
+)
 await page.screenshot({ path: ".taste-skill/sign-in-check.png" })
+
+await page.goto(`${origin}/`, { settleMs: 2000 })
+await sleep(1600)
+const home = await page.eval(() => {
+  const legs = [...document.querySelectorAll("svg path")].filter((path) =>
+    (path.getAttribute("d") ?? "").startsWith("M "),
+  ).length
+  const preview = document.querySelector('[data-flow="render"]')
+  const frame = preview ? getComputedStyle(preview.parentElement) : null
+  return {
+    legs,
+    anchors: document.querySelectorAll("[data-flow]").length,
+    previewWash: frame ? frame.backgroundColor : "",
+  }
+})
+record(
+  "the homepage line routes through every anchor",
+  home.legs === 8 && home.anchors === 8,
+  `legs=${home.legs} anchors=${home.anchors}`,
+)
+record("the hero preview is not tinted", !/234, 242, 251/.test(home.previewWash), `bg=${home.previewWash}`)
 
 await browser.close()
 

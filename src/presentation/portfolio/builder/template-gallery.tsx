@@ -53,27 +53,48 @@ export const LiveTemplatePreview = ({ meta, fill = false }: LivePreviewProps) =>
 type TemplateCardProps = {
   meta: TemplateMeta
   active?: boolean
+  href?: string
 }
 
-export const TemplateCard = ({ meta, active = false }: TemplateCardProps) => (
-  <div className={cn(templateCardStyles.card, active && templateCardStyles.cardActive)}>
-    <div className={templateCardStyles.head}>
-      <span className={templateCardStyles.name}>{meta.name}</span>
-      <span className={meta.freeTier ? templateCardStyles.tag : templateCardStyles.tagPro}>
-        {meta.freeTier ? "Free" : "Pro"}
-      </span>
+export const TemplateCard = ({ meta, active = false, href }: TemplateCardProps) => {
+  const body = (
+    <>
+      <div className={cn(templateCardStyles.head, href && templateCardStyles.headLinked)}>
+        <span className={templateCardStyles.name}>{meta.name}</span>
+        <span className={meta.freeTier ? templateCardStyles.tag : templateCardStyles.tagPro}>
+          {meta.freeTier ? "Free" : "Pro"}
+        </span>
+      </div>
+      <p className={templateCardStyles.forWhom}>{meta.forWhom}</p>
+      <LiveTemplatePreview meta={meta} />
+    </>
+  )
+
+  if (href) {
+    return (
+      <Link
+        className={cn(templateCardStyles.card, templateCardStyles.cardLink)}
+        href={href}
+      >
+        {body}
+      </Link>
+    )
+  }
+
+  return (
+    <div className={cn(templateCardStyles.card, active && templateCardStyles.cardActive)}>
+      {body}
     </div>
-    <p className={templateCardStyles.forWhom}>{meta.forWhom}</p>
-    <LiveTemplatePreview meta={meta} />
-  </div>
-)
+  )
+}
 
 type TemplateGalleryProps = {
   limit?: number
   heading?: string
+  linked?: boolean
 }
 
-export const TemplateGallery = ({ limit, heading }: TemplateGalleryProps) => {
+export const TemplateGallery = ({ limit, heading, linked = false }: TemplateGalleryProps) => {
   const shown = typeof limit === "number" ? registry.slice(0, limit) : registry
   const capped = typeof limit === "number" && shown.length < registry.length
 
@@ -82,12 +103,16 @@ export const TemplateGallery = ({ limit, heading }: TemplateGalleryProps) => {
       {heading ? <h2 className={templateCardStyles.heading}>{heading}</h2> : null}
       <div className={templateCardStyles.grid}>
         {shown.map((entry) => (
-          <TemplateCard key={entry.meta.id} meta={entry.meta} />
+          <TemplateCard
+            href={linked ? `/builder?template=${entry.meta.id}` : undefined}
+            key={entry.meta.id}
+            meta={entry.meta}
+          />
         ))}
 
         {capped ? (
           <Link className={templateCardStyles.viewMore} href="/templates">
-            <span className={templateCardStyles.viewMoreText}>See all templates</span>
+            <span className={templateCardStyles.viewMoreText}>See all portfolio templates</span>
             <LuArrowUpRight aria-hidden size={20} strokeWidth={1.5} />
           </Link>
         ) : null}
