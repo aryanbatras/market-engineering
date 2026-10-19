@@ -5,7 +5,7 @@ type TexPanelProps = {
 }
 
 export const TexPanel = ({ source }: TexPanelProps) => (
-  <div className={editorStyles.editorFill}>
+  <div className={editorStyles.texFrame}>
     <div className={editorStyles.schema}>
       <pre className={editorStyles.texText}>{source}</pre>
     </div>

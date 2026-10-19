@@ -65,24 +65,40 @@ type ResumeBlock =
 
 **They are named after the real projects they reproduce.** A student searching "Jake's resume LaTeX" finds the layout they have already seen forty times on GitHub. An invented name matches nothing and has to be explained. R22 in `AGENTS.md` binds this, and it binds the spelling too.
 
-Composition rules, one line each. **No two share a composition.**
+**A layout is a set of traits, never a name.** The preview, the `.tex` and the PDF all come from the same typed fields, and a renderer that branches on a layout's id instead of on its traits is a bug waiting to happen: rename the layout, the branch goes dead, and every layout silently renders identically. That is exactly what happened when the ids stopped matching, and it is why the traits below exist.
 
-| # | Layout | Columns | Composition | Type |
-|---|---|---|---|---|
-| 1 | **Jake's Resume** | 1 | Full-width name, ruled section headings, flat sections. The default. | 10pt |
-| 2 | **Deedy CV** | 1 | Compact single column at 9.5pt, tight leading. Denser than Jake's. | 9.5pt |
-| 3 | **McDowell** | 1 | A filled header band holding name, role and contact; everything else plain | 10pt |
-| 4 | **Awesome CV** | 1 | Section headings as a filled bar in the accent, body plain | 10pt |
-| 5 | **Rover** | 1 | Section headings on a tab-aligned baseline, deliberately boring | 10pt |
-| 6 | **Simple Resume** | 1 | No rules, no colour, no band. Bold section names, plain text. | 10pt |
-| 7 | **ModernCV** | 1 | ModernCV proportions — a wide measure and a heavy name, academic in feel | 10pt |
-| 8 | **IIT Bombay** | 1 | Board, score and degree as a block at the top, then work | 10pt |
-| 9 | **AltaCV** | 2 | 30% tinted rail for contact, skills and education; work in the column | 9.5pt |
-| 10 | **Friggeri** | 2 | 24% rail carrying everything secondary; a heavier main column | 9pt |
+| Trait | Values | What it changes |
+|---|---|---|
+| `nameStyle` | `left` / `centred` / `boxed` | Where the name sits, and whether it carries the accent |
+| `headerAlign` | `left` / `centred` | Whether the whole header block — name, role, contact — is centred |
+| `headlineStyle` | `italic` / `bold` | The role line under the name |
+| `contactSeparator` | `dot` / `bar` | A middot or a vertical bar between contact details |
+| `headingCaps` | `true` / `false` | Whether section headings are set in caps |
+| `headingStyle` | `plain` / `rule` / `bar` / `caret` | A bare bold word, a rule under it, a filled accent bar, or a square in front of it |
+| `headerRule` | `true` / `false` | A full-width rule under the whole header block |
+| `entryStyle` | `split` / `inline` | Role and dates on one line with the dates pushed right, or all on one line separated by a bar |
+| `bulletStyle` | `none` / `dash` / `dot` | No mark, an em dash, or a bullet |
+| `railTint` | `true` / `false` | Whether the two-column rail gets a tinted ground |
+| `railWidth` | `0.24`–`0.30` | The rail's share of the measure |
 
-**Eight single-column, two two-column, because that is what the ATS evidence supports.** The two-column layouts exist because students choose them for how they look, and we would rather show them the reading order their file produces than forbid them.
+`pageSize` used to live here as a `small / medium / large` trait. It is gone, because the continuous `bodySize` metric in `ResumeMetrics` is the same decision done properly — a layout declared its own type size and fought the user's slider for it.
 
-**Jake's Resume is the default** and the first chip in the picker. It is the layout with the fewest ways to be wrong, and the one most of this audience has already seen.
+| # | Layout | Name | Headings | Entry | Bullets | Cols | ATS |
+|---|---|---|---|---|---|---|---|
+| 1 | **Jake's Resume** | centred header, caps headings | rule | split | none | 1 | Clean |
+| 2 | **Deedy CV** | left, role inline with the name | rule | inline | dash | 1 | Clean |
+| 3 | **McDowell** | centred + header rule | rule | split | dash | 1 | Clean |
+| 4 | **Awesome CV** | left, accent bar headings | bar | split | dash | 1 | Clean |
+| 5 | **Rover** | left, caret headings | caret | split | dot | 1 | Clean |
+| 6 | **Simple Resume** | left | plain | split | dash | 1 | Clean |
+| 7 | **ModernCV** | left + header rule | rule | split | none | 1 | Clean |
+| 8 | **IIT Bombay** | centred, caps headings | plain | split | none | 1 | Clean |
+| 9 | **AltaCV** | boxed | plain | split | dash | 2 | ⚠️ |
+| 10 | **Friggeri** | left | rule | inline | dot | 2 | ⚠️ |
+
+Eight of the ten are single-column because that is what the ATS evidence supports. The two-column layouts exist because students choose them for how they look, and we would rather show them the reading order their file produces than forbid them.
+
+**Jake's Resume is the default** and the first name in the picker. It is the layout with the fewest ways to be wrong, and the one most of this audience has already seen.
 
 ---
 
@@ -90,9 +106,9 @@ Composition rules, one line each. **No two share a composition.**
 
 `DESIGN.md §5` gives six steps sized in pixels. Paper is sized in points and the whole page is a different physical object, so:
 
-- **Body is 10pt, or 9.5pt for the dense layouts.** 9pt is the floor; below that a student on a phone in daylight cannot read their own resume in the preview.
+- **Body is 10pt, and the slider runs 7–14pt.** 7pt is the floor, and it is the floor because that is the smallest a real resume sets; the preview shows it faithfully rather than flattering it, because a preview that disagrees with the PDF is worse than a small preview.
 - **The name is 18–22pt.** One step, not five. A resume has exactly one piece of display type and it is the person's name.
-- **Section headings are 11–12pt, bold, sentence case.** Sentence case, because `DESIGN.md §5` says so and no layout is exempt.
+- **Section headings are 11–12pt and bold.** Case is a trait. `DESIGN.md §5` asks for sentence case on the web, and six of the ten layouts take it; the other four are reproductions of documents that set their headings in caps, and caps is the thing that makes a student recognise the layout as the one they have already seen. R22 is about retrieval, and retrieval wins a detail like this.
 - **Line height 1.15–1.25.** Tighter than the web because the page is a fixed object, not a scroll.
 - **One page is the target. Two is acceptable. Three is a FAIL.**
 
@@ -137,17 +153,25 @@ From `resume-templates.md`, binding under R19.
 
 ## Config surface
 
-**The three document metrics, in the header's `Layout and size` panel:**
+**The page metrics, in the header's `Size and spacing` panel.** Continuous sliders with units, not presets:
 
-| Control | Values | What it moves |
+| Control | Range | What it moves |
 |---|---|---|
-| Type size | Small / Medium / Large | The base point size, and everything derived from it |
-| Section gap | Tight / Normal / Roomy | The vertical space before the second heading and every one after |
-| Page margin | Narrow / Normal / Wide | The text origin on the page |
+| Body size | 7 – 14 pt | The base point size, and everything derived from it |
+| Name size | 12 – 40 pt | The name's point size |
+| Section gap | 0 – 8 ex | The vertical space before the second heading and every one after |
+| Entry gap | 0 – 6 ex | The space between entries inside a section |
+| Page margin | 0.4 – 4 cm | The text origin on the page |
+| Section rule | on / off | Whether a rule-head heading carries its rule |
+| Bullet mark | dash / dot / none | The mark that opens a bullet |
 
-Plus the layout picker itself, and nothing else. Density, accent and dark live in the same panel as preview-only variants and carry no PDF assertion, because a printed resume is black on white.
+**The layout is not in that panel.** It has its own single dropdown in the header showing the current layout's name. Page metrics and template choice are two different decisions, and the second one is not a number you can slide.
 
-**Each of the three metrics has a byte-level assertion in `npm run mock:verify`.** R20 in `AGENTS.md` binds this: a control that does not change the generated bytes is worse than no control, because it teaches the user that the product's controls are decorative. When you add a control, add its assertion in the same change.
+Density, accent and dark live in the portfolio's panel as preview-only variants and carry no PDF assertion, because a printed resume is black on white.
+
+**Each of the seven metrics has a byte-level assertion in `npm run mock:verify`.** R20 in `AGENTS.md` binds this: a control that does not change the generated bytes is worse than no control, because it teaches the user that the product's controls are decorative. When you add a control, add its assertion in the same change.
+
+**A metric may not change the layout's composition.** Not the order of sections, not which sections appear, not the column count. That boundary is the difference between tuning a document and designing a template, and the layout picker is what does the second one.
 
 **A layout may not add controls that only apply to it.** That rule is what keeps ten layouts coherent in one gallery.
 
@@ -155,20 +179,20 @@ Plus the layout picker itself, and nothing else. Density, accent and dark live i
 
 ## The editor
 
-Two views, toggled from the centre of the header. Both show the same four things.
+Two views, toggled from the centre of the header.
 
-**Full sections** (default) — each pane takes the height of the viewport and the full width of its column.
+**Full sections** (default) — two rows, each pane the height of its row.
 
-| Pane | Contents |
-|---|---|
-| Every field | The field guide. Key and example only. It is a reference, not a form. |
-| YAML | The editor. Same height as the pane beside it. |
-| Generated LaTeX | Exactly what downloads. |
-| The sheet | The document, at true A4, with the ATS verdict in the pane head. |
+| Row | Left | Right |
+|---|---|---|
+| 1 | **YAML** — the editor | **The sheet** — the document, at true A4, with the ATS verdict in the pane head |
+| 2 | **Every field** — the field guide, key and example only | **Generated LaTeX** — exactly what downloads |
 
-**One screen** — the same four panes side by side, so the whole pipeline is visible at once. This is the view for someone who already understands what they are looking at.
+Row one is the loop: write, see. Row two is the reference: what the keys mean, and what came out the other end. Both rows carry a copy button on their own pane head.
 
-The field guide is hideable from the same `View` menu, from either view. A student on their first pass does not need it; a student about to add a fourth project does.
+**One screen** — YAML and the sheet only. Nothing else, nothing scrolling. This is the view for someone who already understands what they are looking at and wants to judge the document.
+
+The field guide and the LaTeX are still reachable in one screen, as hover overlays on the two words beside the `YAML` label. Hover opens, leave closes, click pins it open, `Escape` closes. That is the whole reason there is no third option in the `View` menu: every pane that can be hidden can be hovered, and a toggle for a pane you can already hover is a second control for one decision.
 
 ---
 
@@ -190,7 +214,8 @@ The field guide is hideable from the same `View` menu, from either view. A stude
 
 - [ ] Three hues, two radii, no exception
 - [ ] The name is the upstream project's real name, spelled as it spells it
-- [ ] No composition shared with an existing layout
+- [ ] No two layouts share the same trait signature
+- [ ] Every visual difference comes from a trait, never from a layout id
 - [ ] ATS block present in the preamble
 - [ ] Zero icon-font glyphs
 - [ ] Headings plain text, sentence case

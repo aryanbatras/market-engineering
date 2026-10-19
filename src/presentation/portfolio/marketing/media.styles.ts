@@ -7,9 +7,9 @@ export const mediaStyles = {
   inner: "relative mx-auto flex h-full w-full max-w-[1440px] flex-col justify-center px-5 py-24 md:px-8",
 
   heading: "text-display text-white max-w-[14ch]",
-  grid: "mt-16 grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8",
+  grid: "mt-16 grid grid-cols-1 gap-10 border-t border-white/15 pt-10 md:grid-cols-3 md:gap-8",
   cell: "flex flex-col gap-3",
-  cellLabel: "text-micro text-blue font-medium",
+  cellLabel: "text-micro text-white/50 font-medium",
   cellBody: "text-lead text-white/85 max-w-[26ch]",
   creditRow: "mt-16 flex items-center justify-between gap-6",
   creditText: "text-micro text-white/45",

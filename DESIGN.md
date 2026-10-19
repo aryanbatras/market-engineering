@@ -223,11 +223,15 @@ A resume previewing in the builder or on the homepage is **not a card**. It is a
 
 Both editors open on a sticky header carrying **every** control. Nothing that changes the output lives in a side panel, a settings page, or a second screen.
 
-The header is one row on desktop and wraps on a phone. Left: wordmark, a crumb saying which layout or template is loaded, and the tune control. Centre: the view toggle. Right: everything else, ending in the one primary action.
+The header is one row on desktop and wraps on a phone. Left: wordmark, the size control, and the layout dropdown. Right: everything else, ending in the one primary action.
 
-**The tune control is a panel, not a sidebar.** One button labelled `Layout and size` opens a panel that sweeps out from left to right under the header. Opening and closing is transform and opacity on a `scale-x` origin at the left edge, so it reads as a drawer coming off the button rather than a dialog appearing.
+**The layout dropdown doubles as the crumb, so there is no separate crumb.** It already names the layout that is loaded, and a static word beside it saying the same thing is two surfaces showing one fact. That is R23's argument applied to the document: two places to show what you are editing is two places to forget to update. The dropdown is left-aligned, opens downward, scrolls at ten entries, marks the current one with a check, and closes with a link to the full gallery.
 
-**A control that does not change the output does not ship.** R20 in `AGENTS.md` binds this. The three metrics — type size, section gap, page margin — each have a byte-level assertion in `npm run mock:verify`.
+**The size controls are a panel, not a sidebar.** One button labelled `Size and spacing` opens a panel of continuous sliders under the header. These are **numbers with units**, not presets: `Body size 10 pt`, `Name size 21 pt`, `Section gap 2.6 ex`, `Entry gap 1.2 ex`, `Page margin 1.9 cm`, plus the bullet mark and the section rule as toggles. A student who has a specific page in their head cannot reach it through three presets, and a slider gets them there in twenty seconds.
+
+**The layout is not in that panel.** `Size and spacing` is page metrics. Which of the ten layouts you are typing into is a different decision, and it gets its own single dropdown button in the header showing the current layout's name. Ten chips across the header is a menu wearing a toolbar costume.
+
+**A control that does not change the output does not ship.** R20 in `AGENTS.md` binds this. Every metric above has a byte-level assertion in `npm run mock:verify` — the margins move the text origin, the body size reaches the entry titles, the name size scales the name, the section gap moves the second heading, and the rule and bullet toggles change the bytes.
 
 ### Forms
 
@@ -235,7 +239,15 @@ One column. Errors below the field, in `--ink` with a blue marker — **we have 
 
 ### Navigation
 
-`--ground` at 88% opacity with a blur on scroll. Left-aligned. Wordmark, Features · Templates · Pricing, then Sign in and one action. Height 72px. Current page marked by weight, not colour alone.
+`--ground` at 88% opacity with a blur on scroll. Left-aligned. Wordmark, Features · Portfolio templates · Resume templates · Pricing, then Sign in and one action. Height 72px. Current page marked by weight, not colour alone.
+
+### Dialogs
+
+A dialog is a modal panel on a `--ink/20` scrim with a 2px blur. `--radius-panel`, `--shadow-float`, `--text-lead` title, one close button top right, `Escape` and a scrim click both dismiss, and focus moves to the panel on open.
+
+**Anything with more than three options is a dialog, not a dropdown.** A dropdown anchored under a button that is 40px tall cannot hold four two-line options without either clipping or pushing the header out of shape — and the copy we want on those options is one line of explanation each, which is the whole point of the control. A dialog has room for the explanation.
+
+**The confirmation of a copy is a toast, not an inline message.** Toast at the bottom centre, `--shadow-float`, `aria-live="polite"`, gone after 2.6 seconds. A message that replaces the button that produced it is a layout that changes under the user's cursor.
 
 ### Empty states
 
@@ -289,36 +301,13 @@ The gallery is the shop window, so it carries the brand rules harder than any ot
 
 Nine sections. Each has a distinct composition; **no two neighbours share a layout.**
 
-### The line
+### No decorative line
 
-**One line runs the length of the page, behind everything.** It is not decoration and it is not a divider. It is the diagram of the product, and it is drawn to the elements it describes rather than placed by hand.
+There is no line on this page. An earlier draft ran one from the Start building button, through the YAML editor, across the rendered page, down the margin and on to the resume sheet. It was a nice idea and it was the wrong one, for the same reason a paragraph rule on a website is the wrong thing: **a line on a page means something, and this one meant nothing a reader could act on.**
 
-The route, in order: it leaves the bottom of **Start building**, drops to a horizontal at the page centre, carries a caption, turns down into the **YAML editor**, runs right across into the **rendered page**, drops past the hero, turns back left to the margin, and then runs down through **the three things**, threading each marker on the way, before continuing on to the resume sheet.
+It crossed the word "The work". It ran through the first letter of a display heading in the resume section. It produced a stub between the two editor panes that read as a stray mark rather than a route. Every fix moved the problem somewhere else, and the honest reason is that orthogonal routing through unpredictable content is not a problem you solve, it is a problem you remove. The typography already carries the sequence. A line explaining the typography is the typography talking twice.
 
-Rules:
-
-- **Anchored, never positioned.** Each element on the route carries `data-flow`. The route measures them at layout time and routes orthogonally between whatever it finds. Change a section's height and the line follows. It is rebuilt on resize and on the first two settles after mount.
-- **One line, not two.** The rail that runs through the three things *is* this line. There is no separate spine underneath it. Two lines tracking each other is the visual equivalent of two shadows.
-- **Drawn on scroll, per segment.** Each leg is its own path with `pathLength="1"`, and its offset is driven by the viewport sweeping past that leg's own endpoints. Revealing one long path by total length is wrong here: the route's horizontal detours make its length a poor proxy for its height, and the line would lag hundreds of pixels behind the content it is describing.
-- **`--ink-45` at 50% opacity, 2px.** A background line, so it sits behind text without competing with it. It is never blue — blue is reserved for the one accent.
-- **Rounded corners, 20px.** Every turn is a quadratic. A hard 90° on a drawn line reads as a chart; a rounded one reads as a route.
-- **No line at all below 1024px**, and the caption with it. On a phone the route has nowhere to run without crossing text.
-- Reduced motion shows the finished line immediately.
-
-| # | Section | Composition |
-|---|---|---|
-| 1 | **Hero** | Alignment 27% from the left. Headline at display scale, weight 800, two lines. One supporting sentence. One action. Below it the Compile demo rising into view. Right half blank on purpose. |
-| 2 | **Intro** | Narrow column at 15% viewport width. Five short paragraphs. First in full ink, rest in `--ink-70`. Nothing above it. |
-| 3 | **How it works** | Four flat fields across the full viewport, butted, each a step of the same portfolio filling in — name only, then photo and headline, then projects, then published. Each field one clause. |
-| 4 | **Showcase** | The interface fragment three times, stacked, in three states. The middle one is live — the visitor can tick it and it becomes the third state. |
-| 5 | **Portfolio templates** | Three live template previews at true size, asymmetric widths so the row never becomes a zigzag. Each card is a link into the editor. |
-| 6 | **Resume** | One 5/7 split. Left: a two-line statement and one sentence. Right: a single A4 sheet at true proportion, real text, the extracted text layer beside it. |
-| 7 | **Resume templates** | A horizontal rail of six real document sheets, each labelled with its upstream name, scrolling on a phone. Each is a link into the resume editor. |
-| 8 | **Pricing** | Price very large. `--text-display` numerals. One plan per column, no card chrome, whitespace doing the separating. |
-| 9 | **FAQ** | Questions left, answer right, answer pane sticky. Selection follows hover, click, and keyboard. |
-| 10 | **CTA + Footer** | A plain sentence and one button on an almost-empty screen. Footer as a designed close: the wordmark at full width. |
-
-**Portfolio templates and resume templates get separate sections.** They are different products with different buyers, different previews and different failure modes, and merging them under one "Templates" heading makes the visitor work out which one they are looking at. The portfolio section previews a scrolling page; the resume section previews a printed page. Two sections, two headings, two galleries.
+What replaced it is nothing, and the sections below are ordered so that reading them top to bottom is the argument.
 
 ### The hero preview
 
@@ -337,6 +326,14 @@ This is the section that earns the second output. It sits after Templates, becau
 **The sheet sits on `--ground-raised` over `--ground-sunken`, with `--shadow-float`.** A sheet of paper genuinely floats. This is the one place in the marketing site where a resting shadow is correct, and it is correct because the object really is a piece of paper above a desk.
 
 **No icon glyphs anywhere on the sheet.** Not in the contact line, not as bullets. What is being sold is that a parser can read it, so the sheet must not contain a single glyph that extracts as garbage. That constraint is visible on the page as design quality — it looks like a clean typeset document.
+
+### The Questions section
+
+**Two columns, both static, no pin.** The questions sit left and the answers sit right, and the section does what a section does: it is on the page, it reads top to bottom, and it is gone by the time the reader scrolls past. An earlier draft scrolled the left column past a fixed right column so the answers moved at the pace of the questions. It was broken in the way a pin is always broken — the reader who scrolls fast finds a question with an answer three questions away, and the reader who scrolls slowly has to sit and wait for a sentence. Six questions do not need a scroll narrative. They need to be readable.
+
+**No accordion either.** Six answers is roughly a hundred words each way. An accordion hides two thirds of it behind a click per question, and the questions that get clicked are the ones people already expected — which is the opposite of what the section is for.
+
+**No blue in the proof band.** "The page is the bottleneck" is a claim about latency, and the band that carries it is a dark instrument panel. Every label on that panel is `text-white/50` or `text-white/70`, and the one active cell marker is `--ink`. A blue tint there reads as a link, and the cells are not links.
 
 ### Imagery
 
@@ -443,10 +440,13 @@ Each of these is the default output of a generic generated interface. Banned out
 | `no-footage` | The statement band | The band used to run screen-recording footage of someone typing code. The product's entire claim is that you do not write code, so the footage contradicted the copy. It is a still now: hands moving a card into place, which is what the product actually asks you to do. |
 | `shadow` | Document sheets, on `/` and `/resume` | §7 permits a shadow only on something that genuinely floats. An A4 sheet is the one object in this product that genuinely floats above a surface, and a flat rectangle on a flat field reads as a panel rather than a page. The shadow is on the sheet and on nothing inside it. |
 | `hairline` | Ruled section headings inside document sheets | The rule sits under a heading *on a typeset page*, which is typography rather than interface chrome — it is how Jake's Resume, Deedy CV and McDowell all set a section. Remove it and the sheet loses the one thing that makes a resume look typeset rather than printed. It appears on a heading and nowhere else on either page. |
-| `body-size` | Document sheets, on `/` and `/resume` | A resume is set in points, not pixels, and 10pt is 13.3px at 96dpi. 13px is the correct size for the thing — inflating a document to clear a web body-text floor would make it read like a webpage, which is the failure this product exists to avoid. Nothing on the sheet goes below 13px, so `small-text` still holds. |
-| `no-hero` | The two editors | An editor opens on the document, not on a slogan. The rule asks for a focal statement in the first viewport; in `/builder` and `/resume` the focal object is the YAML pane beside the rendered page. A display headline above them would push both below the fold, which is the one thing an editor must not do. The crumb in the header names what is loaded, which is the statement this page actually needs. |
+| `body-size` | Document sheets, on `/` and `/resume` | A resume is set in points, not pixels, and 10pt is 13.3px at 96dpi. 13px is the correct size for the thing — inflating a document to clear a web body-text floor would make it read like a webpage, which is the failure this product exists to avoid. |
+| `small-text` | Document sheets, on `/` and `/resume` | The rule asks that nothing meant to be read goes below 13px, and that is a rule about web copy. A resume's secondary type — the contact line, entry dates, the institution line — is 9pt by convention, which is 12px. Lifting the preview to clear the floor would mean the preview disagreed with the PDF and the `.tex`, and R19 exists precisely to make those three one artefact. A preview that flatters the document at the expense of the download is a preview that lies. |
+| `no-hero` | The two editors | An editor opens on the document, not on a slogan. The rule asks for a focal statement in the first viewport; in `/builder` and `/resume` the focal object is the YAML pane beside the rendered page. A display headline above them would push both below the fold, which is the one thing an editor must not do. The header names what is loaded — a crumb in the builder, the layout dropdown in the resume editor — which is the statement this page actually needs. |
+| `focal-point` | The two editors | The rule wants one dominant element, and it looks for large type or a picture. In an editor the dominant element is the pair of working panes, and on `/resume` it is the A4 sheet on the right — the thing the user came to judge. Neither is display type, and making the document large type would put the YAML and the sheet below the fold. `no-hero` reasons about the same object from the other side; this is the rule that asks what is *big*. |
+| `card-rows` | The resume template gallery | Ten layout previews is a grid on purpose, exactly like the portfolio gallery beside it. A visitor choosing a resume wants to see all ten at once and compare them, and the only honest way to compare two page layouts is to see both pages. |
 | `hairline` | The editor header, on `/builder` and `/resume` | The header carries a 1px bottom rule. It is the one place on either editor where a hairline is the mechanism rather than a divider: it is what tells you the panes below scroll under a fixed surface. One element, one edge, and nothing else on either page. |
-| `first-action` | `/start` | The rule looks for a button in the first screen. On `/start` the two cards are links, because the card is the control. A "Choose portfolio" button sitting under a card that already goes somewhere is two controls for one decision, and the visitor's eye lands on the button first and hesitates there. |
+| `first-action` | `/start` and `/resume/templates` | The rule looks for a button in the first screen. On both pages every card is the control — on `/start` there are two output choices, in the resume gallery there are ten layouts. A "Choose" button sitting under a card that already goes somewhere is two controls for one decision, and the visitor's eye lands on the button first and hesitates there. |
 
 An allowance is a debt with an owner. If the reason stops being true, the allowance goes with it.
 
@@ -467,6 +467,7 @@ An allowance is a debt with an owner. If the reason stops being true, the allowa
 - [ ] Keyboard walkthrough passes
 - [ ] Reduced motion verified
 - [ ] No raw Tailwind in JSX (R7)
+- [ ] No link nested inside a link (R24)
 - [ ] No cross-domain import outside `core` (R18)
 - [ ] Every generated PDF passes the ATS check (R19)
 - [ ] Every layout name is a real one (R22)

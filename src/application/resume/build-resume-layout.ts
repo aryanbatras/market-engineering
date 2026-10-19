@@ -26,10 +26,13 @@ const findSection = (document: ResumeDocument, id: string): ResumeSection | null
 const heading = (spec: ResumeLayoutSpec, text: string): ResumeBlock => ({
   kind: "heading",
   text,
-  rule: spec.ruledHeadings,
+  style: spec.headingStyle,
 })
 
-const entriesToBlocks = (entries: ResumeSection["entries"]): ResumeBlock[] =>
+const entriesToBlocks = (
+  entries: ResumeSection["entries"],
+  spec: ResumeLayoutSpec,
+): ResumeBlock[] =>
   entries.map<ResumeBlock>((entry) => ({
     kind: "entry",
     title: entry.title,
@@ -38,6 +41,7 @@ const entriesToBlocks = (entries: ResumeSection["entries"]): ResumeBlock[] =>
     meta: entry.meta,
     summary: entry.summary,
     bullets: entry.bullets,
+    style: spec.entryStyle,
   }))
 
 const sectionBlocks = (
@@ -48,7 +52,7 @@ const sectionBlocks = (
 ): ResumeBlock[] => {
   const source = findSection(document, id)
   if (source === null || source.entries.length === 0) return []
-  return [heading(spec, title), ...entriesToBlocks(source.entries)]
+  return [heading(spec, title), ...entriesToBlocks(source.entries, spec)]
 }
 
 const kindBlocks = (

@@ -1,6 +1,7 @@
 import type { TemplateProps } from "../types"
 import { cn } from "@presentation/core/design/cn"
 import { ExternalLink } from "../shared/atoms"
+import { PreviewAnchor } from "../shared/preview-anchor"
 import { bentoStyles } from "./bento.styles"
 
 const featured = (count: number): number => Math.min(count, 3)
@@ -26,7 +27,7 @@ const Bento = ({ data, showAttribution }: TemplateProps) => {
           {data.identity.location ? <p className={cn(bentoStyles.tileBodyOnAccent, bentoStyles.gapTop)}>{data.identity.location}</p> : null}
           <div className={cn(bentoStyles.gapWide, bentoStyles.linkStack)}>
             {data.links.map((link) => (
-              <a
+              <PreviewAnchor
                 className={bentoStyles.tileBodyOnAccent}
                 href={link.url}
                 key={link.platform}
@@ -34,7 +35,7 @@ const Bento = ({ data, showAttribution }: TemplateProps) => {
                 target="_blank"
               >
                 {link.label ?? link.platform}
-              </a>
+              </PreviewAnchor>
             ))}
           </div>
         </div>

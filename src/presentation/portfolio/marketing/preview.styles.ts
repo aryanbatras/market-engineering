@@ -10,7 +10,7 @@ export const previewStyles = {
   meta: "text-micro text-ink-45 mt-3 flex flex-wrap items-center gap-x-4 gap-y-1",
   metaItem: "inline-flex items-center gap-1.5",
 
-  links: "flex flex-col",
+  links: "flex flex-col gap-2",
   link: "bg-ground-sunken text-small text-ink flex items-center gap-3 rounded-panel px-4 py-3 hover:bg-blue-wash",
   linkIcon: "text-ink-45 shrink-0",
   linkLabel: "truncate",

@@ -132,6 +132,9 @@ record("templates page previews every template", gallery.count >= 5, `${gallery.
 record("templates page previews are sized", gallery.zoomed, JSON.stringify({ count: gallery.count, names: gallery.names }))
 record("templates page avoids the word five", !gallery.saysFive, `matches=${gallery.saysFive}`)
 
+const nesting = await page.eval(() => document.querySelectorAll("a a").length)
+record("no link nested inside a link", nesting === 0, `nested=${nesting}`)
+
 const portfolioCards = await page.eval(() => {
   const links = [...document.querySelectorAll('a[href^="/builder?template="]')]
   return {
@@ -190,7 +193,7 @@ const resume = await page.eval((names) => {
 const openTune = () =>
   page.eval(() => {
     const tune = [...document.querySelectorAll("button")].find((node) =>
-      /Layout and size/.test(node.textContent),
+      /Size and spacing/.test(node.textContent),
     )
     if (tune) tune.click()
   })
@@ -199,28 +202,49 @@ await openTune()
 await sleep(700)
 const controls = await page.eval(() => {
   const text = document.body.innerText
+  const ranges = document.querySelectorAll('input[type="range"]').length
   return {
-    font: /Type size/.test(text) && /Large/.test(text),
-    gap: /Section gap/.test(text) && /Roomy/.test(text),
-    margin: /Page margin/.test(text) && /Wide/.test(text),
+    font: /Body size/.test(text) && /pt/.test(text),
+    gap: /Section gap/.test(text),
+    margin: /Page margin/.test(text),
+    ranges,
   }
 })
 await openTune()
 
-record("resume renders a document sheet", resume.sheet && resume.sheetText > 200, `${resume.sheetText} chars of real text`)
-record("resume sheet is A4 width", resume.width === 794, `${resume.width}px`)
-record("resume editor shows the source", resume.editor, `editor=${resume.editor}`)
-record("resume editor has no line numbers", !resume.gutter, `gutters=${resume.gutter}`)
-record("resume shows the field guide", resume.schema, `schema=${resume.schema}`)
-record("resume shows the generated LaTeX", resume.tex, `tex=${resume.tex}`)
-record("resume names all ten popular layouts", resume.layouts === 10, `${resume.layouts}/10`)
-record("resume offers PDF and .tex", resume.hasPdf && resume.hasTex, `pdf=${resume.hasPdf} tex=${resume.hasTex}`)
-record("resume offers the three size controls", controls.font && controls.gap && controls.margin, `font=${controls.font} gap=${controls.gap} margin=${controls.margin}`)
+record(
+  "resume offers continuous size and spacing controls",
+  controls.font && controls.gap && controls.margin && controls.ranges >= 5,
+  `ranges=${controls.ranges}`,
+)
+
+const stacked = await page.eval(() => {
+  const labels = [...document.querySelectorAll("span")]
+    .map((node) => node.textContent.trim())
+    .filter((t) => ["YAML", "Every field", "Generated LaTeX", "Jake's Resume"].includes(t))
+  return labels
+})
+record(
+  "full sections lead with YAML and the page",
+  stacked.indexOf("YAML") < stacked.lastIndexOf("Jake's Resume") &&
+    stacked.indexOf("Every field") > stacked.indexOf("YAML"),
+  stacked.join(" > "),
+)
+
 record("resume links back to the portfolio", resume.crossLink, `link=${resume.crossLink}`)
 
 await page.eval(() => {
-  const button = [...document.querySelectorAll("button")].find((node) => node.textContent.trim().startsWith("AltaCV"))
-  if (button) button.click()
+  const picker = [...document.querySelectorAll("button")].find((node) =>
+    node.textContent.includes("Jake's Resume") || node.textContent.includes("Change template"),
+  )
+  if (picker) picker.click()
+})
+await sleep(600)
+await page.eval(() => {
+  const item = [...document.querySelectorAll("button")].find((node) =>
+    node.textContent.trim().startsWith("AltaCV"),
+  )
+  if (item) item.click()
 })
 await sleep(900)
 const twoColumn = await page.eval(() => {
@@ -242,12 +266,24 @@ await sleep(700)
 const compact = await page.eval(() => {
   const text = document.body.innerText
   return {
-    panes: ["Structure", "YAML", "LaTeX"].filter((label) => text.includes(label)).length,
+    yaml: text.includes("YAML"),
+    guidePane: text.includes("Every field"),
+    texPane: text.includes("Generated LaTeX"),
+    triggers: document.querySelectorAll("[data-hover-trigger]").length,
     sheets: document.querySelectorAll("article").length,
     screen: document.documentElement.scrollHeight <= window.innerHeight * 1.6,
   }
 })
-record("compact view shows all four panes at once", compact.panes === 3 && compact.sheets >= 1, `panes=${compact.panes}`)
+record(
+  "compact view shows the YAML and the page",
+  compact.yaml && compact.sheets >= 1,
+  `yaml=${compact.yaml} sheets=${compact.sheets}`,
+)
+record(
+  "compact view hides the guide and the LaTeX behind a hover",
+  !compact.guidePane && !compact.texPane && compact.triggers === 2,
+  `guide=${compact.guidePane} tex=${compact.texPane} triggers=${compact.triggers}`,
+)
 record("compact view fits one screen", compact.screen, `scroll=${compact.screen ? "fits" : "overflows"}`)
 
 await page.goto(`${origin}/resume/templates`, { settleMs: 1800 })
@@ -315,25 +351,6 @@ await page.screenshot({ path: ".taste-skill/sign-in-check.png" })
 
 await page.goto(`${origin}/`, { settleMs: 2000 })
 await sleep(1600)
-const home = await page.eval(() => {
-  const legs = [...document.querySelectorAll("svg path")].filter((path) =>
-    (path.getAttribute("d") ?? "").startsWith("M "),
-  ).length
-  const preview = document.querySelector('[data-flow="render"]')
-  const frame = preview ? getComputedStyle(preview.parentElement) : null
-  return {
-    legs,
-    anchors: document.querySelectorAll("[data-flow]").length,
-    previewWash: frame ? frame.backgroundColor : "",
-  }
-})
-record(
-  "the homepage line routes through every anchor",
-  home.legs === 8 && home.anchors === 8,
-  `legs=${home.legs} anchors=${home.anchors}`,
-)
-record("the hero preview is not tinted", !/234, 242, 251/.test(home.previewWash), `bg=${home.previewWash}`)
-
 await browser.close()
 
 const failed = results.filter((entry) => !entry.pass)

@@ -1,38 +1,23 @@
-import Link from "next/link";
-import { Section, Shell } from "@presentation/core/design/layout";
-import { Button } from "@presentation/core/design/button";
-import { Reveal } from "@presentation/core/motion/reveal";
-import {
-  ScrollProgress,
-  ScrollReveal,
-} from "@presentation/core/motion/scroll-reveal";
-import { heroStyles } from "@presentation/portfolio/marketing/editor.styles";
-import {
-  FaqSection,
-  IntroSection,
-} from "@presentation/portfolio/marketing/home-sections";
-import {
-  ClosingCta,
-  PricingTable,
-} from "@presentation/portfolio/marketing/plans";
-import { CompileEditor } from "@presentation/portfolio/marketing/compile-editor";
-import { FlowLine } from "@presentation/portfolio/marketing/flow-line";
-import { ScrollRail } from "@presentation/portfolio/marketing/scroll-rail";
-import {
-  AtmosphereBand,
-  GallerySection,
-} from "@presentation/portfolio/marketing/gallery";
-import { RecruiterSurfaces } from "@presentation/portfolio/marketing/surfaces";
-import { TemplateGallery } from "@presentation/portfolio/builder/template-gallery";
+import Link from "next/link"
+import { Section, Shell } from "@presentation/core/design/layout"
+import { Button } from "@presentation/core/design/button"
+import { Reveal } from "@presentation/core/motion/reveal"
+import { ScrollProgress } from "@presentation/core/motion/scroll-reveal"
+import { heroStyles } from "@presentation/portfolio/marketing/editor.styles"
+import { IntroSection } from "@presentation/portfolio/marketing/home-sections"
+import { FaqSection } from "@presentation/portfolio/marketing/faq-section"
+import { ClosingCta, PricingTable } from "@presentation/portfolio/marketing/plans"
+import { CompileEditor } from "@presentation/portfolio/marketing/compile-editor"
+import { ScrollRail } from "@presentation/portfolio/marketing/scroll-rail"
+import { AtmosphereBand, GallerySection } from "@presentation/portfolio/marketing/gallery"
+import { RecruiterSurfaces } from "@presentation/portfolio/marketing/surfaces"
+import { TemplateGallery } from "@presentation/portfolio/builder/template-gallery"
 import { ResumeBandSection } from "@presentation/resume/marketing/resume-band"
-import { ResumeTemplateShelf } from "@presentation/resume/marketing/resume-shelf";
-import {
-  SiteFooter,
-  SiteHeader,
-} from "@presentation/portfolio/marketing/site-chrome";
-import { heroYaml } from "@application/portfolio/document-yaml";
-import { pricingStyles } from "@presentation/portfolio/marketing/home-sections.styles";
-import { previewPortfolio } from "@application/portfolio/preview-portfolio";
+import { ResumeTemplateShelf } from "@presentation/resume/marketing/resume-shelf"
+import { SiteFooter, SiteHeader } from "@presentation/portfolio/marketing/site-chrome"
+import { heroYaml } from "@application/portfolio/document-yaml"
+import { pricingStyles } from "@presentation/portfolio/marketing/home-sections.styles"
+import { previewPortfolio } from "@application/portfolio/preview-portfolio"
 
 const HomePage = () => (
   <>
@@ -40,7 +25,6 @@ const HomePage = () => (
     <SiteHeader />
 
     <main className={heroStyles.page}>
-      <FlowLine />
       <div className={heroStyles.pageBody}>
         <div className={heroStyles.root}>
           <div className={heroStyles.copy}>
@@ -48,15 +32,11 @@ const HomePage = () => (
               Your work, made visible
             </Reveal>
             <Reveal as="p" className={heroStyles.lead} delay={120}>
-              Your resume in, a portfolio site out. Ten minutes, one link, and
-              no design decisions in between.
+              Your resume in, a portfolio site out. Ten minutes, one link, and no design decisions in
+              between.
             </Reveal>
-            <Reveal
-              className={heroStyles.actionRow}
-              delay={200}
-              data-flow-trunk="hero"
-            >
-              <Link href="/start" data-flow="start">
+            <Reveal className={heroStyles.actionRow} delay={200}>
+              <Link href="/start">
                 <Button intent="primary">Start building</Button>
               </Link>
               <Link className={heroStyles.secondaryLink} href="/templates">
@@ -112,18 +92,16 @@ const HomePage = () => (
 
         <ResumeBandSection />
 
-      <Section spacing="flush">
-        <Reveal>
-          <ResumeTemplateShelf />
-        </Reveal>
-      </Section>
+        <Section spacing="flush">
+          <Reveal>
+            <ResumeTemplateShelf />
+          </Reveal>
+        </Section>
 
         <Section>
           <Shell>
             <Reveal>
-              <h2 className={pricingStyles.title}>
-                Three tiers, one of them a dollar
-              </h2>
+              <h2 className={pricingStyles.title}>Three tiers, one of them a dollar</h2>
               <div data-reveal>
                 <PricingTable />
               </div>
@@ -132,11 +110,7 @@ const HomePage = () => (
         </Section>
 
         <Section>
-          <Shell>
-            <Reveal>
-              <FaqSection />
-            </Reveal>
-          </Shell>
+          <FaqSection />
         </Section>
 
         <Section spacing="flush">
@@ -149,6 +123,6 @@ const HomePage = () => (
 
     <SiteFooter />
   </>
-);
+)
 
-export default HomePage;
+export default HomePage

@@ -1,6 +1,6 @@
-import type { ResumeLayout, ResumeLayoutSpec, ResumeSkin } from "../resume-layout"
+import type { ResumeBulletStyle, ResumeLayout, ResumeLayoutSpec, ResumeSkin } from "../resume-layout"
+import type { ResumeMetrics } from "../resume-metrics"
 import { escapePdfString, toWinAnsi } from "./pdf-encode"
-import { fontSizes, leading, pageMargins, sectionGaps } from "./pdf-metrics-scale"
 import { textWidth, wrapText, type PdfFontName } from "./pdf-metrics"
 
 export type PdfRun = {
@@ -11,66 +11,95 @@ export type PdfRun = {
   gapBefore: number
   rule: boolean
   hang?: boolean
+  centre?: boolean
+  marker?: string
 }
 
 const a4Width = 595
 const a4Height = 842
 const lineGap = 3
+const pointsPerCm = 28.35
 
-const pageGeometry = (skin: ResumeSkin) => {
-  const margin = pageMargins[skin.metrics.margin]
+const bulletPrefix = (style: ResumeBulletStyle): string => {
+  if (style === "dot") return "• "
+  if (style === "dash") return "- "
+  return ""
+}
+
+const pageGeometry = (metrics: ResumeMetrics) => {
+  const margin = metrics.pageMargin * pointsPerCm
   return { margin, contentWidth: a4Width - margin * 2, top: a4Height - margin, bottom: margin }
 }
 
 const runsFor = (
   layout: ResumeLayout,
   spec: ResumeLayoutSpec,
-  skin: ResumeSkin,
+  metrics: ResumeMetrics,
 ): PdfRun[] => {
-  const base = fontSizes[skin.metrics.fontScale]
-  const gap = sectionGaps[skin.metrics.sectionGap]
-  const tight = skin.metrics.sectionGap === "tight"
+  const base = metrics.bodySize
+  const exToPoints = (ex: number) => ex * base * 0.45
   const runs: PdfRun[] = []
+  const centred = spec.headerAlign === "centred"
+  const entryInline = spec.entryStyle === "inline"
 
   for (const block of layout.blocks) {
     switch (block.kind) {
       case "name":
-        runs.push({ text: block.text, size: base * 2.1, font: "bold", indent: 0, gapBefore: 0, rule: false })
+        runs.push({
+          text: block.text,
+          size: metrics.nameSize,
+          font: "bold",
+          indent: 0,
+          gapBefore: 0,
+          rule: false,
+          centre: centred,
+        })
         break
       case "note":
-        runs.push({ text: block.text, size: base, font: "regular", indent: 0, gapBefore: 2, rule: false })
+        runs.push({
+          text: block.text,
+          size: base,
+          font: spec.headlineStyle === "bold" ? "bold" : "regular",
+          indent: 0,
+          gapBefore: 2,
+          rule: false,
+          centre: centred,
+        })
         break
       case "contact":
         runs.push({
-          text: block.items.join("  |  "),
+          text: block.items.join(spec.contactSeparator === "bar" ? "  |  " : "  \u00b7  "),
           size: base - 0.5,
           font: "regular",
           indent: 0,
           gapBefore: 4,
           rule: false,
+          centre: centred,
         })
         break
       case "heading":
         runs.push({
-          text: block.text,
-          size: base + 1.5,
+          text: spec.headingCaps ? block.text.toUpperCase() : block.text,
+          size: spec.headingCaps ? base + 1 : base + 1.5,
           font: "bold",
           indent: 0,
-          gapBefore: gap,
-          rule: block.rule || spec.id === "altacv" || spec.id === "awesome-cv",
+          gapBefore: exToPoints(metrics.sectionGap),
+          rule: block.style === "rule" && metrics.headingRule,
+          marker: block.style === "caret" ? "• " : undefined,
         })
         break
       case "entry": {
         const head = [block.title, block.organisation].filter(Boolean).join(", ")
+        const headText = entryInline && block.dates.length > 0 ? `${head}  |  ${block.dates}` : head
         runs.push({
-          text: head,
+          text: headText,
           size: base + 0.5,
           font: "bold",
           indent: 0,
-          gapBefore: tight ? 5 : 8,
+          gapBefore: exToPoints(metrics.entryGap) * 1.6,
           rule: false,
         })
-        if (block.dates.length > 0) {
+        if (!entryInline && block.dates.length > 0) {
           runs.push({
             text: block.dates,
             size: base - 0.5,
@@ -103,10 +132,10 @@ const runsFor = (
         }
         for (const bullet of block.bullets) {
           runs.push({
-            text: `- ${bullet}`,
+            text: `${bulletPrefix(metrics.bulletStyle)}${bullet}`,
             size: base,
             font: "regular",
-            indent: 10,
+            indent: metrics.bulletStyle === "none" ? 0 : 10,
             gapBefore: 1,
             rule: false,
           })
@@ -129,6 +158,17 @@ const runsFor = (
     }
   }
 
+  if (spec.headerRule) {
+    runs.push({
+      text: "",
+      size: 0.5,
+      font: "regular",
+      indent: 0,
+      gapBefore: exToPoints(metrics.sectionGap),
+      rule: true,
+    })
+  }
+
   return runs
 }
 
@@ -147,7 +187,7 @@ const place = (
   spec: ResumeLayoutSpec,
   skin: ResumeSkin,
 ): { pages: PlacedLine[][]; geometry: ReturnType<typeof pageGeometry> } => {
-  const geometry = pageGeometry(skin)
+  const geometry = pageGeometry(skin.metrics)
   const pages: PlacedLine[][] = []
   let current: PlacedLine[] = []
   let y = geometry.top
@@ -159,11 +199,13 @@ const place = (
     y = geometry.top
   }
 
-  for (const run of runsFor(layout, spec, skin)) {
+  for (const run of runsFor(layout, spec, skin.metrics)) {
+    const text = run.marker === undefined ? run.text : `${run.marker}${run.text}`
+
     if (run.hang === true && hang !== null) {
-      const width = textWidth(run.text, run.size, run.font)
+      const width = textWidth(text, run.size, run.font)
       current.push({
-        text: run.text,
+        text,
         size: run.size,
         font: run.font,
         x: geometry.margin + geometry.contentWidth - width,
@@ -175,7 +217,7 @@ const place = (
     }
 
     const available = geometry.contentWidth - run.indent
-    const lines = wrapText(run.text, run.size, run.font, available)
+    const lines = wrapText(text, run.size, run.font, available)
 
     y -= run.gapBefore
     hang = null
@@ -184,11 +226,15 @@ const place = (
       const advance = run.size * (index === 0 ? 1.34 : 1.22)
       if (y - advance < geometry.bottom) newPage()
       y -= advance
+      const width = textWidth(line, run.size, run.font)
       current.push({
         text: line,
         size: run.size,
         font: run.font,
-        x: geometry.margin + run.indent,
+        x:
+          run.centre === true
+            ? geometry.margin + (geometry.contentWidth - width) / 2
+            : geometry.margin + run.indent,
         y,
         rule: false,
         ruleWidth: geometry.contentWidth,

@@ -2,6 +2,7 @@ import type { TemplateProps } from "../types"
 import { cn } from "@presentation/core/design/cn"
 import { minimalStyles } from "./minimal.styles"
 
+import { PreviewAnchor } from "../shared/preview-anchor"
 const Minimal = ({ data, showAttribution }: TemplateProps) => (
   <article className={minimalStyles.root}>
     <header>
@@ -67,9 +68,9 @@ const Minimal = ({ data, showAttribution }: TemplateProps) => (
     {data.links.length > 0 ? (
       <div className={minimalStyles.linkStack}>
         {data.links.map((link) => (
-          <a className={cn(minimalStyles.link, minimalStyles.linkTop)} href={link.url} key={link.platform} rel="noreferrer" target="_blank">
+          <PreviewAnchor className={cn(minimalStyles.link, minimalStyles.linkTop)} href={link.url} key={link.platform} rel="noreferrer" target="_blank">
             {link.label ?? link.platform}
-          </a>
+          </PreviewAnchor>
         ))}
       </div>
     ) : null}

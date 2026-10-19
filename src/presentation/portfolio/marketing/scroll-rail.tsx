@@ -77,7 +77,7 @@ export const ScrollRail = () => {
       <div className={railStyles.track}>
         {steps.map((step, index) => (
           <div className={railStyles.step} data-rail-step key={step.title}>
-            <span className={railStyles.marker} data-flow={step.anchor}>
+            <span className={railStyles.marker}>
               <span className={index === 0 ? railStyles.markerCore : railStyles.markerRing} />
             </span>
 
@@ -98,7 +98,7 @@ export const ScrollRail = () => {
         ))}
 
         <div className={railStyles.end}>
-          <span className={railStyles.marker} data-flow="end">
+          <span className={railStyles.marker}>
             <span className={railStyles.markerCore} />
           </span>
           <p className={railStyles.endValue}>

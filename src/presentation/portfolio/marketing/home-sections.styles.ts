@@ -93,16 +93,15 @@ export const pricingStyles = {
 } as const
 
 export const faqStyles = {
-  layout: "grid grid-cols-1 gap-12 lg:grid-cols-12",
-  list: "flex flex-col gap-4 lg:col-span-5",
-  pane: "lg:col-span-6 lg:col-start-7",
-  heading: "text-small text-ink-45 font-medium",
-  question: "text-body text-ink-70 hover:text-ink flex items-center gap-3 transition-colors duration-micro",
-  questionOn: "text-ink",
-  questionActive: "text-body text-ink flex items-center gap-3",
-  dot: "bg-ink-15 size-2 shrink-0 rounded-full transition-colors duration-micro",
-  dotActive: "bg-blue size-2 shrink-0 rounded-full",
-  answer: "text-lead text-ink-70 lg:sticky lg:top-32",
+  layout:
+    "mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 px-5 md:px-8 lg:grid-cols-12 lg:gap-16",
+  list: "flex flex-col gap-5 lg:col-span-5",
+  pane: "flex flex-col gap-8 lg:col-span-6 lg:col-start-7",
+  heading: "text-micro text-ink-45 font-medium",
+  question: "text-body text-ink max-w-[34ch]",
+  answers: "flex flex-col gap-6",
+  answer: "text-small text-ink-70",
+  more: "text-small text-ink-70 inline-flex items-center gap-1.5 underline underline-offset-4 hover:text-ink",
 } as const
 
 export const ctaStyles = {

@@ -2,40 +2,27 @@
 
 import { useState } from "react"
 import { LuChevronDown, LuSlidersHorizontal } from "react-icons/lu"
+import {
+  resumeMetricRanges,
+  type ResumeMetrics,
+} from "@application/resume/resume-metrics"
 import { Button } from "@presentation/core/design/button"
-import { LayoutPicker } from "@presentation/resume/components/layout-picker"
-import { resumeLayoutSpecs } from "@application/resume/resume-registry"
-import type { FontScale, PageMargin, SectionGap } from "@application/resume/resume-layout"
 import { editorStyles } from "./resume-editor.styles"
 
-const fontScales: FontScale[] = ["small", "medium", "large"]
-const sectionGaps: SectionGap[] = ["tight", "normal", "roomy"]
-const margins: PageMargin[] = ["narrow", "normal", "wide"]
+const bulletOptions: ResumeMetrics["bulletStyle"][] = ["none", "dash", "dot"]
 
 const label = (value: string) => value[0]?.toUpperCase() + value.slice(1)
 
 type BuilderControlsProps = {
-  layoutId: string
-  onLayout: (id: string) => void
-  fontScale: FontScale
-  sectionGap: SectionGap
-  margin: PageMargin
-  onFontScale: (value: FontScale) => void
-  onSectionGap: (value: SectionGap) => void
-  onMargin: (value: PageMargin) => void
+  metrics: ResumeMetrics
+  onMetrics: (metrics: ResumeMetrics) => void
 }
 
-export const BuilderControls = ({
-  fontScale,
-  layoutId,
-  margin,
-  onFontScale,
-  onLayout,
-  onMargin,
-  onSectionGap,
-  sectionGap,
-}: BuilderControlsProps) => {
+export const BuilderControls = ({ metrics, onMetrics }: BuilderControlsProps) => {
   const [open, setOpen] = useState(false)
+
+  const set = (field: keyof ResumeMetrics, value: number | boolean | string) =>
+    onMetrics({ ...metrics, [field]: value })
 
   return (
     <div className={editorStyles.tuneWrap}>
@@ -46,24 +33,45 @@ export const BuilderControls = ({
         size="small"
       >
         <LuSlidersHorizontal size={15} strokeWidth={1.5} />
-        Layout and size
+        Size and spacing
         <LuChevronDown className={editorStyles.chevron} size={14} strokeWidth={1.5} />
       </Button>
 
       <div className={open ? editorStyles.tuneOpen : editorStyles.tune}>
-        <div className={editorStyles.tuneGroup}>
-          <span className={editorStyles.controlLabel}>Layout</span>
-          <LayoutPicker layoutId={layoutId} onSelect={onLayout} specs={resumeLayoutSpecs} />
+        <div className={editorStyles.tuneGrid}>
+          {resumeMetricRanges.map((range) => {
+            const current = metrics[range.field] as number
+            return (
+              <label className={editorStyles.tuneField} key={range.field}>
+                <span className={editorStyles.tuneLabel}>
+                  {range.label}
+                  <span className={editorStyles.tuneValue}>
+                    {Number(current.toFixed(2))} {range.unit}
+                  </span>
+                </span>
+                <input
+                  aria-label={range.label}
+                  className={editorStyles.tuneRange}
+                  max={range.max}
+                  min={range.min}
+                  onChange={(event) => set(range.field, Number(event.target.value))}
+                  step={range.step}
+                  type="range"
+                  value={current}
+                />
+              </label>
+            )
+          })}
         </div>
 
         <div className={editorStyles.tuneGroup}>
-          <span className={editorStyles.controlLabel}>Type size</span>
+          <span className={editorStyles.controlLabel}>Bullet mark</span>
           <div className={editorStyles.controlGroup}>
-            {fontScales.map((value) => (
+            {bulletOptions.map((value) => (
               <Button
-                intent={fontScale === value ? "primary" : "ghost"}
+                intent={metrics.bulletStyle === value ? "primary" : "ghost"}
                 key={value}
-                onClick={() => onFontScale(value)}
+                onClick={() => set("bulletStyle", value)}
                 size="small"
               >
                 {label(value)}
@@ -73,34 +81,15 @@ export const BuilderControls = ({
         </div>
 
         <div className={editorStyles.tuneGroup}>
-          <span className={editorStyles.controlLabel}>Section gap</span>
+          <span className={editorStyles.controlLabel}>Section rule</span>
           <div className={editorStyles.controlGroup}>
-            {sectionGaps.map((value) => (
-              <Button
-                intent={sectionGap === value ? "primary" : "ghost"}
-                key={value}
-                onClick={() => onSectionGap(value)}
-                size="small"
-              >
-                {label(value)}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <div className={editorStyles.tuneGroup}>
-          <span className={editorStyles.controlLabel}>Page margin</span>
-          <div className={editorStyles.controlGroup}>
-            {margins.map((value) => (
-              <Button
-                intent={margin === value ? "primary" : "ghost"}
-                key={value}
-                onClick={() => onMargin(value)}
-                size="small"
-              >
-                {label(value)}
-              </Button>
-            ))}
+            <Button
+              intent={metrics.headingRule ? "primary" : "ghost"}
+              onClick={() => set("headingRule", !metrics.headingRule)}
+              size="small"
+            >
+              {metrics.headingRule ? "On" : "Off"}
+            </Button>
           </div>
         </div>
       </div>

@@ -95,7 +95,11 @@ check("the generated PDF has a real text layer", extracted.includes('Naina Kumar
 check("the PDF text layer keeps the email intact", /nainakumari@example\.com/.test(extracted))
 check("the PDF text layer keeps dates intact", /May 2026 . Aug 2026/.test(extracted))
 check("the PDF text layer has no ligature damage", !/[ﬁﬂﬀﬃﬄ]/.test(extracted))
-check("the PDF text layer carries every heading", ['Internships', 'Projects', 'Education', 'Skills', 'Achievements'].every((h) => extracted.includes(h)))
+const lower = extracted.toLowerCase()
+check(
+  "the PDF text layer carries every heading",
+  ['Internships', 'Projects', 'Education', 'Skills', 'Achievements'].every((h) => lower.includes(h.toLowerCase())),
+)
 check("the PDF is one page of real text", rendered.pages === 1 && extracted.replace(/\s+/g, '').length > 600, `pages=${rendered.pages}`)
 
 const pdf = rendered.pdf
@@ -111,30 +115,67 @@ for (const spec of resumeLayoutSpecs) {
 }
 check("every one of the ten layouts emits a readable PDF", everyLayoutParses.every(Boolean), `${everyLayoutParses.filter(Boolean).length}/10`)
 
-const withMetrics = (metrics) => renderResume(resumePortfolio, defaultResumeLayout, { ...defaultResumeSkin, metrics })
+const withMetrics = (metrics) =>
+  renderResume(resumePortfolio, defaultResumeLayout, {
+    ...defaultResumeSkin,
+    metrics: { ...defaultResumeSkin.metrics, ...metrics },
+  })
 
 const xOffsetOf = (pdf) => {
   const text = new TextDecoder().decode(pdf)
-  const match = text.match(/1 0 0 1 ([\d.]+) [\d.]+ Tm/)
+  const xs = [...text.matchAll(/1 0 0 1 ([\d.]+) [\d.]+ Tm/g)].map((m) => Number.parseFloat(m[1]))
+  return xs.length === 0 ? -1 : Math.min(...xs)
+}
+
+const nameSizeOf = (pdf) => {
+  const text = new TextDecoder().decode(pdf)
+  const match = text.match(/\/F2 ([\d.]+) Tf/)
   return match ? Number.parseFloat(match[1]) : -1
 }
 
-const margins = ['narrow', 'normal', 'wide'].map((margin) => xOffsetOf(withMetrics({ fontScale: 'medium', sectionGap: 'normal', margin }).pdf))
-check("the margin control moves the text origin", margins[0] < margins[1] && margins[1] < margins[2], JSON.stringify(margins))
-
-const sizes = ['small', 'medium', 'large'].map((fontScale) => {
-  const text = new TextDecoder().decode(withMetrics({ fontScale, sectionGap: 'normal', margin: 'normal' }).pdf)
-  const match = text.match(/\/F2 ([\d.]+) Tf/)
-  return match ? Number.parseFloat(match[1]) : -1
-})
-check("the font control scales the type", sizes[0] < sizes[1] && sizes[1] < sizes[2], JSON.stringify(sizes))
-
-const gaps = ['tight', 'normal', 'roomy'].map((sectionGap) => {
-  const text = new TextDecoder().decode(withMetrics({ fontScale: 'medium', sectionGap, margin: 'normal' }).pdf)
+const secondHeadingY = (pdf) => {
+  const text = new TextDecoder().decode(pdf)
   const ys = [...text.matchAll(/1 0 0 1 [\d.]+ ([\d.]+) Tm/g)].map((m) => Number.parseFloat(m[1]))
   return ys[4] ?? -1
+}
+
+const margins = [0.8, 1.9, 3.2].map((pageMargin) => xOffsetOf(withMetrics({ pageMargin }).pdf))
+check("the page margin control moves the text origin", margins[0] < margins[1] && margins[1] < margins[2], JSON.stringify(margins))
+
+const sizes = [7, 10, 14].map((bodySize) =>
+  nameSizeOf(withMetrics({ bodySize, nameSize: bodySize * 2 }).pdf),
+)
+check("the body size control scales the type", sizes[0] < sizes[1] && sizes[1] < sizes[2], JSON.stringify(sizes))
+
+const entrySizes = [7, 10, 14].map((bodySize) => {
+  const text = new TextDecoder().decode(withMetrics({ bodySize }).pdf)
+  return text.includes(`/F2 ${(bodySize + 0.5).toFixed(2)} Tf`) ? bodySize : -1
 })
+check(
+  "the body size control reaches the entry titles",
+  entrySizes.every((value) => value > 0),
+  JSON.stringify(entrySizes),
+)
+
+const nameSizes = [12, 21, 40].map((nameSize) => nameSizeOf(withMetrics({ nameSize }).pdf))
+check("the name size control scales the name", nameSizes[0] < nameSizes[1] && nameSizes[1] < nameSizes[2], JSON.stringify(nameSizes))
+
+const gaps = [0, 2.6, 8].map((sectionGap) => secondHeadingY(withMetrics({ sectionGap }).pdf))
 check("the section gap control moves the second heading", gaps[0] > gaps[1] && gaps[1] > gaps[2], JSON.stringify(gaps))
+
+const rules = [true, false].map((headingRule) =>
+  new TextDecoder().decode(withMetrics({ headingRule }).pdf).split(" w\n").length,
+)
+check("the section rule toggle changes the bytes", rules[0] !== rules[1], JSON.stringify(rules))
+
+const bullets = ["none", "dash", "dot"].map((bulletStyle) =>
+  new TextDecoder().decode(withMetrics({ bulletStyle }).pdf).length,
+)
+check(
+  "the bullet mark control changes the bytes",
+  new Set(bullets).size === 3,
+  JSON.stringify(bullets),
+)
 
 const { extractText, getDocumentProxy } = await import('unpdf')
 const stillText = await extractText(await getDocumentProxy(new Uint8Array(rendered.pdf)), { mergePages: false })

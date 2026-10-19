@@ -1,5 +1,6 @@
 import type { Portfolio } from "@application/portfolio/portfolio.schema"
 import { LuArrowUpRight } from "react-icons/lu"
+import { usePreviewMode } from "@presentation/core/preview/preview-mode"
 import { atomsStyles } from "./atoms.styles"
 
 type AvatarProps = {
@@ -60,12 +61,30 @@ type ExternalLinkProps = {
   children: string
 }
 
-export const ExternalLink = ({ href, children }: ExternalLinkProps) => (
-  <a className={atomsStyles.externalLink} href={href} rel="noreferrer" target="_blank">
+const ExternalLinkBody = ({ children }: { children: string }) => (
+  <>
     <span>{children}</span>
     <LuArrowUpRight aria-hidden size={14} strokeWidth={1.5} />
-  </a>
+  </>
 )
+
+export const ExternalLink = ({ href, children }: ExternalLinkProps) => {
+  const preview = usePreviewMode()
+
+  if (preview) {
+    return (
+      <span className={atomsStyles.externalLink}>
+        <ExternalLinkBody>{children}</ExternalLinkBody>
+      </span>
+    )
+  }
+
+  return (
+    <a className={atomsStyles.externalLink} href={href} rel="noreferrer" target="_blank">
+      <ExternalLinkBody>{children}</ExternalLinkBody>
+    </a>
+  )
+}
 
 type AttributionProps = {
   visible: boolean
@@ -93,7 +112,7 @@ export const ContactLine = ({ portfolio }: IdentityLineProps) => {
 export const PlatformLinks = ({ portfolio }: IdentityLineProps) => {
   if (portfolio.links.length === 0) return null
   return (
-    <div className={atomsStyles.row}>
+    <div className={atomsStyles.linkStack}>
       {portfolio.links.map((link) => (
         <ExternalLink href={link.url} key={`${link.platform}-${link.url}`}>
           {link.label ?? link.platform}

@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { LuArrowDown } from "react-icons/lu"
 import type { TemplateProps } from "../types"
 import { cn } from "@presentation/core/design/cn"
+import { PreviewAnchor } from "../shared/preview-anchor"
 import { useScrollDepth } from "./scroll-depth"
 import { immersiveStyles } from "./immersive.styles"
 
@@ -58,9 +59,9 @@ const Immersive = ({ data, showAttribution }: TemplateProps) => {
         {data.links.length > 0 ? (
           <div className={immersiveStyles.actionRow}>
             {data.links.map((link) => (
-              <a className={immersiveStyles.link} href={link.url} key={link.platform} rel="noreferrer" target="_blank">
+              <PreviewAnchor className={immersiveStyles.link} href={link.url} key={link.platform} rel="noreferrer" target="_blank">
                 {link.label ?? link.platform}
-              </a>
+              </PreviewAnchor>
             ))}
           </div>
         ) : null}

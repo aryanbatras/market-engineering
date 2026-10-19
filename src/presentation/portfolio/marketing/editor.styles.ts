@@ -1,12 +1,20 @@
 export const editorStyles = {
   root: "grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8",
   split: "contents",
-  editorShell: "flex h-[520px] min-h-0 flex-col md:h-[640px]",
-  stage: "bg-ground h-[520px] overflow-hidden rounded-panel md:h-[640px]",
-  statusRow: "mt-3 flex items-center justify-between gap-3",
-  statusOk: "text-micro text-blue flex items-center gap-2 font-medium",
-  statusBad: "text-micro text-ink flex items-center gap-2 font-medium",
-  empty: "text-small text-ink-45 px-6 py-10",
+
+  editorShell: "flex h-[520px] min-h-0 flex-col overflow-hidden rounded-panel bg-ground-sunken md:h-[640px]",
+  editorFill: "min-h-0 flex-1",
+
+  stage: "bg-ground-sunken flex h-[520px] min-h-0 flex-col overflow-hidden rounded-panel md:h-[640px]",
+  stageFill: "min-h-0 flex-1 overflow-y-auto rounded-panel",
+
+  paneHead: "flex items-center justify-between gap-3 px-5 py-3.5",
+  paneLabel: "text-micro text-ink-45 font-medium",
+  paneNote: "text-micro text-ink-45",
+
+  statusOk: "text-micro text-ink flex items-center gap-1.5 font-medium",
+  statusBad: "text-micro text-ink font-medium",
+
   issueList: "mt-3 flex flex-col gap-2",
   issue: "bg-ground-sunken text-micro text-ink rounded-panel px-4 py-3",
   issueField: "text-blue font-medium",

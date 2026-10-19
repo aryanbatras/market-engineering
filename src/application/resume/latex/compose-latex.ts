@@ -1,52 +1,58 @@
-import type { ResumeLayout, ResumeLayoutSpec, ResumeSkin } from "../resume-layout"
+import type { ResumeBlock, ResumeLayout, ResumeLayoutSpec, ResumeSkin } from "../resume-layout"
 import { atsPreamble } from "./ats-preamble"
-import { emitBlock } from "./emit-block"
+import { emitLayout } from "./emit-block"
 import { resumeMacros } from "./resume-macros"
 
-const pageGeometry = (spec: ResumeLayoutSpec, skin: ResumeSkin): string => {
-  const margin = skin.density === "compact" ? "1.5cm" : "1.9cm"
-  const tight = spec.id === "compact" || spec.id === "rail"
-  const size = tight ? "\\fontsize{9.5}{11.2}\\selectfont" : "\\fontsize{10}{12.4}\\selectfont"
-  return [`\\usepackage[a4paper,margin=${margin}]{geometry}`, "\\setlength{\\emergencystretch}{3em}", size].join("\n")
+const pageGeometry = (skin: ResumeSkin): string => {
+  const margin = skin.metrics.pageMargin
+  const body = skin.metrics.bodySize
+  const lead = (body * 1.24).toFixed(2)
+  return [
+    `\\usepackage[a4paper,margin=${margin}cm]{geometry}`,
+    "\\setlength{\\emergencystretch}{3em}",
+    `\\fontsize{${body}}{${lead}}\\selectfont`,
+  ].join("\n")
 }
+
+const usesAccent = (spec: ResumeLayoutSpec): boolean =>
+  spec.headingStyle === "bar" || spec.nameStyle === "boxed" || spec.railTint
 
 const colourPackage = (spec: ResumeLayoutSpec, skin: ResumeSkin): string => {
-  if (spec.id !== "colour" && spec.id !== "atlas" && spec.id !== "campus") return ""
+  if (!usesAccent(spec)) return ""
   const hex = skin.accent === "blue" ? "0A66C2" : "0A0A0B"
-  return [`\\usepackage{xcolor}`, `\\definecolor{resumeaccent}{HTML}{${hex}}`].join("\n")
+  return ["\\usepackage{xcolor}", `\\definecolor{resumeaccent}{HTML}{${hex}}`].join("\n")
 }
 
-const sectionMacro = (spec: ResumeLayoutSpec): string =>
-  spec.id === "colour"
-    ? `\\renewcommand{\\rsection}[1]{\\vspace{2.6ex}\\colorbox{resumeaccent}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep\\relax}{\\color{white}\\bfseries #1}}}\\vspace{1.2ex}}`
-    : spec.id === "header"
-      ? `\\renewcommand{\\rname}[1]{\\vspace{1.4ex}{\\colorbox{resumeaccent}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep\\relax}{\\color{white}\\fontsize{20}{23}\\selectfont\\bfseries #1}}}\\par}`
-      : ""
-
-const documentClass = (spec: ResumeLayoutSpec): string =>
-  spec.id === "campus" ? "\\documentclass[11pt,a4paper]{article}" : "\\documentclass[10pt,a4paper]{article}"
+const headerLength = (blocks: ResumeBlock[]): number => {
+  const firstHeading = blocks.findIndex((block) => block.kind === "heading")
+  return firstHeading === -1 ? blocks.length : firstHeading
+}
 
 export const composeLatex = (
   layout: ResumeLayout,
   spec: ResumeLayoutSpec,
   skin: ResumeSkin,
 ): string => {
-  const body = layout.blocks
-    .map((block) => emitBlock(block))
-    .filter((line): line is string => line !== null)
-    .join("\n")
+  const head = headerLength(layout.blocks)
+  const header: ResumeLayout = { id: layout.id, blocks: layout.blocks.slice(0, head), railIndexes: [] }
+  const body: ResumeLayout = {
+    id: layout.id,
+    blocks: layout.blocks.slice(head),
+    railIndexes: layout.railIndexes.filter((index) => index >= head).map((index) => index - head),
+  }
 
   return [
-    documentClass(spec),
+    "\\documentclass[a4paper]{article}",
     atsPreamble,
-    pageGeometry(spec, skin),
+    pageGeometry(skin),
     colourPackage(spec, skin),
     resumeMacros,
-    sectionMacro(spec),
     "",
     "\\begin{document}",
     "\\rdocsetup",
-    body,
+    emitLayout(header, spec, skin.metrics),
+    spec.headerRule ? `\\rheadrule{${(skin.metrics.sectionGap / 2).toFixed(2)}}` : "",
+    emitLayout(body, spec, skin.metrics),
     "\\end{document}",
     "",
   ]

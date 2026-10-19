@@ -6,7 +6,7 @@ import { keymap } from "@codemirror/view"
 import { yaml as yamlLang } from "@codemirror/lang-yaml"
 import { EditorView as View } from "@codemirror/view"
 
-export const editorGround = "#0d1117"
+export const editorGround = "#3d4451"
 export const editorInk = "#e6edf3"
 
 const key = "#7ee787"

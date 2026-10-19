@@ -180,7 +180,7 @@ Steps 1 through 7 are done, and so is step 12. Steps 8 and 9 are in progress.
 
 **Step 11 is partially done.** The spec, the schema extension, the LaTeX compiler, the ATS check, the editor and the layout gallery all ship and pass every gate. The PDF engine ships too — `direct-pdf-compiler.ts` writes the PDF bytes from the same layout descriptor as the `.tex` and the preview, so the download is the document and not a placeholder. Every page is still verified through `unpdf` before it is offered.
 
-**The two editors now share one shape.** Both open at the same place, use the same field guide, the same YAML editor, the same header, and the same "make it the other one" button. The resume adds a second view and a tune panel on top of that. Anything that appears in one editor and not the other is a bug in the one that has it.
+**The two editors now share one shape.** Both open at the same place, use the same field guide, the same YAML editor, the same header, and the same "make it the other one" button. The resume adds a second view, a continuous size panel and a layout dropdown on top of that. Anything that appears in one editor and not the other is a bug in the one that has it.
 
 ---
 
@@ -245,11 +245,17 @@ A font-size selector that resizes the preview but leaves the PDF identical is wo
 
 ---
 
-## R21 — Three controls, not twelve
+## R21 — The resume is a document, and a document is continuous
 
-A student picking a resume wants one decision. Someone who wants typography control has a `.tex` file and Overleaf, and that round-trip is supported and documented.
+The resume is not a template with three presets. A resume is a typeset page, and the things that change a page — the type size, the space between sections, the space between entries, the page margin, whether a heading carries a rule, what a bullet looks like — are **numbers**, not choices.
 
-Portfolio templates cap their config at three. Resume layouts do the same. Adding a fourth is a founder decision, not a product decision, and the argument for it has to beat "download the `.tex`", which is free and already there.
+So the resume editor exposes them as continuous sliders, not as `small / medium / large`. Every one of them writes straight into the generated `.tex` and the generated PDF, exactly as if the user had typed the value into the LaTeX themselves. Nothing about the layout or the structure of the document is affected by any of them; they are page metrics, and that boundary is what keeps them safe.
+
+**This replaced an earlier rule that capped the resume at three controls.** That cap was wrong, and the reason it was wrong is worth keeping: it treated the document as a picture of a document. Someone who has a specific page in their head — a recruiter who has seen one page fit it — cannot reach it through three presets, so they download the `.tex` and fight LaTeX on Overleaf. A slider is twenty seconds. The presets were not simplicity, they were a wall.
+
+**The portfolio keeps its cap.** Three controls — accent, density, dark. A portfolio is a screen, not a page, and a screen is a composition somebody already designed. R22 is the adjacent rule on what a thing is called.
+
+**The boundary, exactly:** a metric may change size, spacing, a rule, or a mark. A metric may not change the layout's composition, the order of sections, which sections appear, or the column count. That is the difference between tuning a document and designing a template, and the second one is what the layout picker is for.
 
 ---
 
@@ -263,6 +269,8 @@ The corollary, and it binds harder: **we do not invent a category the user did n
 
 **Every layout name is the upstream project's name, spelled the way that project spells it.** When we add a layout, we ship the name people already type into a search box.
 
+**And a layout is a set of traits, never a name.** Every visual difference between two layouts comes from typed fields on the spec — `nameStyle`, `headerAlign`, `headlineStyle`, `contactSeparator`, `headingCaps`, `headingStyle`, `entryStyle`, `bulletStyle`, `headerRule`, `railTint`, `railWidth` — and from nothing else. A renderer that branches on a layout's id is a bug with a timer on it: rename the layout, the branch silently goes dead, every layout renders identically, and nothing fails. It happened. **Every difference between two layouts has to survive a rename.**
+
 ---
 
 ## R23 — One account surface
@@ -272,3 +280,15 @@ The signed-in name in the nav is the **only** route into the account. It goes to
 There is no `/settings` route, and no "Dashboard" button sitting next to it. Two surfaces that show the same account facts are two places to forget to update, and the second one is always the one nobody looks at.
 
 Account actions are for signed-in users only. Before sign-in there is one action — start building — and it is not a different action depending on state.
+
+---
+
+## R24 — A link is never nested inside a link
+
+No `<a>` inside an `<a>`, and no `<Link>` inside a `<Link>`. It is invalid HTML, React reports it as a hydration mismatch, and the result is a browser guessing which element a click belongs to.
+
+**A card is a link only when the card is a link.** Where the card's contents carry their own links — a live template preview with a nav rail and three social buttons — the card's target is a click handler on a non-interactive element, and the contents are inert. A render of a template inside a gallery or a picker runs in preview mode, where every internal anchor becomes a `<span>`.
+
+A `<button>` inside a `<Link>` is the ordinary way to style a link as a button and is not what this rule is about. That is one control wearing two costumes, not two controls. What is banned is two controls: a link inside a link, where the inner one is unreachable and the outer one is unclickable where it appears to be.
+
+**This is not only an HTML rule.** It is the rule that nobody clicks something that looks clickable and does nothing. Nested anchors produce exactly that, in the DOM and in the mind.

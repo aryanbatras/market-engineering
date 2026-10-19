@@ -9,8 +9,6 @@ type RevealProps = {
   as?: ElementType
   delay?: number
   distance?: number
-  "data-flow"?: string
-  "data-flow-trunk"?: string
 }
 
 export const Reveal = ({
@@ -49,7 +47,6 @@ export const Reveal = ({
 
   return (
     <Tag
-      {...anchors}
       className={className}
       ref={ref}
       style={

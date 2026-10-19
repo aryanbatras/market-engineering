@@ -2,6 +2,7 @@ import { cn } from "@presentation/core/design/cn"
 import type { TemplateProps } from "../types"
 import { editorialStyles } from "./editorial.styles"
 
+import { PreviewAnchor } from "../shared/preview-anchor"
 const sections = [
   { id: "work", label: "Work" },
   { id: "projects", label: "Projects" },
@@ -18,13 +19,13 @@ const Editorial = ({ data, showAttribution }: TemplateProps) => (
       </div>
       <nav className={editorialStyles.railNav}>
         {sections.map((section, index) => (
-          <a
+          <PreviewAnchor
             className={cn(editorialStyles.railLink, index === 0 && editorialStyles.railActive)}
             href={`#${section.id}`}
             key={section.id}
           >
             {section.label}
-          </a>
+          </PreviewAnchor>
         ))}
       </nav>
       {data.identity.location ? <p className={editorialStyles.railHeadline}>{data.identity.location}</p> : null}
@@ -37,7 +38,7 @@ const Editorial = ({ data, showAttribution }: TemplateProps) => (
         {data.links.length > 0 ? (
           <div className={editorialStyles.linkRow}>
             {data.links.map((link) => (
-              <a
+              <PreviewAnchor
                 className={editorialStyles.link}
                 href={link.url}
                 key={link.platform}
@@ -45,7 +46,7 @@ const Editorial = ({ data, showAttribution }: TemplateProps) => (
                 target="_blank"
               >
                 {link.label ?? link.platform}
-              </a>
+              </PreviewAnchor>
             ))}
           </div>
         ) : null}

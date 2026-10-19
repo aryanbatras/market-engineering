@@ -9,24 +9,22 @@ import { editorStyles } from "./resume-editor.styles"
 type BuilderToggleProps = {
   view: "stacked" | "compact"
   onView: (view: "stacked" | "compact") => void
-  schemaOpen: boolean
-  onToggleSchema: () => void
 }
 
 const views = [
   {
     id: "stacked",
     label: "Full sections",
-    note: "Structure, YAML, LaTeX and the page, one after another",
+    note: "YAML and the page first, then the field guide and the LaTeX",
   },
   {
     id: "compact",
     label: "One screen",
-    note: "All four side by side, so you see everything at once",
+    note: "Only the YAML and the page. Hover Structure or LaTeX to open them.",
   },
 ] as const
 
-export const BuilderToggle = ({ view, onView, schemaOpen, onToggleSchema }: BuilderToggleProps) => {
+export const BuilderToggle = ({ view, onView }: BuilderToggleProps) => {
   const [open, setOpen] = useState(false)
 
   return (
@@ -58,19 +56,6 @@ export const BuilderToggle = ({ view, onView, schemaOpen, onToggleSchema }: Buil
               <span className={editorStyles.popNote}>{entry.note}</span>
             </button>
           ))}
-          <button
-            className={cn(editorStyles.popItem, schemaOpen && editorStyles.popItemOn)}
-            onClick={() => {
-              onToggleSchema()
-              setOpen(false)
-            }}
-            type="button"
-          >
-            <span>Field guide</span>
-            <span className={editorStyles.popNote}>
-              {schemaOpen ? "Hide" : "Show"} the list of every field
-            </span>
-          </button>
         </div>
       ) : null}
     </div>

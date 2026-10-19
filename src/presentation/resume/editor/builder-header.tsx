@@ -6,33 +6,35 @@ import { LuDownload } from "react-icons/lu"
 import { Button } from "@presentation/core/design/button"
 import { Wordmark } from "@presentation/core/brand/wordmark"
 import { CopyPrompts } from "@presentation/core/source/copy-prompts"
+import { LayoutPicker } from "@presentation/resume/components/layout-picker"
+import { resumeLayoutSpecs } from "@application/resume/resume-registry"
 import { BuilderToggle } from "./builder-toggle"
 import { editorStyles } from "./resume-editor.styles"
 
 type BuilderHeaderProps = {
-  canExport: boolean
   busy: boolean
+  canExport: boolean
   controls: ReactNode
+  layoutId: string
   onDownloadPdf: () => void
   onDownloadTex: () => void
+  onLayout: (id: string) => void
   onSignIn: () => void
-  schemaOpen: boolean
+  onView: (view: "stacked" | "compact") => void
   signedIn: boolean
   view: "stacked" | "compact"
-  onToggleSchema: () => void
-  onView: (view: "stacked" | "compact") => void
 }
 
 export const BuilderHeader = ({
   busy,
   canExport,
   controls,
+  layoutId,
   onDownloadPdf,
   onDownloadTex,
+  onLayout,
   onSignIn,
-  onToggleSchema,
   onView,
-  schemaOpen,
   signedIn,
   view,
 }: BuilderHeaderProps) => (
@@ -40,27 +42,12 @@ export const BuilderHeader = ({
     <div className={editorStyles.barInner}>
       <div className={editorStyles.barLeft}>
         <Wordmark />
-        <span className={editorStyles.crumb}>Resume</span>
         {controls}
-      </div>
-
-      <div className={editorStyles.barCentre}>
-        <BuilderToggle
-          onToggleSchema={onToggleSchema}
-          onView={onView}
-          schemaOpen={schemaOpen}
-          view={view}
-        />
+        <LayoutPicker layoutId={layoutId} onSelect={onLayout} specs={resumeLayoutSpecs} />
       </div>
 
       <div className={editorStyles.actionRow}>
         <CopyPrompts align="right" />
-
-        <Link href="/resume/templates">
-          <Button intent="ghost" size="small">
-            Layouts
-          </Button>
-        </Link>
 
         <Link href="/builder">
           <Button intent="ghost" size="small">
@@ -87,6 +74,8 @@ export const BuilderHeader = ({
             Sign in
           </Button>
         )}
+
+        <BuilderToggle onView={onView} view={view} />
       </div>
     </div>
   </div>

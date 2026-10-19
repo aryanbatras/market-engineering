@@ -21,7 +21,7 @@ export const ResumeBandSection = () => (
         </Link>
       </div>
 
-      <div className={resumeBandStyles.sheetWrap} data-flow="resume">
+      <div className={resumeBandStyles.sheetWrap}>
         <DocumentSheet layout={rendered.layout} skin={defaultResumeSkin} spec={rendered.spec} />
       </div>
     </div>

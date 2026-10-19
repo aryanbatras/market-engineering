@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { LuCheck, LuChevronDown } from "react-icons/lu"
+import { useState } from "react"
 import { promptOptions } from "@application/core/source/prompt-options"
 import { Button } from "@presentation/core/design/button"
-import { cn } from "@presentation/core/design/cn"
+import { Dialog } from "@presentation/core/design/dialog"
+import { Toast } from "@presentation/core/design/toast"
 import { copyPromptStyles } from "./copy-prompts.styles"
 
 type CopyPromptsProps = {
@@ -14,70 +14,43 @@ type CopyPromptsProps = {
 export const CopyPrompts = ({ align = "left" }: CopyPromptsProps) => {
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
-  const wrap = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    if (!open) return
-    const dismiss = (event: MouseEvent) => {
-      if (!wrap.current?.contains(event.target as Node)) setOpen(false)
-    }
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false)
-    }
-    document.addEventListener("mousedown", dismiss)
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.removeEventListener("mousedown", dismiss)
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [open])
 
   const copy = async (id: string, prompt: string) => {
     await navigator.clipboard.writeText(prompt)
     setOpen(false)
     setCopied(id)
-    window.setTimeout(() => setCopied(null), 2200)
+    window.setTimeout(() => setCopied(null), 2600)
   }
 
   return (
-    <div className={copyPromptStyles.wrap} ref={wrap}>
-      <Button
-        aria-expanded={open}
-        intent="ghost"
-        onClick={() => setOpen((value) => !value)}
-        size="small"
-      >
+    <>
+      <Button intent="ghost" onClick={() => setOpen(true)} size="small">
         Copy for LLMs
-        <LuChevronDown className={copyPromptStyles.chevron} size={14} strokeWidth={1.5} />
       </Button>
 
-      {open ? (
-        <div
-          className={cn(
-            align === "right" ? copyPromptStyles.panelWide : copyPromptStyles.panel,
-          )}
-          role="group"
-        >
-          {promptOptions.map((option) => (
-            <button
-              className={copyPromptStyles.item}
-              key={option.id}
-              onClick={() => void copy(option.id, option.prompt)}
-              type="button"
-            >
-              <span className={copyPromptStyles.itemLabel}>{option.label}</span>
-              <span className={copyPromptStyles.itemNote}>{option.note}</span>
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <Dialog
+        align={align}
+        lead="Paste one into ChatGPT, Gemini, or whatever you already pay for. Nothing runs on our side, and your resume never leaves your browser."
+        onClose={() => setOpen(false)}
+        open={open}
+        title="Copy a prompt"
+      >
+        {promptOptions.map((option) => (
+          <button
+            className={copyPromptStyles.item}
+            key={option.id}
+            onClick={() => void copy(option.id, option.prompt)}
+            type="button"
+          >
+            <span className={copyPromptStyles.itemLabel}>{option.label}</span>
+            <span className={copyPromptStyles.itemNote}>{option.note}</span>
+          </button>
+        ))}
+      </Dialog>
 
-      {copied ? (
-        <p className={copyPromptStyles.done} role="status">
-          <LuCheck className={copyPromptStyles.doneMark} size={14} strokeWidth={2} />
-          Prompt copied. Paste it into any AI you already use.
-        </p>
-      ) : null}
-    </div>
+      <Toast
+        message={copied ? "Prompt copied. Paste it into any AI you already use." : null}
+      />
+    </>
   )
 }

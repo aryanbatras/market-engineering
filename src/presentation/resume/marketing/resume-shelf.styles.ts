@@ -5,15 +5,15 @@ export const resumeShelfStyles = {
   title: "text-title text-ink",
   lead: "text-body max-w-[44ch] text-ink-70",
 
-  rail: "mt-14 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4",
-  item: "flex w-[326px] shrink-0 snap-start flex-col gap-4",
+  grid: "mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3",
 
-  frame: "relative h-[430px] overflow-hidden rounded-panel bg-ground-sunken",
-  canvas: "w-[794px] origin-top-left [zoom:0.41]",
+  item: "bg-ground-sunken rounded-panel p-5 transition-colors duration-micro ease-out hover:bg-blue-wash",
+  frame: "relative mt-5 h-[400px] overflow-hidden rounded-panel",
+  canvas: "w-[794px] origin-top-left [zoom:0.39]",
 
-  foot: "flex items-baseline justify-between gap-4",
+  foot: "mt-5 flex items-baseline justify-between gap-4",
   name: "text-small text-ink font-medium",
-  note: "text-micro text-ink-45",
+  note: "text-micro text-ink-70",
 
   all: "text-small text-ink-70 inline-flex shrink-0 items-center gap-1.5 underline underline-offset-4 hover:text-ink",
 } as const

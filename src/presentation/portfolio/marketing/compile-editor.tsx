@@ -36,35 +36,42 @@ export const CompileEditor = ({ initialText }: CompileEditorProps) => {
   const settled = useDebounced(draft, DEBOUNCE_MS)
 
   const result = useMemo(() => parsePortfolioText(settled), [settled])
-  const pending = draft !== settled
   const issues = result.ok ? 0 : result.issues.length
 
   return (
     <div className={editorStyles.root}>
       <div className={editorStyles.split}>
-        <div className={editorStyles.editorShell} data-flow="parser">
-          <SourceEditor editable editorRef={editorRef} onChange={setDraft} value={draft} />
-          <div className={editorStyles.statusRow}>
+        <div className={editorStyles.editorShell}>
+          <div className={editorStyles.paneHead}>
+            <span className={editorStyles.paneLabel}>YAML</span>
             {result.ok ? (
-              <p className={editorStyles.statusOk}>
+              <span className={editorStyles.statusOk}>
                 <LuCheck aria-hidden size={14} strokeWidth={2} />
                 Valid
-              </p>
+              </span>
             ) : (
-              <p className={editorStyles.statusBad}>
+              <span className={editorStyles.statusBad}>
                 {issues} thing{issues === 1 ? "" : "s"} to fix
-              </p>
+              </span>
             )}
+          </div>
+          <div className={editorStyles.editorFill}>
+            <SourceEditor editable editorRef={editorRef} onChange={setDraft} value={draft} />
           </div>
         </div>
 
-        <div className={editorStyles.stage} data-flow="render">
+        <div className={editorStyles.stage}>
+          <div className={editorStyles.paneHead}>
+            <span className={editorStyles.paneLabel}>Rendered page</span>
+            <span className={editorStyles.paneNote}>Live</span>
+          </div>
           {result.ok ? (
-            <PortfolioPreview data={result.data} />
+            <div className={editorStyles.stageFill}>
+              <PortfolioPreview data={result.data} />
+            </div>
           ) : (
-            <p className={editorStyles.empty}>
-              {issues} thing{issues === 1 ? "" : "s"} to fix. The page appears the moment the file
-              parses.
+            <p className={previewStyles.empty}>
+              The page appears the moment the file parses.
             </p>
           )}
         </div>

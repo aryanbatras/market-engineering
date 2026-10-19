@@ -7,6 +7,7 @@ import { registry } from "@presentation/portfolio/templates/registry"
 import type { TemplateMeta, TemplateModule } from "@presentation/portfolio/templates/types"
 import { previewPortfolio } from "@application/portfolio/preview-portfolio"
 import { cn } from "@presentation/core/design/cn"
+import { PreviewModeProvider } from "@presentation/core/preview/preview-mode"
 import { templateCardStyles } from "./template-card.styles"
 
 const previewConfig = { accent: "blue", density: "comfortable", dark: false } as const
@@ -40,7 +41,9 @@ export const LiveTemplatePreview = ({ meta, fill = false }: LivePreviewProps) =>
       {Component ? (
         <div className={templateCardStyles.stage}>
           <div className={cn(templateCardStyles.canvas, meta.dark && templateCardStyles.canvasDark)}>
-            <Component config={previewConfig} data={previewPortfolio} showAttribution={false} />
+            <PreviewModeProvider value={true}>
+              <Component config={previewConfig} data={previewPortfolio} showAttribution={false} />
+            </PreviewModeProvider>
           </div>
         </div>
       ) : (

@@ -4,6 +4,7 @@ export const atomsStyles = {
   avatarInitials: "text-title text-ink-70 flex size-full items-center justify-center",
   stack: "flex flex-col",
   row: "flex flex-wrap items-center gap-3",
+  linkStack: "flex flex-col items-start gap-2",
   eyebrow: "text-micro text-ink-45 font-medium",
   heading: "text-title text-ink",
   subheading: "text-lead text-ink",

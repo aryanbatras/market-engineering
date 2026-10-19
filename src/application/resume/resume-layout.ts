@@ -1,5 +1,13 @@
 import type { ResumeSectionKind } from "./resume.schema"
 
+export type ResumeHeadingStyle = "plain" | "rule" | "bar" | "caret"
+
+export type ResumeNameStyle = "left" | "centred" | "boxed"
+
+export type ResumeEntryStyle = "split" | "inline"
+
+export type ResumeBulletStyle = "none" | "dash" | "dot"
+
 export type ResumeNameBlock = {
   kind: "name"
   text: string
@@ -13,7 +21,7 @@ export type ResumeContactBlock = {
 export type ResumeHeadingBlock = {
   kind: "heading"
   text: string
-  rule: boolean
+  style: ResumeHeadingStyle
 }
 
 export type ResumeEntryBlock = {
@@ -24,6 +32,7 @@ export type ResumeEntryBlock = {
   meta: string
   summary: string
   bullets: string[]
+  style: ResumeEntryStyle
 }
 
 export type ResumeSkillsBlock = {
@@ -50,6 +59,12 @@ export type ResumeLayout = {
   railIndexes: number[]
 }
 
+export type ResumeHeaderAlign = "left" | "centred"
+
+export type ResumeHeadlineStyle = "italic" | "bold"
+
+export type ResumeContactSeparator = "dot" | "bar"
+
 export type ResumeLayoutSpec = {
   id: string
   name: string
@@ -60,35 +75,33 @@ export type ResumeLayoutSpec = {
   dialect: "pdftex" | "luatex"
   order: ResumeSectionKind[]
   rail: ResumeSectionKind[]
-  ruledHeadings: boolean
   summaryBlock: boolean
+  headlineFirst: boolean
   experienceTitle: string
   educationTitle: string
   projectsTitle: string
   skillsTitle: string
   highlightsTitle: string
-  headlineFirst: boolean
+  nameStyle: ResumeNameStyle
+  headerAlign: ResumeHeaderAlign
+  headlineStyle: ResumeHeadlineStyle
+  contactSeparator: ResumeContactSeparator
+  headingCaps: boolean
+  headingStyle: ResumeHeadingStyle
+  headerRule: boolean
+  entryStyle: ResumeEntryStyle
+  bulletStyle: ResumeBulletStyle
+  railTint: boolean
+  railWidth: number
 }
 
 export type ResumeDensity = "compact" | "comfortable"
 
 export type ResumeAccent = "blue" | "ink"
 
-export type FontScale = "small" | "medium" | "large"
-
-export type SectionGap = "tight" | "normal" | "roomy"
-
-export type PageMargin = "narrow" | "normal" | "wide"
-
-export type ResumeMetrics = {
-  fontScale: FontScale
-  sectionGap: SectionGap
-  margin: PageMargin
-}
-
 export type ResumeSkin = {
   accent: ResumeAccent
   density: ResumeDensity
   dark: boolean
-  metrics: ResumeMetrics
+  metrics: import("./resume-metrics").ResumeMetrics
 }

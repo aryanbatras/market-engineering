@@ -193,4 +193,4 @@ If the founder ever wants browser LaTeX specifically, `texlyre-busytex` is the o
 
 All three walk `ResumeLayout`. A block cannot be dropped or reordered in one and not the others, so the preview and the download are the same document by construction.
 
-**The three controls live in `ResumeMetrics`**, which all three renderers read. The PDF emitter uses Helvetica's real AFM widths for wrapping and right-alignment, so "Narrow" actually produces a narrower line of text rather than the same line with more white space.
+**The page metrics live in `ResumeMetrics`**, which all three renderers read. They are continuous numbers, not presets, and every one of them is a parameter to a macro rather than a constant baked into it — `\rnameleft[<gap>]{<size>}{<text>}`, `\rsectionrule[<gap>]{<text>}` — so the generated `.tex` reads like something the user typed. The PDF emitter uses Helvetica's real AFM widths for wrapping and right-alignment, so a narrow margin actually produces a narrower line of text rather than the same line with more white space.

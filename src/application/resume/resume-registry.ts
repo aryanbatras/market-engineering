@@ -11,6 +11,7 @@ import {
   rover,
   simpleResume,
 } from "./resume-layouts"
+import { defaultResumeMetrics } from "./resume-metrics"
 
 export const resumeLayoutSpecs: ResumeLayoutSpec[] = [
   jakesResume,
@@ -36,5 +37,5 @@ export const defaultResumeSkin = {
   accent: "blue",
   density: "comfortable",
   dark: false,
-  metrics: { fontScale: "medium", sectionGap: "normal", margin: "normal" },
+  metrics: defaultResumeMetrics,
 } as const

@@ -270,6 +270,56 @@ const layers = [
   },
 ]
 
+const anchorTags = new Set(["a", "Link"])
+
+const opensAnchor = (node) => node.type === "JSXElement" && anchorTags.has(node.openingElement.name.name)
+
+const containsAnchor = (node) => {
+  let found = false
+
+  const walk = (child) => {
+    if (found || child === null || typeof child !== "object") return
+    if (Array.isArray(child)) {
+      for (const inner of child) walk(inner)
+      return
+    }
+    if (child.type === "JSXElement" && child !== node && opensAnchor(child)) {
+      found = true
+      return
+    }
+    if (Array.isArray(child.children)) walk(child.children)
+  }
+
+  walk(node.children)
+  return found
+}
+
+const nestingRule = () => ({
+  meta: {
+    type: "problem",
+    docs: { description: "R24: a link inside a link" },
+    schema: [],
+    messages: {
+      nested:
+        "R24: a link may not contain another link. Render the contents inert in preview mode instead.",
+    },
+  },
+  create(context) {
+    let depth = 0
+
+    return {
+      JSXElement(node) {
+        if (!opensAnchor(node)) return
+        if (depth === 0 && containsAnchor(node)) context.report({ node, messageId: "nested" })
+        depth += 1
+      },
+      "JSXElement:exit"(node) {
+        if (opensAnchor(node)) depth -= 1
+      },
+    }
+  },
+})
+
 const config = [
   { ignores: [".next/**", "node_modules/**", ".taste-skill/**", "next-env.d.ts"] },
   js.configs.recommended,
@@ -280,11 +330,12 @@ const config = [
   documentEdge,
   {
     plugins: {
-      market: { rules: { "market-rules": ruleSet() } },
+      market: { rules: { "market-rules": ruleSet(), "no-nested-interactive": nestingRule() } },
     },
     files: ["src/**/*.{ts,tsx}"],
     rules: {
       "market/market-rules": "error",
+      "market/no-nested-interactive": "error",
       "no-console": ["error", { allow: ["warn", "error"] }],
       "no-debugger": "error",
       "no-eval": "error",

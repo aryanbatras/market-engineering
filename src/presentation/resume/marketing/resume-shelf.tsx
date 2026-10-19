@@ -8,13 +8,17 @@ import { resumeShelfStyles } from "./resume-shelf.styles"
 
 const sample = sampleDocument()
 
-const shown = resumeLayoutSpecs.slice(0, 6)
-
-const renderings = shown.map((spec) => ({
-  id: spec.id,
+const cards = resumeLayoutSpecs.map((spec) => ({
   spec,
   layout: renderResume(sample, spec, defaultResumeSkin).layout,
 }))
+
+const noteOf = (columns: number, heading: string): string => {
+  if (columns === 2) return "Two columns"
+  if (heading === "rule") return "Ruled sections"
+  if (heading === "bar") return "Filled headings"
+  return "One column"
+}
 
 export const ResumeTemplateShelf = () => (
   <div className={resumeShelfStyles.root}>
@@ -27,23 +31,23 @@ export const ResumeTemplateShelf = () => (
         </p>
       </div>
       <Link className={resumeShelfStyles.all} href="/resume/templates">
-        All ten resume templates
+        Open the gallery
         <LuArrowRight size={15} strokeWidth={1.5} />
       </Link>
     </div>
 
-    <div className={resumeShelfStyles.rail}>
-      {renderings.map((entry) => (
-        <Link className={resumeShelfStyles.item} href={`/resume?layout=${entry.id}`} key={entry.id}>
+    <div className={resumeShelfStyles.grid}>
+      {cards.map((card) => (
+        <Link className={resumeShelfStyles.item} href={`/resume?layout=${card.spec.id}`} key={card.spec.id}>
           <div className={resumeShelfStyles.frame}>
             <div className={resumeShelfStyles.canvas}>
-              <DocumentSheet layout={entry.layout} skin={defaultResumeSkin} spec={entry.spec} />
+              <DocumentSheet layout={card.layout} skin={defaultResumeSkin} spec={card.spec} />
             </div>
           </div>
           <div className={resumeShelfStyles.foot}>
-            <span className={resumeShelfStyles.name}>{entry.spec.name}</span>
+            <span className={resumeShelfStyles.name}>{card.spec.name}</span>
             <span className={resumeShelfStyles.note}>
-              {entry.spec.columns === 2 ? "Two columns" : "One column"}
+              {noteOf(card.spec.columns, card.spec.headingStyle)}
             </span>
           </div>
         </Link>
